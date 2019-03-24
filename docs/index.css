@@ -13,7 +13,7 @@ code{ font-family: 'Roboto Mono', monospace;}
 
 .banner {
   padding: 60px 16px;
-  background: steelblue;
+  background: #b44646;
   color: #fff;
   text-align: center;
   font-family: 'Varela Round', sans-serif;
@@ -76,7 +76,7 @@ code{ font-family: 'Roboto Mono', monospace;}
 
 .examples,
 .qstart {
-  background-color: lightsteelblue;
+  background-color: #deb0b0;
 }
 .footer{
   background-color: #444;

@@ -14,7 +14,8 @@ module.exports = {
     externals: {
       'esprima': 'esprima',
       'commander':'commander',
-      'native-promise-only':'native-promise-only'
+      'native-promise-only':'native-promise-only',
+      'yargs':'yargs',
     },
     optimization: {
       splitChunks: {
@@ -23,10 +24,14 @@ module.exports = {
     },
     
     devtool: 'cheap-module-source-map',
+    output: {
+      path: path.join(__dirname, "dist"),
+      filename: 'rapipdf-min.js'
+    },
     devServer: {
-        contentBase: './dist',
-        port: 8080,
-        hot: true
+      contentBase: path.join(__dirname, 'docs'),
+      port: 8080,
+      hot: true
     },
     module: {
         rules: [
@@ -61,10 +66,6 @@ module.exports = {
           "@": path.resolve(__dirname, 'src')
         }
     },
-    output: {
-        filename: 'rapidoc-min.js',
-        chunkFilename: '[name].bundle.js',
-    },
     plugins: [
         new webpack.HotModuleReplacementPlugin(),
         new webpack.optimize.LimitChunkCountPlugin({
@@ -79,7 +80,6 @@ module.exports = {
           onEnd : {
             copy: [
               {source: 'dist/*.js', destination: 'docs' },
-              {source: 'dist/*.woff2', destination: 'docs' }
             ]
           }
         })

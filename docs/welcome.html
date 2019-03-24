@@ -1,7 +1,6 @@
 <!doctype html>
 
 <head>
-
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes">
   <meta name="description" content="RapiDoc is Web Component based Swagger & OpenAPI Spec Viewer. Alternate for SwaggerUI or Redoc. It is fast, small and made with lit-element">
@@ -20,34 +19,33 @@
 
   <link rel="stylesheet" href="index.css">
 
-  <title>RapiDoc - Web Component based Swagger & OpenAPI Spec Viewer</title>
+  <title>RapiPDF - Web Component based Swagger & OpenAPI PDF Generator</title>
 </head>
 
 <body>
   <div class="banner container" id="banner">
     <div class="header">
       <img class="logo" src="./images/logo.png" style="width:48px;height:48px;margin-right:10px;" />
-      <div class="product-name">&lt;rapi-doc&gt;</div>
+      <div class="product-name">&lt;rapi-pdf&gt;</div>
       <div class="menu" style="flex:1"></div>
       <nav class="menu" onclick="goToSection(event)">
         <a class="menu-item" href="#features"> Features </a>
         <a class="menu-item" href="#qstart"> Quick Start </a>
-        <a class="menu-item" href="#examples"> Examples </a>
         <a class="menu-item" href="#api"> API </a>
         <a class="menu-item" data-action="git" href="https://github.com/mrin9/RapiDoc"> GitHub </a>
       </nav>
     </div>
     <div>
       <div class="banner-content">
-        <h1 class="banner-title">Web Component for OpenAPI Spec Viewing</h1>
+        <h1 class="banner-title">Web Component to generate PDF from OpenAPI Spec</h1>
         <div class="banner-content-inner">
-          <p style="font-size:18px">Create beautiful, customizable, interactive API documentation from your OpenAPI Specification</p>
+          <p style="font-size:18px">Create beautiful, customizable API documentation in PDF format from your OpenAPI Specification</p>
         </div>
       </div>
     </div>
     <div style="display:flex; justify-content: center;">
       <div style="display:block">
-        <img class="screenshot shadow3" src="./images/dark_ss.png" />
+        <img class="screenshot shadow3" src="./images/pdf_sample1.png" />
       </div>
     </div>
   </div>
@@ -69,8 +67,8 @@
       <div class="feature-info">
         <div class="feature-title"> Easy Usage</div>
         <div class="feature-descr"> 
-          Use It just like any other HTML Tag, Change its attribute using JavaScript and see
-          it react to those changes. Basic knowledge of HTML is all that's required 
+          Use It just like any other HTML Tag, use its various attributes to customize the generation of your PDF. 
+          Basic knowledge of HTML is all that's required 
         </div>
       </div>
     </div>
@@ -78,20 +76,10 @@
     <div class="feature">
       <object type="image/svg+xml" data="./images/mask.svg" style="width:64px; height:64px;"> </object>
       <div class="feature-info">
-        <div class="feature-title"> Fully Customizable</div>
+        <div class="feature-title">Customizable</div>
         <div class="feature-descr"> 
-          Style it to your heart's content. Change font, logo, colors and theme. 
-          Inject external HTML or embed into another HTML document.
-        </div>
-      </div>
-    </div>
-    <div class="feature">
-      <object type="image/svg+xml" data="./images/fast.svg" style="width:64px; height:64px;"> </object>
-      <div class="feature-info">
-        <div class="feature-title"> Small And Fast</div>
-        <div class="feature-descr"> 
-          Minimal dependencies, no runtime and no virtual DOM ensures lowest memory consumption, 
-          Just native and raw speed of modern browser.
+          Change font colors to match your brand colors. 
+          Pick and choose the sections from the API Spec that you want to include in the PDF.
         </div>
       </div>
     </div>
@@ -103,33 +91,10 @@
         <div class="feature-descr"> 
           Loved by tech writers, designers, dev-ops, testers and developers alike, 
           due to its simplicity, interoperability and powerful features.
-          No special build-steps, runtime or framework required
         </div>
       </div>
     </div>
 
-    <div class="feature">
-      <object type="image/svg+xml" data="./images/console.svg" style="width:64px; height:64px;"> </object>
-      <div class="feature-info">
-        <div class="feature-title"> Integrated Console</div>
-        <div class="feature-descr"> 
-          Comes with built in console to Try out the APIs. Supports authentication mechanism. 
-          No validation ensures, you can test negative cases.
-        </div>
-      </div>
-    </div>
-
-    <div class="feature">
-      <object type="image/svg+xml" data="./images/mouse.svg" style="width:64px; height:64px;"> </object>
-      <div class="feature-info">
-        <div class="feature-title"> Better Usability</div>
-        <div class="feature-descr"> 
-            Browse the spec with minimal clicks. All models & examples are expanded by default, eliminates the need to click and reveal.
-            Requests and Responses are pre-populated with sample data.
-        </div>
-      </div>
-    </div>
-  
   </div>
 
   <div id="qstart" class="qstart container">
@@ -340,116 +305,6 @@
       </div>  
     </div>
   <!-- End of API -->
-
-<!-- Start of Examples -->
-  <div class="examples container" id="examples">
-    <div style="display:flex; flex-direction: column;">
-      <h2> Examples & Demos</h2> 
-
-<b> Basic Example  ( <a href="./example1.html">DEMO</a> ) </b>
-<pre class="shadow code-block"><code class="html" style="border-radius:4px">
-  &lt;rapi-doc 
-    spec-url="https://api.apis.guru/v2/specs/bitbucket.org/2.0/swagger.json" 
-  &gt; 
-  &lt;/rapi-doc&gt;
-</code></pre>
-<br/>
-
-<b> Dark Theme ( <a href="./example2.html">DEMO</a> ) </b> 
-<pre class="shadow code-block" ><code class="html" style="border-radius:4px">
-  &lt;rapi-doc 
-    spec-url="https://api.apis.guru/v2/specs/bitbucket.org/2.0/swagger.json"
-    theme="dark"
-  &gt; 
-  &lt;/rapi-doc&gt;
-</code></pre>
-<br/>
-
-<b> Change Header Color with Dark Theme ( <a href="./example3.html">DEMO</a> ) </b> 
-<pre class="shadow code-block" ><code class="html" style="border-radius:4px">
-  &lt;rapi-doc 
-    spec-url="https://api.apis.guru/v2/specs/bitbucket.org/2.0/swagger.json"
-    header-color="#2d87e2"
-    theme="dark"
-  &gt; 
-  &lt;/rapi-doc&gt;
-</code></pre>
-<br/>
-
-
-<b>Integrate with other HTML document - No &lt;iframe&gt; ( <a href="./example4.html">DEMO</a> ) </b>
-<pre class="shadow code-block"><code class="html" style="border-radius:4px">
-  &lt;rapi-doc 
-    spec-url="https://api.apis.guru/v2/specs/bitbucket.org/2.0/swagger.json"
-    theme='dark' 
-    show-header='false'
-    show-info='false'
-    allow-authentication='false'
-    theme='dark' 
-    layout="column"
-  &gt; 
-  &lt;/rapi-doc&gt;
-</code></pre>
-<br/>
-  
-<b>Change Font ( <a href="./example5.html">DEMO</a> ) </b>
-<pre class="shadow code-block" ><code class="html" style="border-radius:4px">
-  &lt;head&gt;
-    &lt;link href="https://fonts.googleapis.com/css?family=Varela+Round" 
-     rel="stylesheet" &gt;
-  &lt;/head&gt;
-
-  &lt;body&gt;
-    &lt;rapi-doc 
-      spec-url="https://api.apis.guru/v2/specs/bitbucket.org/2.0/swagger.json"
-      regular-font="'Varela Round', 'Arial Rounded MT Bold' "
-    &gt; 
-    &lt;/rapi-doc&gt;
-  &lt;/body&gt;
-</code></pre>
-<br/>
-
-<b>Change Logo ( <a href="./example6.html">DEMO</a> ) </b>
-<pre class="shadow code-block"><code class="html" style="border-radius:4px">
-  &lt;rapi-doc spec-url="https://api.apis.guru/v2/specs/bitbucket.org/2.0/swagger.json"&gt;
-    &lt;img 
-      slot="logo" 
-      src="https://img.icons8.com/color/48/000000/youtube-play.png"
-    /&gt; 
-  &lt;/rapi-doc&gt;
-
-</code></pre>
-<br/>
-
-
-<b>Add HTML content inside the spec ( <a href="./example7.html">DEMO</a> ) </b>
-<pre class="shadow code-block" ><code class="html" style="border-radius:4px">
-  &lt;rapi-doc spec-url="https://api.apis.guru/v2/specs/bitbucket.org/2.0/swagger.json"&gt;
-
-    &lt;!-- content at the top --&gt;
-    &lt;p>This is an example to add external html content &lt;/li&gt;
-    &lt;p>Ypu may add &lt;/li&gt;
-    &lt;ul&gt;
-      &lt;li&gt; Table &lt;/li&gt;
-      &lt;li&gt; Text &lt;/li&gt;
-      &lt;li&gt; Images &lt;/li&gt;
-      &lt;li&gt; Links &lt;/li&gt;
-      &lt;li&gt; any HTML content &lt;/li&gt;
-    &lt;/ul&gt;  
-
-    &lt;!-- content at the bottom --&gt;
-    &lt;p slot="footer"&gt; This content will apear at the bottom &lt;/p&gt;
-
-  &lt;/rapi-doc&gt;
-</code></pre>
-<br/>
-
-<div style="font-size:20px"> Playground - change attributes using JavaScript &nbsp; <a href="./example100.html">DEMO</a> </div>
-
-    </div>  
-  </div> 
-<!-- End of Examples -->
-
 
   <div id="footer" class="footer container">
     <div class="footer-item"> MIT Licence</div>

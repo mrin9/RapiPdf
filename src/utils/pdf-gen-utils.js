@@ -46,7 +46,7 @@ export function getInfoDef(spec, bookTitle){
     content = [
       {text: bookTitle ? bookTitle:'API Reference', style:['h2', 'primary','right', 'b', 'topMargin1']},
       (spec.info.title ? {text:spec.info.title, style:['title', 'right']} : ''),
-      (spec.info.version ? {text:`API Version: ${spec.info.version}`, style:['p','b', 'right', 'blue']} : ''),
+      (spec.info.version ? {text:`API Version: ${spec.info.version}`, style:['p','b', 'right', 'alternate']} : ''),
       specInfDescrMarkDef,
       ...contactDef,
       {text:'', pageBreak:'after'}
@@ -55,7 +55,7 @@ export function getInfoDef(spec, bookTitle){
   }
   else{
     content = [
-      {text:bookTitle?bookTitle:'API Reference', style:['h3', 'primary','right', 'topMargin1']}
+      {text:bookTitle?bookTitle:'API Reference', style:['h1', 'bold', 'primary','right', 'topMargin1']}
     ];
   }
   return content;
@@ -65,7 +65,7 @@ export function getInfoDef(spec, bookTitle){
 export function getSecurityDef(spec, tableLayout){
   let content =[]
   if (spec.securitySchemes){
-    content.push( {text:'Security and Authentication', style:['h3', 'b', 'primary','right', 'topMargin3'], pageBreak:'before'} );
+    content.push( {text:'Security and Authentication', style:['h3', 'b', 'primary','right', 'topMargin3']} );
     content.push({text:'SECURITY SCHEMES', style:['b','tableMargin']});
     let tableContent = [
       [ {text: 'TYPE', style: ['small','b']}, {text: 'DESCRIPTION', style: ['small','b']} ]
@@ -154,7 +154,7 @@ export function getApiDef(spec, filterPath, sectionHeading, tableLayout){
       const headerParamTableDef   = getParameterTableDef(headerParams, 'header',tableLayout);
       const cookieParamTableDef   = getParameterTableDef(cookieParams, 'cookie',tableLayout);
 
-      operationContent.push({ text: 'REQUEST', style:['p', 'b', 'blue'], margin:[0, 10, 0, 0]});
+      operationContent.push({ text: 'REQUEST', style:['p', 'b', 'alternate'], margin:[0, 10, 0, 0]});
       if (pathParamTableDef || queryParamTableDef || headerParamTableDef || cookieParamTableDef || requestBodyTableDefs){
         if (pathParamTableDef){
           requestSetDef.push(pathParamTableDef);
@@ -186,7 +186,7 @@ export function getApiDef(spec, filterPath, sectionHeading, tableLayout){
 
 
       let respDef = getResponseDef(path.responses, tableLayout)
-      operationContent.push({ text: 'RESPONSE', style:['p', 'b', 'blue'], margin:[0, 10, 0, 0]});
+      operationContent.push({ text: 'RESPONSE', style:['p', 'b', 'alternate'], margin:[0, 10, 0, 0]});
       operationContent.push({
         stack:respDef,
         margin:[10, 5, 0, 5]
@@ -283,9 +283,9 @@ function getParameterTableDef(parameters, paramType, tableLayout){
   }
   let tableContent = [
     [ 
-      {text: 'NAME', style: ['sub','b','blue']}, 
-      {text: 'TYPE', style: ['sub','b','blue']},
-      {text: 'DESCRIPTION', style: ['sub','b','blue']}
+      {text: 'NAME', style: ['sub','b','alternate']}, 
+      {text: 'TYPE', style: ['sub','b','alternate']},
+      {text: 'DESCRIPTION', style: ['sub','b','alternate']}
     ]
   ];
   

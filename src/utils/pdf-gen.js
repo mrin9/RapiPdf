@@ -4,7 +4,7 @@ import pdfFonts from "@/utils/vfs_fonts";
 import ProcessSpec from '@/utils/parse-utils';
 import { getInfoDef, getSecurityDef, getApiDef, getApiListDef, getMarkDownDef } from '@/utils/pdf-gen-utils';
 
-export default async function createPdf(specUrl, footerText, primaryColor){
+export default async function createPdf(specUrl, options){
 
   let parsedSpec = await ProcessSpec(specUrl);
 
@@ -29,7 +29,8 @@ export default async function createPdf(specUrl, footerText, primaryColor){
     tableMargin:{ margin: [0, 5, 0, 15]},
     b:{bold: true},
     i:{italics: true},
-    primary:{color: (primaryColor ? primaryColor:'#ff791a')},
+    primary:{color: (options.pdfPrimaryColor ? options.pdfPrimaryColor:'#b44646')},
+    alternate:{color: (options.pdfAlternateColor ? options.pdfAlternateColor:'#005b96')},
     gray:{color: 'gray'},
     red:{color:  'orangered'},
     blue:{color: '#005b96'},
@@ -59,35 +60,47 @@ export default async function createPdf(specUrl, footerText, primaryColor){
       return (i === 0 || i === node.table.body.length) ? 'black' : 'lightgray';
     },
   }
+  let allContent=[], infoDef={}, tocDef={}, securityDef={}, apiListDef={}, apiDef={};
 
-  let infoDef = getInfoDef(parsedSpec, 'API Reference');
-  let securityDef = getSecurityDef(parsedSpec, rowLinesTableLayout);
-  let apiListDef =getApiListDef(parsedSpec, "API List", rowLinesTableLayout);
-  let apiDef = getApiDef(parsedSpec, '', 'API', rowLinesTableLayout, rowLinesOnlyTableLayout);
+  if (options.includeInfo){
+    infoDef = getInfoDef(parsedSpec, options.pdfTitle);
+    allContent.push(infoDef);
+  }
+  if (options.includeToc){
+    tocDef = {
+      toc: {
+        title: {text: 'INDEX', style:['b', 'h2']},
+        numberStyle: {bold: true},
+        style:['small'],
+      },
+      pageBreak:'after'
+    }
+    allContent.push(tocDef);
+  }
+  if (options.includeSecurity){
+    securityDef = getSecurityDef(parsedSpec, rowLinesTableLayout);
+    allContent.push(securityDef);
+  }
+  if (options.includeApiDetails){
+    apiDef = getApiDef(parsedSpec, '', 'API', rowLinesTableLayout, rowLinesOnlyTableLayout);
+    allContent.push(apiDef);
+  }
+  if (options.includeApiList){
+    apiListDef =getApiListDef(parsedSpec, "API List", rowLinesTableLayout);
+    allContent.push(apiListDef);
+  }
 
-  let docDef = {
+  let finalDocDef = {
     footer: function(currentPage, pageCount) { 
       return { 
         margin:10,
         columns:[
-          {text:`© ${parsedSpec.info.title}`, style:["sub", "gray","left"]},
+          {text:options.pdfFooterText, style:["sub", "gray","left"]},
           {text:`${currentPage} of ${pageCount}`, style:["sub", "gray","right"]}
         ]
       };
     },
-    content:[
-      ...infoDef,
-      {
-        toc: {
-          title: {text: 'INDEX', style:['b', 'h2']},
-          numberStyle: {bold: true},
-          style:['small'],
-        }
-      },
-      ...securityDef,
-      ...apiDef,
-      ...apiListDef,
-    ],
+    content:allContent,
     styles:pdfStyles
   }
 
@@ -107,5 +120,5 @@ export default async function createPdf(specUrl, footerText, primaryColor){
   };
   //pdfMake.vfs = pdfFonts.pdfMake.vfs;
   pdfMake.vfs = pdfFonts;
-  pdfMake.createPdf(docDef).open();
+  pdfMake.createPdf(finalDocDef).open();
 }

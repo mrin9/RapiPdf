@@ -18,7 +18,23 @@
     https://assets.zuora.com/zuora-documentation/swagger.yaml <<< Large spec with lot of markdown
   -->
 
-  <rapi-pdf spec-url="https://api.apis.guru/v2/specs/bitbucket.org/2.0/swagger.json"> TEST PDF </rapi-pdf>
+  <rapi-pdf id='rapipdf' 
+  style="width:700px; height:60px;"
+  spec-url="https://api.apis.guru/v2/specs/bitbucket.org/2.0/swagger.json" 
+  pdf-title="New API Reference"
+  > 
+    GENERATE PDF 
+  </rapi-pdf>
+  <button onclick="changeSpec()">Change Spec</button>
+  <script type="text/javascript">
+    function changeSpec(){
+      let el = document.getElementById("rapipdf");
+      //el.specUrl = 'abcd'
+      el.setAttribute('spec-url', 'set new attrib');
+    } 
+  </script>  
+
+
 </body>
 
 </html>
