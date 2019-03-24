@@ -1,9 +1,10 @@
 import JsonRefs from 'json-refs';
 import converter from 'swagger2openapi';
 
-export default async function ProcessSpec(specUrl){
+export default async function ProcessSpec(specUrl) {
   let jsonParsedSpec, convertedSpec, resolvedRefSpec;
   let convertOptions = { patch:true, warnOnly:true };
+  let resolveOptions = { resolveCirculars: false }
   let refParserOptions = {
     resolve: {
       http: { 
@@ -13,7 +14,7 @@ export default async function ProcessSpec(specUrl){
   };
   try {
     convertedSpec = await converter.convertUrl(specUrl, convertOptions);
-    resolvedRefSpec = await JsonRefs.resolveRefs(convertedSpec.openapi, {resolveCirculars: true});
+    resolvedRefSpec = await JsonRefs.resolveRefs(convertedSpec.openapi, resolveOptions);
     jsonParsedSpec = resolvedRefSpec.resolved;
   }
   catch(err){
@@ -71,7 +72,6 @@ export default async function ProcessSpec(specUrl){
           }
           tags.push(tagObj);
         }
-
         //Generate Path summary and Description if it is missing for a method
         let summary = fullPath.summary?fullPath.summary:"";
         let description = fullPath.description?fullPath.description:"";
@@ -150,6 +150,7 @@ export default async function ProcessSpec(specUrl){
     })
   }
   servers = openApiSpec.servers;
+  tags.sort((a, b) =>  (a.name < b.name ? -1 : (a.name > b.name ? 1: 0)) );
   let parsedSpec = {
     "info"    : openApiSpec.info,
     "tags"    : tags,

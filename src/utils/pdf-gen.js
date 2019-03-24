@@ -1,24 +1,22 @@
 import pdfMake from "pdfmake/build/pdfmake";
 //import pdfFonts from "pdfmake/build/vfs_fonts";
-import marked from 'marked';
 import pdfFonts from "@/utils/vfs_fonts";
 import ProcessSpec from '@/utils/parse-utils';
-import { getInfoDef, getSecurityDef, getApiDef, getApiListDef } from '@/utils/pdf-gen-utils';
+import { getInfoDef, getSecurityDef, getApiDef, getApiListDef, getMarkDownDef } from '@/utils/pdf-gen-utils';
 
 export default async function createPdf(specUrl, footerText, primaryColor){
 
   let parsedSpec = await ProcessSpec(specUrl);
-  console.log(parsedSpec);
 
   let pdfStyles={
     title:{fontSize:32},
-    h1:{ fontSize:24 },
-    h2:{ fontSize:22 },
-    h3:{ fontSize:20 },
-    h4:{ fontSize:18 },
-    h5:{ fontSize:16 },
-    h6:{ fontSize:14 },
-    p:{fontSize:12},
+    h1:{ fontSize:22 },
+    h2:{ fontSize:20 },
+    h3:{ fontSize:18 },
+    h4:{ fontSize:16 },
+    h5:{ fontSize:14 },
+    h6:{ fontSize:12, bold:true },
+    p:{fontSize:12 },
     small:{fontSize:10},
     sub:{fontSize:8},
     right: {alignment: 'right'},
@@ -27,6 +25,7 @@ export default async function createPdf(specUrl, footerText, primaryColor){
     topMargin2: { margin:[0, 60, 0, 5]},
     topMargin3: { margin:[0, 20, 0, 3]},
     topMargin4: { margin:[0, 15, 0, 3]},
+    topMarginRegular: { margin:[0, 3, 0, 0]},
     tableMargin:{ margin: [0, 5, 0, 15]},
     b:{bold: true},
     i:{italics: true},

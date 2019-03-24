@@ -16,7 +16,7 @@ let rowLinesOnlyTableLayout= {
 	paddingBottom: function(i, node) { return 0; },
 };
 
-function getTypeInfo(schema, overrideAttributes=null){
+export function getTypeInfo(schema, overrideAttributes=null){
   if (!schema){
     return;
   }
@@ -129,7 +129,7 @@ function getTypeInfo(schema, overrideAttributes=null){
 }
 
 /* For changing JSON-Schema to a Object Model that can be represnted in a tree-view */ 
-function schemaToModel (schema, obj) {
+export function schemaToModel (schema, obj) {
   if (schema==null){
     return;
   }
@@ -176,7 +176,7 @@ function schemaToModel (schema, obj) {
   return obj;
 }
 
-function schemaToPdf (schema, obj=[], name) {
+export function schemaToPdf (schema, obj=[], name) {
   if (schema==null){ return; }
   if (schema.type === "object" || schema.properties) {
     // Create a blank row for pdfMake to have the total count of columns
@@ -295,12 +295,12 @@ function schemaToPdf (schema, obj=[], name) {
   return obj;
 }
 
-function getBaseUrlFromUrl(url){
+export function getBaseUrlFromUrl(url){
     let pathArray = url.split( '/' );
     return pathArray[0] + "//" + pathArray[2];
 }
 
-function removeCircularReferences(level=0) {
+export function removeCircularReferences(level=0) {
   const seen = new WeakSet();
   return (key, value) => {
     if (typeof value === "object" && value !== null) {
@@ -322,6 +322,3 @@ function removeCircularReferences(level=0) {
     return value;
   };
 };
-
-
-export {schemaToModel, schemaToPdf, generateExample, getTypeInfo, getBaseUrlFromUrl, removeCircularReferences }

@@ -1,3 +1,4 @@
+import marked from 'marked';
 import { getTypeInfo, schemaToModel, schemaToPdf, removeCircularReferences} from '@/utils/common-utils';
 
 //Info Def
@@ -29,11 +30,24 @@ export function getInfoDef(spec, bookTitle){
         ]}
       ]
     }
+
+    let specInfDescrMarkDef;
+    if (spec.info.description){
+      let tokens = marked.lexer(spec.info.description);
+      specInfDescrMarkDef = {
+        stack: getMarkDownDef(tokens),
+        style: ['topMargin3']
+      }
+    }
+    else{
+      specInfDescrMarkDef='';
+    }
+
     content = [
       {text: bookTitle ? bookTitle:'API Reference', style:['h2', 'primary','right', 'b', 'topMargin1']},
       (spec.info.title ? {text:spec.info.title, style:['title', 'right']} : ''),
       (spec.info.version ? {text:`API Version: ${spec.info.version}`, style:['p','b', 'right', 'blue']} : ''),
-      (spec.info.description ? {text:`${spec.info.description}`, style:['p', 'topMargin3']} : ''),
+      specInfDescrMarkDef,
       ...contactDef,
       {text:'', pageBreak:'after'}
     ];
@@ -81,8 +95,8 @@ export function getApiDef(spec, filterPath, sectionHeading, tableLayout){
   let content =[{text: sectionHeading, style:['h2','b'],pageBreak:'before'}];
   let tagSeq=0;
 
-  // Sort by Tag name
-  spec.tags.sort((a, b) =>  (a.name < b.name ? -1 : (a.name > b.name ? 1: 0)) );
+  // Sort by Tag name (allready sorted)
+  // spec.tags.sort((a, b) =>  (a.name < b.name ? -1 : (a.name > b.name ? 1: 0)) );
 
   spec.tags.map(function(tag, i){
     let operationContent=[];
@@ -105,9 +119,28 @@ export function getApiDef(spec, filterPath, sectionHeading, tableLayout){
       });
 
       if (path.description || path.summary){
-        operationContent.push(
-          { text: path.description?path.description:path.summary? path.summary:'', style:['small'], margin:[0,5,0,5]}
-        )
+
+        let pathDescrMarkDef, tokens;
+        if (path.description) {
+          tokens = marked.lexer(path.description);
+          pathDescrMarkDef = {
+            stack: getMarkDownDef(tokens),
+            style:['topMarginRegular'],
+          }
+        }
+        else {
+          if (path.summary){
+            tokens = marked.lexer(path.summary);
+            pathDescrMarkDef = {
+              stack: getMarkDownDef(tokens),
+              style:['topMarginRegular'],
+            }
+          }
+          pathDescrMarkDef='';
+        }
+        if (pathDescrMarkDef){
+          operationContent.push(pathDescrMarkDef);
+        }
       }
       let requestSetDef = [];
       const pathParams   = path.parameters ? path.parameters.filter(param => param.in === 'path'):null;
@@ -163,6 +196,19 @@ export function getApiDef(spec, filterPath, sectionHeading, tableLayout){
     
     if (pathSeq > 0){
       tagSeq = tagSeq + 1;
+      let tagDescrMarkDef, tokens;
+      if (tag.description) {
+        tokens = marked.lexer(tag.description);
+        tagDescrMarkDef = {
+          stack: getMarkDownDef(tokens),
+          style:['topMarginRegular'],
+        }
+      }
+      else{
+        tagDescrMarkDef={text:''}
+      }
+
+      //tag.description = tag.description.replace(/ /g, '\u200B ');
       content.push(
         { 
           text: `${tagSeq}. ${tag.name.toUpperCase()}`, 
@@ -172,7 +218,7 @@ export function getApiDef(spec, filterPath, sectionHeading, tableLayout){
           tocStyle: ['small', 'b'],
           tocMargin: [0, 10, 0, 0],
         },
-        { text: tag.description, style:['p']},
+        tagDescrMarkDef,
         operationContent
       );
     }
@@ -350,12 +396,13 @@ function getResponseDef(responses, tableLayout){
 }
 
 //API List Def
-export function getApiListDef(spec, sectionHeading, tableLayout){
+export function getApiListDef(spec, sectionHeading, tableLayout) {
   let content =[{text: sectionHeading, style:['h3','b'],pageBreak:'before'}];
   spec.tags.map(function(tag, i){
     let tableContent = [
       [ {text: 'METHOD', style: ['small','b']}, {text: 'API', style: ['small','b']}]
     ];
+
     tag.paths.map(function(path){
       tableContent.push([
         { text:path.method, style:['small','mono','right'] },
@@ -387,4 +434,151 @@ export function getApiListDef(spec, sectionHeading, tableLayout){
   });
 
   return content;
+}
+
+export function getMarkDownDef(tokens){
+  let content = [];
+  let uList={ ul:[], style:['topMarginRegular'] };
+  let oList={ ol:[], style:['topMarginRegular'] };
+  let listInsert='';
+  
+  tokens.forEach(function(v){
+    if (v.type==='paragraph'){
+      let textArr = getInlineMarkDownDef(v.text);
+      content.push({
+        text:textArr,
+        style:['topMarginRegular']
+      });
+    }
+    else if (v.type==='heading'){
+      let headingStyle = [];
+      if (v.depth===6){
+        headingStyle=['small','b','topMarginRegular'];
+      }
+      else if (v.depth===5){
+        headingStyle=['p','b','topMarginRegular'];
+      }
+      else{
+        headingStyle.push(`h${v.depth+2}`);
+        headingStyle.push('topMarginRegular');
+      }
+
+      content.push({
+        text:v.text,
+        style:headingStyle
+      });
+    }
+    else if (v.type==='space'){
+      let headingStyle = []
+      headingStyle.push(`h${v.depth}`);
+      content.push({
+        text:'\u200B ',
+        style:['small','topMarginRegular'],
+      });
+    }
+    else if (v.type==='code'){
+      let newText = v.text.replace(/ /g, '\u200B ');
+      content.push({
+        text:newText,
+        style:['small', 'mono', 'gray','topMarginRegular'],
+      });
+    }
+    else if (v.type==='list_start'){
+      listInsert= v.ordered?'ol':'ul';
+      if (v.ordered){
+        listInsert='ol'
+        oList.start =  v.start;
+      }
+      else{
+        listInsert= 'ul';
+      }
+    }
+    else if (v.type==='list_item_start' || v.type==='list_item_end'){
+      
+    }
+    else if (v.type==='text'){
+      let textArr = getInlineMarkDownDef(v.text);
+      if (listInsert==='ul'){
+        uList.ul.push({
+          text:textArr
+        });
+      }
+      else if (listInsert==='ol'){
+        oList.ol.push({
+          text:textArr
+        });
+      }
+    }
+    else if (v.type==='list_end'){
+      // Clone the appropriate list and add it to the main content 
+      if (listInsert==='ul'){
+        content.push(
+          Object.assign({}, uList)
+        );
+      }
+      else if (listInsert==='ol'){
+        content.push(
+          Object.assign({}, oList)
+        );
+      }
+      // reset temp list elements 
+      uList={ ul:[], style:['topMarginRegular'] };
+      oList={ ol:[], style:['topMarginRegular'] };
+      listInsert='';
+    }
+  });
+  return content;
+
+}
+
+export function getInlineMarkDownDef(txt){
+  var final=[];
+  if (!txt){
+    return [];
+  }
+  let boldItalicDelimiter = new RegExp("\\*{3}|\\_{3}");
+  let boldDelimiter = new RegExp("\\*{2}|\\_{2}");
+  let codeDelimiter = new RegExp("`");
+  if (!txt.split){
+    console.log(txt);
+  }
+  let bi_parts = txt.split(boldItalicDelimiter);
+  bi_parts.forEach(function(bi_val,i){
+    if (i%2 === 0){
+      if (bi_val){
+        let b_parts = bi_val.split(boldDelimiter);
+        b_parts.forEach(function(b_val,j){
+          if (j%2 === 0){
+            if (b_val){
+              let c_parts = b_val.split(codeDelimiter);
+              c_parts.forEach(function(c_val,k){
+                if (k%2 === 0){
+                  if (c_val){
+                    final.push({ text:c_val,style:['small']});
+                  }
+                }
+                else{
+                  if (c_val.trim){
+                    final.push({ text:c_val,style:['small','mono', 'gray']});
+                  }
+                }
+              });
+
+            }
+          }
+          else{
+            if (b_val){
+              final.push({text:b_val,style:['small','bold']});
+            }
+          }
+        });
+      }
+    }
+    else{
+      if(bi_val){
+        final.push({ text:bi_val, style:['small','bold', 'italics']});
+      }
+    }
+  });
+  return final;
 }
