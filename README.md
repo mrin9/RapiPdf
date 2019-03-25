@@ -1,13 +1,10 @@
-<img alt="MrinDoc logo" src="https://github.com/mrin9/RapiDoc/blob/master/logo.png" width="60px" />
+<img alt="MrinDoc logo" src="https://github.com/mrin9/RapiPdf/blob/master/logo.png" width="60px" />
 
 
 <p align="center">
     <img src="https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square"/>
-    <img src="https://img.shields.io/github/size/mrin9/rapidoc/dist/rapidoc-min.js.svg?colorB=blue&label=minified&style=flat-square">
-    <img src="https://img.shields.io/github/size/mrin9/rapidoc/dist/rapidoc-min.js.gz.svg?colorB=blue&label=zip&style=flat-square">
-    <a href="https://www.webcomponents.org/element/rapidoc" alt="published on webcomponents.org">
-        <img src="https://img.shields.io/badge/webcomponents.org-rapidoc-blue.svg?style=social"/>
-    </a>
+    <img src="https://img.shields.io/github/size/mrin9/rapipdf/dist/rapipdf-min.js.svg?colorB=blue&label=minified&style=flat-square">
+    <img src="https://img.shields.io/github/size/mrin9/rapipdf/dist/rapipdf-min.js.gz.svg?colorB=blue&label=zip&style=flat-square">
 </p>        
 
 # RapiPDF
@@ -20,6 +17,8 @@ Custom Eelement for Open-API to PDF generation
 - Plenty of customizing options, including selection of brand colors
 - Supported on Chrome, FireFox and Safari. (Not yet tested on Edge)
 
+## Documentation
+[Check out the usage and examples](https://mrin9.github.io/RapiPdf/)
 
 ## Build Process
 We recommend `yarn` over `npm` as we use yarn [resolutions](https://yarnpkg.com/lang/en/docs/selective-version-resolutions/) to keep the bundle size smaller. As of this writing this feature is not supported in npm natively 
