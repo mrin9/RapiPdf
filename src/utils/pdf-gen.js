@@ -1,6 +1,7 @@
-import pdfMake from "pdfmake/build/pdfmake";
-//import pdfFonts from "pdfmake/build/vfs_fonts";
+import pdfMake from "pdfmake/build/pdfmake.min.js";
 import pdfFonts from "@/utils/vfs_fonts";
+//import pdfFonts from "pdfmake/build/vfs_fonts";
+
 import ProcessSpec from '@/utils/parse-utils';
 import { getInfoDef, getSecurityDef, getApiDef, getApiListDef, getMarkDownDef } from '@/utils/pdf-gen-utils';
 
@@ -110,11 +111,13 @@ export default async function createPdf(specUrl, options){
       normal: 'Roboto-Regular.ttf',
       bold: 'Roboto-Medium.ttf',
       italics: 'Roboto-Italic.ttf',
-      bolditalics: 'Roboto-MediumItalic.ttf'
+      bolditalics: 'Roboto-Medium.ttf'
     },
     RobotoMono: {
       normal: 'RobotoMono-Regular.ttf',
-      bold: 'RobotoMono-Bold.ttf',
+      bold: 'RobotoMono-Regular.ttf',
+      italics: 'RobotoMono-Regular.ttf',
+      bolditalics: 'RobotoMono-Regular.ttf',
     },
 
   };

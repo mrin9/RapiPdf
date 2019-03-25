@@ -73,7 +73,7 @@ module.exports = {
         }),
         new CleanWebpackPlugin(),
         new HtmlWebpackPlugin({template: 'index.html'}),
-        // new BundleAnalyzerPlugin({analyzerMode:'static'}),
+        new BundleAnalyzerPlugin({analyzerMode:'static'}),
         new DuplicatesPlugin({emitErrors: false, verbose: true}),
         new CompressionPlugin(),
         new FileManagerPlugin({

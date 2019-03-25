@@ -164,7 +164,6 @@ export default customElements.define('rapi-pdf', class RapiPdf extends HTMLEleme
       includeApiDetails,
       includeApiList
     }
-    debugger;
     createPdf(this.specUrl, options);
   }
 

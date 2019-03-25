@@ -2254,6 +2254,13 @@ detect-node@^2.0.4:
   resolved "https://registry.yarnpkg.com/detect-node/-/detect-node-2.0.4.tgz#014ee8f8f669c5c58023da64b8179c083a28c46c"
   integrity sha512-ZIzRpLJrOj7jjP2miAtgqIfmzbxa4ZOr5jJc601zklsfEx9oTzmmj2nVpIPRpNlRTIh8lc1kyViIY7BWSGNmKw==
 
+dfa-lite@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/dfa-lite/-/dfa-lite-1.2.0.tgz#7dac25489e6bc45b7a9f32282deafac036c2f943"
+  integrity sha512-UaomDzDUQRjG7OX4c4H++HQVKYHIPu3ODqTGmJaifDCI0fGjkpSntgBc52WfiNSsseYlYT+jEpmxm2Y/nwrPlA==
+  dependencies:
+    babel-runtime "^6.11.6"
+
 dfa@^1.0.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/dfa/-/dfa-1.1.0.tgz#d30218bd10d030fa421df3ebbc82285463a31781"
@@ -2912,6 +2919,23 @@ follow-redirects@^1.0.0:
   integrity sha512-m/pZQy4Gj287eNy94nivy5wchN3Kp+Q5WgUPNy5lJSZ3sgkVKSYV/ZChMAQVIgx1SqfZ2zBZtPA2YlXIWxxJOQ==
   dependencies:
     debug "^3.2.6"
+
+fontkit-lite@^1.8.0:
+  version "1.8.1"
+  resolved "https://registry.yarnpkg.com/fontkit-lite/-/fontkit-lite-1.8.1.tgz#af1217283d40440fafe4aaebf8669d7f80c850ff"
+  integrity sha512-M3QgWllAYJdQdqSa9ukK+ZXaU2lQR96ZYloFtxO9/C58qLpHhaGpA0xOQ1E8rw3GIrAFvFc8g36lNGKIuAGH7w==
+  dependencies:
+    babel-runtime "^6.11.6"
+    brfs "^1.4.0"
+    brotli "^1.2.0"
+    browserify-optional "^1.0.0"
+    clone "^1.0.1"
+    deep-equal "^1.0.0"
+    dfa-lite "^1.2.0"
+    restructure "^0.5.3"
+    tiny-inflate "^1.0.2"
+    unicode-properties "^1.0.0"
+    unicode-trie "^0.3.0"
 
 fontkit@^1.0.0:
   version "1.8.0"
@@ -5319,6 +5343,15 @@ pbkdf2@^3.0.3:
     safe-buffer "^5.0.1"
     sha.js "^2.4.8"
 
+pdfkit@^0.8.3:
+  version "0.8.3"
+  resolved "https://registry.yarnpkg.com/pdfkit/-/pdfkit-0.8.3.tgz#ec99a57fc55ca309726f856456da14418f5330e3"
+  integrity sha1-7Jmlf8Vcowlyb4VkVtoUQY9TMOM=
+  dependencies:
+    fontkit "^1.0.0"
+    linebreak "^0.3.0"
+    png-js ">=0.1.0"
+
 pdfkit@^0.9.0:
   version "0.9.0"
   resolved "https://registry.yarnpkg.com/pdfkit/-/pdfkit-0.9.0.tgz#0d356363be4594d7d757238879dd701176f79f45"
@@ -5330,7 +5363,17 @@ pdfkit@^0.9.0:
     png-js ">=0.1.0"
     saslprep "1.0.1"
 
-pdfmake@^0.1.53:
+pdfmake-lite@^0.1.38:
+  version "0.1.38"
+  resolved "https://registry.yarnpkg.com/pdfmake-lite/-/pdfmake-lite-0.1.38.tgz#8b4479ad981dd4b342b0c3024eab4f9e3cf2ba11"
+  integrity sha512-aKjE4bR29JWhKAXbuLqvp3g1p19U33f2F+U3F4f99h6N3ADX0BYsVlMVlCFsou7zdgBe8CKMg4KYiVT9vbuPCA==
+  dependencies:
+    fontkit-lite "^1.8.0"
+    iconv-lite "^0.4.24"
+    linebreak "^0.3.0"
+    pdfkit "^0.8.3"
+
+pdfmake@^0.1.54:
   version "0.1.54"
   resolved "https://registry.yarnpkg.com/pdfmake/-/pdfmake-0.1.54.tgz#91a9ba862ee689f6dfd1caa07dd581c0fd770bfb"
   integrity sha512-HO2FX+czmO+8LpWXQMFQfdUCCKnqwSvSEJExGkUKfsV34DRIV5PZjNg0xWS7ypGrnTY6RTTssWpdreX/pbyeyw==

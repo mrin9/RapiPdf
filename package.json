@@ -29,6 +29,7 @@
     "json-refs": "^3.0.12",
     "marked": "^0.6.1",
     "pdfmake": "^0.1.54",
+    "pdfmake-lite": "^0.1.38",
     "swagger2openapi": "^4.0.2"
   },
   "resolutions": {
