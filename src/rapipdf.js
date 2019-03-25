@@ -4,11 +4,12 @@ let tmpl = document.createElement('template');
 tmpl.innerHTML = `
   <style>
   :host{
-    --primary-color:orangered;
+    --primary-color:#0078d7;
     --border-radius:2px;
     --input-bg:#fff;
     --fg:#333;
     --primary-text:#fff;
+    --font-size:13px;
     display:block;
     width:350px;
   }
@@ -17,10 +18,10 @@ tmpl.innerHTML = `
     border-radius:var(--border-radius);
     border:1px solid var(--primary-color);
     background:var(--input-bg);
+    font-size: inherit;
     color:var(--fg);
     transition: border .2s;
     outline: none;
-    font-size:13px;
     padding:6px 5px;
     box-sizing: border-box;
     flex:1;
@@ -32,10 +33,10 @@ tmpl.innerHTML = `
 
   .btn-default {
     border-radius: 0 var(--border-radius) var(--border-radius) 0;
+    font-size: 85%;
     font-weight: 600;
     display: inline-block;
     padding: 6px 16px;
-    font-size: 12px;
     outline: none;
     outline-offset: -2px;
     line-height: 1;
@@ -53,11 +54,9 @@ tmpl.innerHTML = `
   }
   
   </style>
-  <div>
-    <div style='display:flex; width:100%;'>
-      <input class="spec-input" id="spec-url" type="text"  placeholder="Spec URL" value="" tabindex="0">
-      <button class="btn-default" style="margin-left:-2px" tabindex="0"><slot></slot></button>
-    </div>  
+  <div style='display:flex; width:100%; height: 100%;'>
+    <input  class="spec-input"  id="spec-url" type="text"  placeholder="Spec URL" value="" tabindex="0">
+    <button class="btn-default" type="button" style="margin-left:-1px" tabindex="0">GENERATE PDF</button>
   </div>  
 `;
 
@@ -71,37 +70,48 @@ export default customElements.define('rapi-pdf', class RapiPdf extends HTMLEleme
     
     // Initialize attributes if not defined 
     shadowRoot.appendChild(elFromTemplate);
-
-
-
   }
 
   connectedCallback() {
     // Add Event Listeners
-    this.inputEl.addEventListener('change', e => this.inputOnChange(e) );    
-    this.inputEl.addEventListener('keyup', e => this.onKeyUp(e) );    
-    this.btnEl.addEventListener('click', e => this.generatePdf() );
+    this.inputEl.addEventListener('change', e => this.onChangeInput(e) );    
+    this.inputEl.addEventListener('keyup',  e => this.onKeyUp(e) );    
+    this.btnEl.addEventListener('click',  e => this.generatePdf(e) );
   }
 
   disconnectedCallback() {
     // Remove Event Listeners
-    this.inputEl.removeEventListener('change', e => this.inputOnChange(e) );    
-    this.inputEl.removeEventListener('keyup', e => this.onKeyUp(e) );    
-    this.btnEl.removeEventListener('click', e => this.generatePdf() );
+    this.inputEl.removeEventListener('change', this.inputOnChange );    
+    this.inputEl.removeEventListener('keyup', this.onKeyUp );    
+    this.btnEl.removeEventListener('click', this.generatePdf );
   }
 
   static get observedAttributes() {
-    return ['spec-url', 'button-bg', 'input-bg', 'button-color', 'input-color'];
+    return ['spec-url', 'button-bg', 'input-bg', 'button-color', 'input-color', 'button-label', 'hide-input'];
   }
-  
+
   attributeChangedCallback(name, oldValue, newValue) {
-    console.log(name);
     switch (name) {
     case 'spec-url':
       if (oldValue !== newValue){
-        this.inputEl.value = this.getAttribute('spec-url');
+        this.inputEl.value = newValue;
+        return true;
       }
-      break;
+    case 'button-label':
+      if (oldValue !== newValue){
+        this.btnEl.innerText = newValue;
+        return true;
+      }
+    case 'hide-input':
+      if (oldValue !== newValue){
+        if (newValue==='true'){
+          this.inputEl.style.display='none';
+        }
+        else{
+          this.inputEl.style.display='block';
+        }
+        return true;
+      }
     case 'button-bg':
       this.btnEl.style.backgroundColor = newValue;
       this.inputEl.style.borderColor = newValue;
@@ -126,12 +136,13 @@ export default customElements.define('rapi-pdf', class RapiPdf extends HTMLEleme
     this.setAttribute('spec-url', newSpecUrl);
   }
 
-  inputOnChange(e){
+  onChangeInput(e){
     this.specUrl = e.target.value;
   }
 
   onKeyUp(e){
     if (e.keyCode === 13) {
+      // In case of input keyup - first change event will fire which will set the new specUrl URL
       this.generatePdf();
     }
   }
@@ -149,7 +160,6 @@ export default customElements.define('rapi-pdf', class RapiPdf extends HTMLEleme
     let includeSecurity   = this.getAttribute('include-security')==='false'?false:true;
     let includeApiDetails = this.getAttribute('include-api-details')==='false'?false:true;
     let includeApiList    = this.getAttribute('include-api-list')==='true'?true:false;
-
     let options = {
       pdfPrimaryColor,
       pdfAlternateColor,

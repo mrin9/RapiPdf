@@ -1,11 +1,11 @@
 {
-  "name": "rapidoc",
-  "version": "4.2.0",
-  "description": "RapiDoc - Open API spec viewer with built in console",
+  "name": "rapipdf",
+  "version": "1.0.0",
+  "description": "RapiPdf - Generate PDF from Open API spec",
   "author": "Mrinmoy Majumdar <mrin9@yahoo.com>",
   "repository": {
     "type": "git",
-    "url": "https://github.com/mrin9/RapiDoc.git"
+    "url": "https://github.com/mrin9/RapiPdf"
   },
   "license": "MIT",
   "keywords": [
@@ -18,12 +18,13 @@
     "documentation",
     "Custom Element",
     "Web Component",
-    "rapidoc",
+    "rapipdf",
     "swagger",
-    "swagger ui"
+    "swagger ui",
+    "pdf"
   ],
-  "main": "rapidoc.js",
-  "module": "rapidoc.js",
+  "main": "rapipdf.js",
+  "module": "rapipdf.js",
   "dependencies": {
     "@babel/plugin-syntax-dynamic-import": "^7.2.0",
     "json-refs": "^3.0.12",
@@ -32,12 +33,8 @@
     "pdfmake-lite": "^0.1.38",
     "swagger2openapi": "^4.0.2"
   },
-  "resolutions": {
-    "json-schema-ref-parser/**/js-yaml": "3.12.2",
-    "swagger2openapi/js-yaml": "3.12.2"
-  },
   "scripts": {
-    "build": "webpack --mode=${NODE_ENV:-production}",
+    "build": "NODE_ENV=production webpack",
     "serve": "webpack-dev-server --mode=development"
   },
   "devDependencies": {
