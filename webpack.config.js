@@ -13,8 +13,8 @@ const commonPlugins = [
   new webpack.optimize.LimitChunkCountPlugin({
       maxChunks:1
   }),
-  new CleanWebpackPlugin(),
   new HtmlWebpackPlugin({template: 'index.html'}),
+  new CleanWebpackPlugin(),
   new CompressionPlugin(),
   new FileManagerPlugin({
     onEnd : {

@@ -44,6 +44,7 @@
         <a class="menu-item" href="#features"> Features </a>
         <a class="menu-item" href="#qstart"> Quick Start </a>
         <a class="menu-item" href="#api"> API </a>
+        <a class="menu-item" data-action="url" href="https://mrin9.github.io/RapiDoc/"> RapiDoc </a>
         <a class="menu-item" data-action="git" href="https://github.com/mrin9/RapiPdf"> GitHub </a>
       </nav>
     </div>
@@ -279,7 +280,7 @@
   <script>
   
   function goToSection(e){
-    if (e.target.dataset.action==='git'){
+    if (e.target.dataset.action==='git' || e.target.dataset.action==='url' ){
       return;
     }
 

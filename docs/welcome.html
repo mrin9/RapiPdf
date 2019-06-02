@@ -8,6 +8,16 @@
 
   <link rel="shortcut icon" type="image/png" href="./images/logo.png"/>
 
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-132775238-2"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-132775238-2');
+  </script>
+
   <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css?family=Roboto+Mono:400,700" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css?family=Varela+Round" rel="stylesheet">
@@ -34,6 +44,7 @@
         <a class="menu-item" href="#features"> Features </a>
         <a class="menu-item" href="#qstart"> Quick Start </a>
         <a class="menu-item" href="#api"> API </a>
+        <a class="menu-item" data-action="url" href="https://mrin9.github.io/RapiDoc/"> RapiDoc </a>
         <a class="menu-item" data-action="git" href="https://github.com/mrin9/RapiPdf"> GitHub </a>
       </nav>
     </div>
@@ -119,14 +130,13 @@
   &lt;/body&gt; 
   &lt;/html&gt;
   </code></pre>
-  </div>
-
+  
   <rapi-pdf id='rapipdf' style="width:730px; height:40px; font-size:18px;"
     spec-url="https://api.apis.guru/v2/specs/bitbucket.org/2.0/swagger.json" 
     button-bg="#b44646"
     pdf-title="My API Reference"
   > </rapi-pdf>
-
+</div>
   </div>
 
   <!-- Start of API -->
@@ -203,7 +213,7 @@
     
             <tr>
               <td class="mono-bold">pdf-footer-text</td>
-              <td class="gray">Text to be printed at the bottom of eavery page</td>
+              <td class="gray">Text to be printed at the bottom of every page</td>
               <td>(empty)</td>
             </tr>
 
@@ -251,7 +261,7 @@
               <td class="gray">to programmatically generate the PDF </td>
             </tr>
             <tr>
-              <td class="mono-bold">setAttribute()</td>
+              <td class="mono-bold">setAttribute(attr-name, value)</td>
               <td class="gray">All HTML elements contains setAttribute() method, You may use this method to programmatically update/change any of its properties</td>
             </tr>
           </table>
@@ -270,7 +280,7 @@
   <script>
   
   function goToSection(e){
-    if (e.target.dataset.action==='git'){
+    if (e.target.dataset.action==='git' || e.target.dataset.action==='url' ){
       return;
     }
 
