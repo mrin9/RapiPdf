@@ -1,6 +1,6 @@
 {
   "name": "rapipdf",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "RapiPdf - Generate PDF from Open API spec",
   "author": "Mrinmoy Majumdar <mrin9@yahoo.com>",
   "repository": {
@@ -27,7 +27,7 @@
   "module": "rapipdf.js",
   "dependencies": {
     "@babel/plugin-syntax-dynamic-import": "^7.2.0",
-    "json-refs": "^3.0.13",
+    "json-refs": "^3.0.12",
     "marked": "^0.6.2",
     "pdfmake": "^0.1.56",
     "pdfmake-lite": "^0.1.38",

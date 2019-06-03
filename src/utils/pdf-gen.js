@@ -87,7 +87,7 @@ export default async function createPdf(specUrl, options){
     allContent.push(apiDef);
   }
   if (options.includeApiList){
-    apiListDef =getApiListDef(parsedSpec, "API List", rowLinesTableLayout);
+    apiListDef =getApiListDef(parsedSpec, 'API List', rowLinesTableLayout);
     allContent.push(apiListDef);
   }
 
@@ -96,8 +96,8 @@ export default async function createPdf(specUrl, options){
       return { 
         margin:10,
         columns:[
-          {text:options.pdfFooterText, style:["sub", "gray","left"]},
-          {text:`${currentPage} of ${pageCount}`, style:["sub", "gray","right"]}
+          {text:options.pdfFooterText, style:['sub', 'gray', 'left']},
+          {text:`${currentPage} of ${pageCount}`, style:['sub', 'gray', 'right']}
         ]
       };
     },
