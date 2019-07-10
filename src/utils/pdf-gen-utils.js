@@ -350,27 +350,6 @@ function getParameterTableDef(parameters, paramType, tableLayout){
 
 }
 
-
-function getDataUri(url, callback) {
-    var image = new Image();
-
-    image.onload = function () {
-        var canvas = document.createElement('canvas');
-        canvas.width = this.naturalWidth; // or 'width' if you want a special/scaled size
-        canvas.height = this.naturalHeight; // or 'height' if you want a special/scaled size
-
-        canvas.getContext('2d').drawImage(this, 0, 0);
-
-        // Get raw image data
-        callback(canvas.toDataURL());
-
-        // ... or get as Data URI
-        // callback(canvas.toDataURL('image/png'));
-    };
-
-    image.src = url;
-}
-
 //Response Def
 function getResponseDef(responses, tableLayout){
   let respDef=[];
@@ -628,17 +607,21 @@ export function getInlineMarkDownDef(txt){
     text.split(imageRegex).forEach(function(val){
       let match = val.match(imageArgsGroup);
       if (match){
-        
-        final.push({text:':::img::: ' + match.groups.altText + ' src: ' + match.groups.src + ' width: ' + match.groups.width + ':::img:::', style:style});
         final.push(new Promise(function(resolve, reject){
           fetch(match.groups.src).then(function(response){
             response.blob().then(function(blob){
               var reader = new FileReader();
               reader.readAsDataURL(blob);
               reader.onloadend = function() {
-                resolve({
+                const result = {
                   image: reader.result
-                });
+                }
+                try {
+                  console.log(match.groups.width);
+                  result["width"] = match.groups.width;
+                } catch(e) {
+                }
+                resolve(result);
               }
             });
           });
