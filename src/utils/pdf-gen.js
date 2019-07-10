@@ -123,5 +123,32 @@ export default async function createPdf(specUrl, options){
   };
   //pdfMake.vfs = pdfFonts.pdfMake.vfs;
   pdfMake.vfs = pdfFonts;
-  pdfMake.createPdf(finalDocDef).open();
+
+  const zipObj = (keys=[], vals=[]) => {
+    const result = {}
+    keys.forEach(function(key, idx) {
+      result[key] = vals[idx];
+    });
+    return result;
+  };
+
+  const recursivePromise = (function(obj) {
+    return Promise.all(Object.values(obj).map(val => {
+      if (typeof(val) === 'object' && !val.then) {
+        return recursivePromise(val);
+      }
+      return val;
+    }))
+      .then(result => {
+        if (Array.isArray(obj)) {
+          return result;
+        }
+        return zipObj(Object.keys(obj), result);
+      });
+  });
+  // pdfMake.createPdf(finalDocDef).open();
+  recursivePromise(finalDocDef).then(result => {
+    console.log(result);
+    pdfMake.createPdf(result).open();
+  });
 }

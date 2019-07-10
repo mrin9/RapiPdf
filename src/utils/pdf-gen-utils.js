@@ -350,6 +350,27 @@ function getParameterTableDef(parameters, paramType, tableLayout){
 
 }
 
+
+function getDataUri(url, callback) {
+    var image = new Image();
+
+    image.onload = function () {
+        var canvas = document.createElement('canvas');
+        canvas.width = this.naturalWidth; // or 'width' if you want a special/scaled size
+        canvas.height = this.naturalHeight; // or 'height' if you want a special/scaled size
+
+        canvas.getContext('2d').drawImage(this, 0, 0);
+
+        // Get raw image data
+        callback(canvas.toDataURL());
+
+        // ... or get as Data URI
+        // callback(canvas.toDataURL('image/png'));
+    };
+
+    image.src = url;
+}
+
 //Response Def
 function getResponseDef(responses, tableLayout){
   let respDef=[];
@@ -436,6 +457,40 @@ export function getApiListDef(spec, sectionHeading, tableLayout) {
   return content;
 }
 
+//Override buildin parser constructor
+marked.prototype.constructor.Parser.prototype.parse = function (src) {
+    this.inline = new marked.InlineLexer(src.links, this.options, this.renderer);
+    //custom rule/syntax
+    this.inline.rules.link = /^[!@]?\[((?:\[[^\]]*\]|[^\[\]]|\](?=[^\[]*\]))*)\]\(\s*<?([\s\S]*?)>?(?:\s+['"]([\s\S]*?)['"])?\s*\)/;
+    this.tokens = src.reverse();
+
+    var out = '';
+    while (this.next()) {
+        out += this.tok();
+    }
+
+    return out;
+};
+
+//Customize the outputLink Inline lexer
+marked.InlineLexer.prototype.outputLink = function(cap, link) {
+  var href = escape(link.href)
+    , title = link.title ? escape(link.title) : null;
+
+  console.log(title);
+
+  if (cap[0].charAt(0) === '@') {
+    return this.renderer.articles(
+        cap[1],
+        cap[2]
+    );
+  }
+
+  return cap[0].charAt(0) !== '!'
+    ? this.renderer.link(href, title, this.output(cap[1]))
+    : this.renderer.image(href, title, escape(cap[1]));
+};
+
 export function getMarkDownDef(tokens){
   let content = [];
   let uList={ ul:[], style:['topMarginRegular'] };
@@ -445,10 +500,30 @@ export function getMarkDownDef(tokens){
   tokens.forEach(function(v){
     if (v.type==='paragraph'){
       let textArr = getInlineMarkDownDef(v.text);
+      // check if content is image:
+      // var renderer = new marked.Renderer;
+      // renderer.image = function(href, title, alt) {
+      //   content.push({
+      //     text:"bunnybunny: " + href
+      //   });
+      //   return marked.Renderer.prototype.image.apply(this, arguments);
+      // }
+      // textArr.forEach(function(element) {
+      //   marked(element.text, {renderer: renderer});
+      //   // if (renderer.image){
+      //     content.push({
+      //       text:element.text + ' babab',
+      //       style:['topMarginRegular']
+      //     });
+      //   // }
+      // });
+      
       content.push({
-        text:textArr,
+        stack:textArr,
         style:['topMarginRegular']
       });
+
+      // console.log(textArr);
     }
     else if (v.type==='heading'){
       let headingStyle = [];
@@ -526,6 +601,10 @@ export function getMarkDownDef(tokens){
       oList={ ol:[], style:['topMarginRegular'] };
       listInsert='';
     }
+    else {
+      console.log(v);
+    }
+    
   });
   return content;
 
@@ -542,6 +621,35 @@ export function getInlineMarkDownDef(txt){
   if (!txt.split){
     console.log(txt);
   }
+
+  function imageSplit(text, style){
+    let imageRegex = /([!@]?\[(?:\[[^\]]*\]|[^\[\]]|\](?=[^\[]*\]))*\]\(\s*<?[\s\S]*?>?(?:\s+['"][\s\S]*?['"])?\s*\))/;
+    let imageArgsGroup = /[!@]?\[(?<altText>(?:\[[^\]]*\]|[^\[\]]|\](?=[^\[]*\]))*)\]\(\s*<?(?<src>[\s\S]*?)>?(?:\s+['"](?<titleText>[\s\S]*?)['"])?(?:\s+=(?<width>[0-9]+)x(?<height>[0-9]+)?)?\s*\)/
+    text.split(imageRegex).forEach(function(val){
+      let match = val.match(imageArgsGroup);
+      if (match){
+        
+        final.push({text:':::img::: ' + match.groups.altText + ' src: ' + match.groups.src + ' width: ' + match.groups.width + ':::img:::', style:style});
+        final.push(new Promise(function(resolve, reject){
+          fetch(match.groups.src).then(function(response){
+            response.blob().then(function(blob){
+              var reader = new FileReader();
+              reader.readAsDataURL(blob);
+              reader.onloadend = function() {
+                resolve({
+                  image: reader.result
+                });
+              }
+            });
+          });
+        }));
+      }
+      else {
+        final.push({text:val, style:style});
+      }
+    });
+  };
+
   let bi_parts = txt.split(boldItalicDelimiter);
   bi_parts.forEach(function(bi_val,i){
     if (i%2 === 0){
@@ -554,12 +662,14 @@ export function getInlineMarkDownDef(txt){
               c_parts.forEach(function(c_val,k){
                 if (k%2 === 0){
                   if (c_val){
-                    final.push({ text:c_val,style:['small']});
+                    imageSplit(c_val, ['small']);
+                    // final.push({ text:c_val,style:['small']});
                   }
                 }
                 else{
                   if (c_val.trim){
-                    final.push({ text:c_val,style:['small','mono', 'gray']});
+                    imageSplit(c_val, ['small','mono','gray']);
+                    // final.push({ text:c_val,style:['small','mono', 'gray']});
                   }
                 }
               });
@@ -568,7 +678,8 @@ export function getInlineMarkDownDef(txt){
           }
           else{
             if (b_val){
-              final.push({text:b_val,style:['small','bold']});
+              imageSplit(b_val, ['small','bold']);
+              // final.push({text:b_val,style:['small','bold']});
             }
           }
         });
@@ -576,7 +687,8 @@ export function getInlineMarkDownDef(txt){
     }
     else{
       if(bi_val){
-        final.push({ text:bi_val, style:['small','bold', 'italics']});
+        imageSplit(bi_val, ['small','bold','italics']);
+        // final.push({ text:bi_val, style:['small','bold', 'italics']});
       }
     }
   });
