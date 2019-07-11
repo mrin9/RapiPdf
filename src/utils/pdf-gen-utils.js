@@ -554,14 +554,15 @@ export function getInlineMarkDownDef(txt){
             response.blob().then(function(blob){
               var reader = new FileReader();
               reader.readAsDataURL(blob);
-              reader.onloadend = function() {
+              reader.onloadend = function(){
                 const result = {
                   image: reader.result
                 }
-                try {
-                  console.log(match.groups.width);
-                  result["width"] = match.groups.width;
-                } catch(e) {
+                if ('width' in match.groups && match.groups.width){
+                  result["width"] = parseInt(match.groups.width);
+                }
+                if ('height' in match.groups && match.groups.height){
+                  result["height"] = parseInt(match.groups.height);
                 }
                 resolve(result);
               }
