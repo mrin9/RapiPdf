@@ -138,17 +138,15 @@ export default async function createPdf(specUrl, options){
         return recursivePromise(val);
       }
       return val;
-    }))
-      .then(result => {
+    })).then(result => {
         if (Array.isArray(obj)) {
           return result;
         }
         return zipObj(Object.keys(obj), result);
       });
   });
-  // pdfMake.createPdf(finalDocDef).open();
+
   recursivePromise(finalDocDef).then(result => {
-    console.log(result);
     pdfMake.createPdf(result).open();
   });
 }

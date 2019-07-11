@@ -436,40 +436,6 @@ export function getApiListDef(spec, sectionHeading, tableLayout) {
   return content;
 }
 
-//Override buildin parser constructor
-marked.prototype.constructor.Parser.prototype.parse = function (src) {
-    this.inline = new marked.InlineLexer(src.links, this.options, this.renderer);
-    //custom rule/syntax
-    this.inline.rules.link = /^[!@]?\[((?:\[[^\]]*\]|[^\[\]]|\](?=[^\[]*\]))*)\]\(\s*<?([\s\S]*?)>?(?:\s+['"]([\s\S]*?)['"])?\s*\)/;
-    this.tokens = src.reverse();
-
-    var out = '';
-    while (this.next()) {
-        out += this.tok();
-    }
-
-    return out;
-};
-
-//Customize the outputLink Inline lexer
-marked.InlineLexer.prototype.outputLink = function(cap, link) {
-  var href = escape(link.href)
-    , title = link.title ? escape(link.title) : null;
-
-  console.log(title);
-
-  if (cap[0].charAt(0) === '@') {
-    return this.renderer.articles(
-        cap[1],
-        cap[2]
-    );
-  }
-
-  return cap[0].charAt(0) !== '!'
-    ? this.renderer.link(href, title, this.output(cap[1]))
-    : this.renderer.image(href, title, escape(cap[1]));
-};
-
 export function getMarkDownDef(tokens){
   let content = [];
   let uList={ ul:[], style:['topMarginRegular'] };
@@ -479,30 +445,10 @@ export function getMarkDownDef(tokens){
   tokens.forEach(function(v){
     if (v.type==='paragraph'){
       let textArr = getInlineMarkDownDef(v.text);
-      // check if content is image:
-      // var renderer = new marked.Renderer;
-      // renderer.image = function(href, title, alt) {
-      //   content.push({
-      //     text:"bunnybunny: " + href
-      //   });
-      //   return marked.Renderer.prototype.image.apply(this, arguments);
-      // }
-      // textArr.forEach(function(element) {
-      //   marked(element.text, {renderer: renderer});
-      //   // if (renderer.image){
-      //     content.push({
-      //       text:element.text + ' babab',
-      //       style:['topMarginRegular']
-      //     });
-      //   // }
-      // });
-      
       content.push({
         stack:textArr,
         style:['topMarginRegular']
       });
-
-      // console.log(textArr);
     }
     else if (v.type==='heading'){
       let headingStyle = [];
@@ -580,10 +526,6 @@ export function getMarkDownDef(tokens){
       oList={ ol:[], style:['topMarginRegular'] };
       listInsert='';
     }
-    else {
-      console.log(v);
-    }
-    
   });
   return content;
 
@@ -646,13 +588,11 @@ export function getInlineMarkDownDef(txt){
                 if (k%2 === 0){
                   if (c_val){
                     imageSplit(c_val, ['small']);
-                    // final.push({ text:c_val,style:['small']});
                   }
                 }
                 else{
                   if (c_val.trim){
                     imageSplit(c_val, ['small','mono','gray']);
-                    // final.push({ text:c_val,style:['small','mono', 'gray']});
                   }
                 }
               });
@@ -662,7 +602,6 @@ export function getInlineMarkDownDef(txt){
           else{
             if (b_val){
               imageSplit(b_val, ['small','bold']);
-              // final.push({text:b_val,style:['small','bold']});
             }
           }
         });
@@ -671,7 +610,6 @@ export function getInlineMarkDownDef(txt){
     else{
       if(bi_val){
         imageSplit(bi_val, ['small','bold','italics']);
-        // final.push({ text:bi_val, style:['small','bold', 'italics']});
       }
     }
   });
