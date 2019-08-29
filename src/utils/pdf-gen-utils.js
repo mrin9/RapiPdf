@@ -241,7 +241,7 @@ function getRequestBodyDef(requestBody, tableLayout){
   for(let contentType in requestBody.content ) {
     let contentTypeObj = requestBody.content[contentType];
     let requestBodyTableDef;
-    if (contentType.includes('form') || contentType.includes('multipart-form')){
+    if ( (contentType.includes('form') || contentType.includes('multipart-form')) && contentTypeObj.schema ){
       formParamTableDef = getParameterTableDef(contentTypeObj.schema.properties, "FORM DATA", tableLayout);
       content.push(formParamTableDef);
     }
