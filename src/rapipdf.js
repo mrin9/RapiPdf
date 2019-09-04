@@ -160,6 +160,33 @@ export default customElements.define('rapi-pdf', class RapiPdf extends HTMLEleme
     let includeSecurity   = this.getAttribute('include-security')==='false'?false:true;
     let includeApiDetails = this.getAttribute('include-api-details')==='false'?false:true;
     let includeApiList    = this.getAttribute('include-api-list')==='true'?true:false;
+    let localize = {
+      'index':'INDEX',
+      'api':'API',
+      'apiList':'API List',
+      'apiReference':'API Reference',
+      'apiVersion':'API Version',
+      'contact':'CONTACT',
+      'name':'NAME',
+      'email':'EMAIL',
+      'url':'URL',
+      'termsOfService':'Terms of service',
+      'securityAndAuthentication':'Security and Authentication',
+      'securitySchemes':'SECURITY SCHEMES',
+      'type':'TYPE',
+      'description':'DESCRIPTION',
+      'request':'REQUEST',
+      'requestBody':'REQUEST BODY',
+      'response':'RESPONSE',
+      'responseModel':'RESPONSE MODEL',
+      'statusCode':'STATUS CODE',
+      'deprecated':'DEPRECATED',
+      'allowed':'allowed',
+      'pattern':'pattern',
+      'parameters':'Parameters',
+      'noRequestParameters': 'No request parameters',
+      'method':'METHOD'
+    }
     
     let options = {
       pdfPrimaryColor,
@@ -173,7 +200,8 @@ export default customElements.define('rapi-pdf', class RapiPdf extends HTMLEleme
       includeToc,
       includeSecurity,
       includeApiDetails,
-      includeApiList
+      includeApiList,
+      localize,
     }
     createPdf(this.specUrl, options);
   }

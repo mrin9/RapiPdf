@@ -64,13 +64,13 @@ export default async function createPdf(specUrl, options){
   let allContent=[], infoDef={}, tocDef={}, securityDef={}, apiListDef={}, apiDef={};
 
   if (options.includeInfo){
-    infoDef = getInfoDef(parsedSpec, options.pdfTitle);
+    infoDef = getInfoDef(parsedSpec, options.pdfTitle, options.localize);
     allContent.push(infoDef);
   }
   if (options.includeToc){
     tocDef = {
       toc: {
-        title: {text: 'INDEX', style:['b', 'h2']},
+        title: {text: options.localize.index, style:['b', 'h2']},
         numberStyle: {bold: true},
         style:['small'],
       },
@@ -79,15 +79,15 @@ export default async function createPdf(specUrl, options){
     allContent.push(tocDef);
   }
   if (options.includeSecurity){
-    securityDef = getSecurityDef(parsedSpec, rowLinesTableLayout);
+    securityDef = getSecurityDef(parsedSpec, rowLinesTableLayout, options.localize);
     allContent.push(securityDef);
   }
   if (options.includeApiDetails){
-    apiDef = getApiDef(parsedSpec, '', 'API', rowLinesTableLayout, rowLinesOnlyTableLayout);
+    apiDef = getApiDef(parsedSpec, '', options.localize.api, rowLinesTableLayout, options.localize);
     allContent.push(apiDef);
   }
   if (options.includeApiList){
-    apiListDef =getApiListDef(parsedSpec, 'API List', rowLinesTableLayout);
+    apiListDef = getApiListDef(parsedSpec, options.localize.apiList, rowLinesTableLayout, options.localize);
     allContent.push(apiListDef);
   }
 

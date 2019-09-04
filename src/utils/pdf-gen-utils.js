@@ -2,26 +2,26 @@ import marked from 'marked';
 import { getTypeInfo, schemaToModel, schemaToPdf, removeCircularReferences} from '@/utils/common-utils';
 
 //Info Def
-export function getInfoDef(spec, bookTitle){
+export function getInfoDef(spec, bookTitle, localize){
   let content;
   if (spec.info){
     let contactDef=[], contactName, contactEmail, contactUrl, termsOfService;
 
     if (spec.info.contact){
       if (spec.info.contact.name){
-        contactName = {text:[{text:'Name: ', style:['b','small']}, {text:spec.info.contact.name, style:['small']}]}; 
+        contactName = {text:[{text:`\n${localize.name}: `, style:['b','small']}, {text:spec.info.contact.name, style:['small']}]}; 
       }
       if (spec.info.contact.email){
-        contactEmail = {text:[{text:'Email: ', style:['b','small']}, {text:spec.info.contact.email, style:['small']}]};
+        contactEmail = {text:[{text:`\n${localize.email}: `, style:['b','small']}, {text:spec.info.contact.email, style:['small']}]};
       }
       if (spec.info.contact.url){
-        contactUrl = {text:[{text:'URL: ', style:['b','small']}, {text:spec.info.contact.url, style:['small','blue'],link:spec.info.contact.url}]};
+        contactUrl = {text:[{text:`\n${localize.url}: `, style:['b','small']}, {text:spec.info.contact.url, style:['small','blue'],link:spec.info.contact.url}]};
       }
       if (spec.info.termsOfService){
-        termsOfService = {text:[{text:'\nTerms of service: ', style:['b','small']}, {text:spec.info.termsOfService, style:['small','blue'],link:spec.info.termsOfService}]};
+        termsOfService = {text:[{text:`\n${localize.termsOfService}: `, style:['b','small']}, {text:spec.info.termsOfService, style:['small','blue'],link:spec.info.termsOfService}]};
       }
       contactDef= [
-        {text:'CONTACT', style:['p', 'b', 'topMargin3']},
+        {text:localize.contact, style:['p', 'b', 'topMargin3']},
         {text:[ 
           contactName, 
           contactEmail,
@@ -44,9 +44,9 @@ export function getInfoDef(spec, bookTitle){
     }
 
     content = [
-      {text: bookTitle ? bookTitle:'API Reference', style:['h2', 'primary','right', 'b', 'topMargin1']},
+      {text: bookTitle ? bookTitle:localize.apiReference, style:['h2', 'primary','right', 'b', 'topMargin1']},
       (spec.info.title ? {text:spec.info.title, style:['title', 'right']} : ''),
-      (spec.info.version ? {text:`API Version: ${spec.info.version}`, style:['p','b', 'right', 'alternate']} : ''),
+      (spec.info.version ? {text:`${localize.apiVersion}: ${spec.info.version}`, style:['p','b', 'right', 'alternate']} : ''),
       specInfDescrMarkDef,
       ...contactDef,
       {text:'', pageBreak:'after'}
@@ -55,20 +55,20 @@ export function getInfoDef(spec, bookTitle){
   }
   else{
     content = [
-      {text:bookTitle?bookTitle:'API Reference', style:['h1', 'bold', 'primary','right', 'topMargin1']}
+      {text:bookTitle?bookTitle:apiVersion.apiReference, style:['h1', 'bold', 'primary','right', 'topMargin1']}
     ];
   }
   return content;
 };
 
 //Security Def
-export function getSecurityDef(spec, tableLayout){
+export function getSecurityDef(spec, tableLayout, localize){
   let content =[]
   if (spec.securitySchemes){
-    content.push( {text:'Security and Authentication', style:['h3', 'b', 'primary','right', 'topMargin3']} );
-    content.push({text:'SECURITY SCHEMES', style:['b','tableMargin']});
+    content.push( {text:localize.securityAndAuthentication, style:['h3', 'b', 'primary','right', 'topMargin3']} );
+    content.push({text:localize.securitySchemes, style:['b','tableMargin']});
     let tableContent = [
-      [ {text: 'TYPE', style: ['small','b']}, {text: 'DESCRIPTION', style: ['small','b']} ]
+      [ {text: localize.type, style: ['small','b']}, {text: localize.description, style: ['small','b']} ]
     ];
     for (const key in spec.securitySchemes) {
       tableContent.push([
@@ -90,8 +90,7 @@ export function getSecurityDef(spec, tableLayout){
 };
 
 // API details def
-export function getApiDef(spec, filterPath, sectionHeading, tableLayout){
-
+export function getApiDef(spec, filterPath, sectionHeading, tableLayout, localize){
   let content =[{text: sectionHeading, style:['h2','b'],pageBreak:'before'}];
   let tagSeq=0;
 
@@ -148,13 +147,12 @@ export function getApiDef(spec, filterPath, sectionHeading, tableLayout){
       const headerParams = path.parameters ? path.parameters.filter(param => param.in === 'header'):null;
       const cookieParams = path.parameters ? path.parameters.filter(param => param.in === 'cookie'):null;
 
-      const pathParamTableDef     = getParameterTableDef(pathParams, 'path',tableLayout);
-      const queryParamTableDef    = getParameterTableDef(queryParams, 'query',tableLayout);
-      const requestBodyTableDefs  = getRequestBodyDef(path.requestBody, tableLayout);
-      const headerParamTableDef   = getParameterTableDef(headerParams, 'header',tableLayout);
-      const cookieParamTableDef   = getParameterTableDef(cookieParams, 'cookie',tableLayout);
-
-      operationContent.push({ text: 'REQUEST', style:['p', 'b', 'alternate'], margin:[0, 10, 0, 0]});
+      const pathParamTableDef     = getParameterTableDef(pathParams, 'path',tableLayout, localize);
+      const queryParamTableDef    = getParameterTableDef(queryParams, 'query',tableLayout, localize);
+      const requestBodyTableDefs  = getRequestBodyDef(path.requestBody, tableLayout, localize);
+      const headerParamTableDef   = getParameterTableDef(headerParams, 'header',tableLayout, localize);
+      const cookieParamTableDef   = getParameterTableDef(cookieParams, 'cookie',tableLayout, localize);
+      operationContent.push({ text: localize.request, style:['p', 'b', 'alternate'], margin:[0, 10, 0, 0]});
       if (pathParamTableDef || queryParamTableDef || headerParamTableDef || cookieParamTableDef || requestBodyTableDefs){
         if (pathParamTableDef){
           requestSetDef.push(pathParamTableDef);
@@ -183,10 +181,8 @@ export function getApiDef(spec, filterPath, sectionHeading, tableLayout){
         stack:requestSetDef,
         margin:[10, 0, 0, 0]
       });
-
-
-      let respDef = getResponseDef(path.responses, tableLayout)
-      operationContent.push({ text: 'RESPONSE', style:['p', 'b', 'alternate'], margin:[0, 10, 0, 0]});
+      let respDef = getResponseDef(path.responses, tableLayout, localize)
+      operationContent.push({ text: localize.response, style:['p', 'b', 'alternate'], margin:[0, 10, 0, 0]});
       operationContent.push({
         stack:respDef,
         margin:[10, 5, 0, 5]
@@ -231,7 +227,7 @@ export function getApiDef(spec, filterPath, sectionHeading, tableLayout){
 
 
 //Request Body Def
-function getRequestBodyDef(requestBody, tableLayout){
+function getRequestBodyDef(requestBody, tableLayout, localize){
   if (!requestBody){
     return;
   }
@@ -242,7 +238,7 @@ function getRequestBodyDef(requestBody, tableLayout){
     let contentTypeObj = requestBody.content[contentType];
     let requestBodyTableDef;
     if ( (contentType.includes('form') || contentType.includes('multipart-form')) && contentTypeObj.schema ){
-      formParamTableDef = getParameterTableDef(contentTypeObj.schema.properties, "FORM DATA", tableLayout);
+      formParamTableDef = getParameterTableDef(contentTypeObj.schema.properties, "FORM DATA", tableLayout, localize);
       content.push(formParamTableDef);
     }
     else{
@@ -259,7 +255,7 @@ function getRequestBodyDef(requestBody, tableLayout){
             table: {
               widths:['*'],
               body: [
-                [{text:'REQUEST BODY '+  contentType, style:['small','b']}],
+                [{text:`${localize.requestBody} ${contentType}`, style:['small','b']}],
                 requestBodyTableDef
               ]
             }
@@ -276,16 +272,16 @@ function getRequestBodyDef(requestBody, tableLayout){
 }
 
 //Parameter Table
-function getParameterTableDef(parameters, paramType, tableLayout){
+function getParameterTableDef(parameters, paramType, tableLayout, localize){
   //let filteredParams= parameters ? parameters.filter(param => param.in === paramType):[];
   if (parameters.length == 0 ){
     return;
   }
   let tableContent = [
     [ 
-      {text: 'NAME', style: ['sub','b','alternate']}, 
-      {text: 'TYPE', style: ['sub','b','alternate']},
-      {text: 'DESCRIPTION', style: ['sub','b','alternate']}
+      {text: localize.name, style: ['sub','b','alternate']}, 
+      {text: localize.type, style: ['sub','b','alternate']},
+      {text: localize.description, style: ['sub','b','alternate']}
     ]
   ];
   
@@ -314,7 +310,7 @@ function getParameterTableDef(parameters, paramType, tableLayout){
           text:[
             {text:paramSchema.required?'*':'', style:['small','b','red','mono'] },
             {text:param.name, style:['small','mono'] },
-            (paramSchema.depricated ?{text:'\nDEPRICATED',style:['small','red','b'] }:undefined)
+            (paramSchema.depricated ?{text:'\n'+localize.deprecated, style:['small','red','b'] }:undefined)
           ]
         },
         {
@@ -322,11 +318,11 @@ function getParameterTableDef(parameters, paramType, tableLayout){
             { text: `${paramSchema.type==='array' ? paramSchema.arrayType:paramSchema.type}${paramSchema.format ? `(${paramSchema.format})`:'' }`, style:['small','mono']},
             ( paramSchema.constrain ? { text: paramSchema.constrain, style:['small', 'gray']}:''),
             ( paramSchema.allowedValues ? { text:[
-                {text: 'allowed: ', style:['b','small']},
+                {text: localize.allowed+': ', style:['b','small']},
                 {text: paramSchema.allowedValues, style:['small', 'gray']}
               ]} : ''
             ),
-            ( paramSchema.pattern ? { text: `pattern: ${paramSchema.pattern}`, style:['small','gray']}:''),
+            ( paramSchema.pattern ? { text: `${localize.pattern}: ${paramSchema.pattern}`, style:['small','gray']}:''),
           ]
         },
         { text:param.description, style:['small'],margin:[0,2,0,0]},
@@ -335,7 +331,7 @@ function getParameterTableDef(parameters, paramType, tableLayout){
   }
 
   return [
-    {text: `${paramType} Parameters`.toUpperCase(), style:['small', 'b'], margin:[0,10,0,0]},
+    {text: `${paramType} ${localize.parameters}`.toUpperCase(), style:['small', 'b'], margin:[0,10,0,0]},
     {
       table: {
         headerRows: 1,
@@ -351,7 +347,7 @@ function getParameterTableDef(parameters, paramType, tableLayout){
 }
 
 //Response Def
-function getResponseDef(responses, tableLayout){
+function getResponseDef(responses, tableLayout, localize){
   let respDef=[];
   let allResponseModelTabelDefs=[];
   for(let statusCode in responses) {
@@ -370,7 +366,7 @@ function getResponseDef(responses, tableLayout){
             table: {
               widths:['*'],
               body: [
-                [{text:`RESPONSE MODEL (${contentType})`,style:['small','b']}],
+                [{text:`${localize.responseModel} (${contentType})`,style:['small','b']}],
                 reponseModelTableDef
               ]
             }
@@ -382,7 +378,7 @@ function getResponseDef(responses, tableLayout){
 
     respDef.push({
       text:[
-        {text: `STATUS CODE - ${statusCode}: `, style:['small', 'b']},
+        {text: `${localize.statusCode} - ${statusCode}: `, style:['small', 'b']},
         {text: responses[statusCode].description, style:['small']}
       ],
       margin:[0,10,0,0]
@@ -396,11 +392,11 @@ function getResponseDef(responses, tableLayout){
 }
 
 //API List Def
-export function getApiListDef(spec, sectionHeading, tableLayout) {
+export function getApiListDef(spec, sectionHeading, tableLayout, localize) {
   let content =[{text: sectionHeading, style:['h3','b'],pageBreak:'before'}];
   spec.tags.map(function(tag, i){
     let tableContent = [
-      [ {text: 'METHOD', style: ['small','b']}, {text: 'API', style: ['small','b']}]
+      [ {text: localize.method, style: ['small','b']}, {text: localize.api, style: ['small','b']}]
     ];
 
     tag.paths.map(function(path){
