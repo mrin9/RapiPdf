@@ -160,6 +160,7 @@ export default customElements.define('rapi-pdf', class RapiPdf extends HTMLEleme
     let includeSecurity   = this.getAttribute('include-security')==='false'?false:true;
     let includeApiDetails = this.getAttribute('include-api-details')==='false'?false:true;
     let includeApiList    = this.getAttribute('include-api-list')==='true'?true:false;
+    
     let options = {
       pdfPrimaryColor,
       pdfAlternateColor,

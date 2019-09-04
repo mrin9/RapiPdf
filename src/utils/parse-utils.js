@@ -5,15 +5,13 @@ export default async function ProcessSpec(specUrl) {
   let jsonParsedSpec, convertedSpec, resolvedRefSpec;
   let convertOptions = { patch:true, warnOnly:true };
   let resolveOptions = { resolveCirculars: false }
-  let refParserOptions = {
-    resolve: {
-      http: { 
-        withCredentials: false 
-      } 
-    }
-  };
   try {
-    convertedSpec = await converter.convertUrl(specUrl, convertOptions);
+    if (typeof specUrl==="string") {
+      convertedSpec = await converter.convertUrl(specUrl, convertOptions);
+    }
+    else {
+      convertedSpec = await converter.convertObj(specUrl, convertOptions);
+    }
     resolvedRefSpec = await JsonRefs.resolveRefs(convertedSpec.openapi, resolveOptions);
     jsonParsedSpec = resolvedRefSpec.resolved;
   }
