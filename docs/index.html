@@ -266,6 +266,44 @@
             </tr>
           </table>
         </div>
+
+        <h2> Localization</h2>
+        <div class="mono-bold" style="text-align: center;">create a &lt;template&gt; inside &lt;rapi-pdf&gt; element and provide the translations</div>
+        <pre class="shadow code-block"><code class="html" style="border-radius:4px">
+&lt;rapi-pdf spec-url="https://api.apis.guru/v2/specs/bitbucket.org/2.0/swagger.json"&gt;
+  &lt;template&gt;
+  {
+    "index"          : "INDEX",
+    "api"            : "API",
+    "apiList"        : "API List",
+    "apiReference"   : "API Reference",
+    "apiVersion"     : "API Version",
+    "contact"        : "CONTACT",
+    "name"           : "NAME",
+    "email"          : "EMAIL",
+    "url"            : "URL",
+    "termsOfService" : "Terms of service",
+    "securitySchemes": "SECURITY SCHEMES",
+    "type"           : "TYPE",
+    "description"    : "DESCRIPTION",
+    "request"        : "REQUEST",
+    "requestBody"    : "REQUEST BODY",
+    "response"       : "RESPONSE",
+    "responseModel"  : "RESPONSE MODEL",
+    "statusCode"     : "STATUS CODE",
+    "deprecated"     : "DEPRECATED",
+    "allowed"        : "allowed",
+    "pattern"        : "pattern",
+    "parameters"     : "Parameters",
+    "method"         : "METHOD",
+    "securityAndAuthentication" : "Security and Authentication",
+    "noRequestParameters"       : "No request parameters",
+  }
+  &lt;/template&gt;
+&lt;/rapi-pdf&gt;
+          </code>
+        </pre>
+
       </div>  
     </div>
   <!-- End of API -->
@@ -290,8 +328,6 @@
       gotoEl.scrollIntoView({ block: 'start',  behavior: 'smooth' });
     }
   }
-  
-  
   
   </script>
 </body>
