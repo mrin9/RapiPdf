@@ -174,7 +174,7 @@ export function getApiDef(spec, filterPath, sectionHeading, tableLayout, localiz
 
       }
       else{
-        requestSetDef.push({ text: 'No request parameters', style:['small', 'gray'], margin:[0, 5, 0, 0]});
+        requestSetDef.push({ text: localize.noRequestParameters, style:['small', 'gray'], margin:[0, 5, 0, 0]});
       }
 
       operationContent.push({

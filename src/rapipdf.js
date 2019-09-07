@@ -71,12 +71,53 @@ export default customElements.define('rapi-pdf', class RapiPdf extends HTMLEleme
     // Initialize attributes if not defined 
     shadowRoot.appendChild(elFromTemplate);
   }
-
+  static get properties() { 
+    return { 
+      localize: { type: Object }
+    };
+  }
   connectedCallback() {
     // Add Event Listeners
     this.inputEl.addEventListener('change', e => this.onChangeInput(e) );    
     this.inputEl.addEventListener('keyup',  e => this.onKeyUp(e) );    
     this.btnEl.addEventListener('click',  e => this.generatePdf(e) );
+    if (this.children[0]){
+      let localizeStr = this.children[0].content.textContent;
+      let localizeObj = {};
+      try {
+        localizeObj = JSON.parse(localizeStr);
+      }
+      catch(e) {
+        localizeObj = {};
+      }
+      this.localize = Object.assign({
+        'index':'INDEX',
+        'api':'API',
+        'apiList':'API List',
+        'apiReference':'API Reference',
+        'apiVersion':'API Version',
+        'contact':'CONTACT',
+        'name':'NAME',
+        'email':'EMAIL',
+        'url':'URL',
+        'termsOfService':'Terms of service',
+        'securityAndAuthentication':'Security and Authentication',
+        'securitySchemes':'SECURITY SCHEMES',
+        'type':'TYPE',
+        'description':'DESCRIPTION',
+        'request':'REQUEST',
+        'requestBody':'REQUEST BODY',
+        'response':'RESPONSE',
+        'responseModel':'RESPONSE MODEL',
+        'statusCode':'STATUS CODE',
+        'deprecated':'DEPRECATED',
+        'allowed':'allowed',
+        'pattern':'pattern',
+        'parameters':'Parameters',
+        'noRequestParameters': 'No request parameters',
+        'method':'METHOD'
+      }, localizeObj)
+    }
   }
 
   disconnectedCallback() {
@@ -160,6 +201,8 @@ export default customElements.define('rapi-pdf', class RapiPdf extends HTMLEleme
     let includeSecurity   = this.getAttribute('include-security')==='false'?false:true;
     let includeApiDetails = this.getAttribute('include-api-details')==='false'?false:true;
     let includeApiList    = this.getAttribute('include-api-list')==='true'?true:false;
+
+    /*
     let localize = {
       'index':'INDEX',
       'api':'API',
@@ -187,7 +230,8 @@ export default customElements.define('rapi-pdf', class RapiPdf extends HTMLEleme
       'noRequestParameters': 'No request parameters',
       'method':'METHOD'
     }
-    
+    */
+    let localize = this.localize;
     let options = {
       pdfPrimaryColor,
       pdfAlternateColor,
