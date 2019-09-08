@@ -71,53 +71,56 @@ export default customElements.define('rapi-pdf', class RapiPdf extends HTMLEleme
     // Initialize attributes if not defined 
     shadowRoot.appendChild(elFromTemplate);
   }
+
   static get properties() { 
     return { 
       localize: { type: Object }
     };
   }
+
   connectedCallback() {
     // Add Event Listeners
     this.inputEl.addEventListener('change', e => this.onChangeInput(e) );    
     this.inputEl.addEventListener('keyup',  e => this.onKeyUp(e) );    
-    this.btnEl.addEventListener('click',  e => this.generatePdf(e) );
+    this.btnEl.addEventListener('click',  e => this.generatePdf() );
+    let localizeObj = {};
     if (this.children[0]){
       let localizeStr = this.children[0].content.textContent;
-      let localizeObj = {};
       try {
         localizeObj = JSON.parse(localizeStr);
       }
       catch(e) {
         localizeObj = {};
       }
-      this.localize = Object.assign({
-        'index':'INDEX',
-        'api':'API',
-        'apiList':'API List',
-        'apiReference':'API Reference',
-        'apiVersion':'API Version',
-        'contact':'CONTACT',
-        'name':'NAME',
-        'email':'EMAIL',
-        'url':'URL',
-        'termsOfService':'Terms of service',
-        'securityAndAuthentication':'Security and Authentication',
-        'securitySchemes':'SECURITY SCHEMES',
-        'type':'TYPE',
-        'description':'DESCRIPTION',
-        'request':'REQUEST',
-        'requestBody':'REQUEST BODY',
-        'response':'RESPONSE',
-        'responseModel':'RESPONSE MODEL',
-        'statusCode':'STATUS CODE',
-        'deprecated':'DEPRECATED',
-        'allowed':'allowed',
-        'pattern':'pattern',
-        'parameters':'Parameters',
-        'noRequestParameters': 'No request parameters',
-        'method':'METHOD'
-      }, localizeObj)
     }
+    this.localize = Object.assign({
+      'index':'INDEX',
+      'api':'API',
+      'apiList':'API List',
+      'apiReference':'API Reference',
+      'apiVersion':'API Version',
+      'contact':'CONTACT',
+      'name':'NAME',
+      'email':'EMAIL',
+      'url':'URL',
+      'termsOfService':'Terms of service',
+      'securityAndAuthentication':'Security and Authentication',
+      'securitySchemes':'SECURITY SCHEMES',
+      'type':'TYPE',
+      'description':'DESCRIPTION',
+      'request':'REQUEST',
+      'requestBody':'REQUEST BODY',
+      'response':'RESPONSE',
+      'responseModel':'RESPONSE MODEL',
+      'statusCode':'STATUS CODE',
+      'deprecated':'DEPRECATED',
+      'allowed':'allowed',
+      'pattern':'pattern',
+      'parameters':'Parameters',
+      'noRequestParameters': 'No request parameters',
+      'method':'METHOD'
+    }, localizeObj)
+    
   }
 
   disconnectedCallback() {
@@ -173,7 +176,8 @@ export default customElements.define('rapi-pdf', class RapiPdf extends HTMLEleme
   get specUrl() {
     return this.getAttribute('spec-url');
   }
-  set specUrl(newSpecUrl) {
+
+  set specUrl(newSpecUrl){
     this.setAttribute('spec-url', newSpecUrl);
   }
 
@@ -182,13 +186,13 @@ export default customElements.define('rapi-pdf', class RapiPdf extends HTMLEleme
   }
 
   onKeyUp(e){
-    if (e.keyCode === 13) {
+    if (e.keyCode === 13){
       // In case of input keyup - first change event will fire which will set the new specUrl URL
       this.generatePdf();
     }
   }
 
-  generatePdf(){
+  generatePdf(jsonObj){
     let pdfPrimaryColor   = this.getAttribute('pdf-primary-color');
     let pdfAlternateColor = this.getAttribute('pdf-alternate-color');
     let pdfTitle          = this.getAttribute('pdf-title')===null?'API Reference':this.getAttribute('pdf-title');
@@ -202,35 +206,6 @@ export default customElements.define('rapi-pdf', class RapiPdf extends HTMLEleme
     let includeApiDetails = this.getAttribute('include-api-details')==='false'?false:true;
     let includeApiList    = this.getAttribute('include-api-list')==='true'?true:false;
 
-    /*
-    let localize = {
-      'index':'INDEX',
-      'api':'API',
-      'apiList':'API List',
-      'apiReference':'API Reference',
-      'apiVersion':'API Version',
-      'contact':'CONTACT',
-      'name':'NAME',
-      'email':'EMAIL',
-      'url':'URL',
-      'termsOfService':'Terms of service',
-      'securityAndAuthentication':'Security and Authentication',
-      'securitySchemes':'SECURITY SCHEMES',
-      'type':'TYPE',
-      'description':'DESCRIPTION',
-      'request':'REQUEST',
-      'requestBody':'REQUEST BODY',
-      'response':'RESPONSE',
-      'responseModel':'RESPONSE MODEL',
-      'statusCode':'STATUS CODE',
-      'deprecated':'DEPRECATED',
-      'allowed':'allowed',
-      'pattern':'pattern',
-      'parameters':'Parameters',
-      'noRequestParameters': 'No request parameters',
-      'method':'METHOD'
-    }
-    */
     let localize = this.localize;
     let options = {
       pdfPrimaryColor,
@@ -247,7 +222,8 @@ export default customElements.define('rapi-pdf', class RapiPdf extends HTMLEleme
       includeApiList,
       localize,
     }
-    createPdf(this.specUrl, options);
+    let spec = this.specUrl || jsonObj;
+    createPdf(spec, options);
   }
 
 });

@@ -6,7 +6,6 @@ export function getInfoDef(spec, bookTitle, localize){
   let content;
   if (spec.info){
     let contactDef=[], contactName, contactEmail, contactUrl, termsOfService;
-
     if (spec.info.contact){
       if (spec.info.contact.name){
         contactName = {text:[{text:`\n${localize.name}: `, style:['b','small']}, {text:spec.info.contact.name, style:['small']}]}; 
