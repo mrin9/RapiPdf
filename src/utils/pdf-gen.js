@@ -48,7 +48,7 @@ export default async function createPdf(specUrl, options){
     hLineColor: function (i, node) {
       return (i === 0 || i === 1 || i === node.table.body.length) ? 'black' : 'lightgray';
     },
-  }
+  };
 
   let rowLinesOnlyTableLayout= {
     hLineWidth: function (i, node) {
@@ -60,7 +60,7 @@ export default async function createPdf(specUrl, options){
     hLineColor: function (i, node) {
       return (i === 0 || i === node.table.body.length) ? 'black' : 'lightgray';
     },
-  }
+  };
   let allContent=[], infoDef={}, tocDef={}, securityDef={}, apiListDef={}, apiDef={};
 
   if (options.includeInfo){
@@ -73,9 +73,8 @@ export default async function createPdf(specUrl, options){
         title: {text: options.localize.index, style:['b', 'h2']},
         numberStyle: {bold: true},
         style:['small'],
-      },
-      pageBreak:'after'
-    }
+      }
+    };
     allContent.push(tocDef);
   }
   if (options.includeSecurity){
@@ -103,7 +102,7 @@ export default async function createPdf(specUrl, options){
     },
     content:allContent,
     styles:pdfStyles
-  }
+  };
 
 
   pdfMake.fonts = {
