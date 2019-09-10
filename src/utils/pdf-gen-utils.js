@@ -58,11 +58,11 @@ export function getInfoDef(spec, bookTitle, localize){
     ];
   }
   return content;
-};
+}
 
 //Security Def
 export function getSecurityDef(spec, tableLayout, localize){
-  let content =[]
+  let content =[];
   if (spec.securitySchemes){
     content.push( {text:localize.securityAndAuthentication, style:['h3', 'b', 'primary','right', 'topMargin3']} );
     content.push({text:localize.securitySchemes, style:['b','tableMargin']});
@@ -82,11 +82,12 @@ export function getSecurityDef(spec, tableLayout, localize){
         body: tableContent,
       },
       layout: tableLayout,
-      style: 'tableMargin'
+      style: 'tableMargin',
+      pageBreak: 'before'
     });
   }
   return content;
-};
+}
 
 // API details def
 export function getApiDef(spec, filterPath, sectionHeading, tableLayout, localize){
@@ -102,7 +103,7 @@ export function getApiDef(spec, filterPath, sectionHeading, tableLayout, localiz
 
     for (let j = 0; j < tag.paths.length; j++) {
       let path = tag.paths[j];
-      if (filterPath.trim()!=''){
+      if (filterPath.trim() !== ''){
         if (path.path.includes(filterPath) === false){
           continue;
         }
@@ -186,7 +187,7 @@ export function getApiDef(spec, filterPath, sectionHeading, tableLayout, localiz
         stack:respDef,
         margin:[10, 5, 0, 5]
       });
-    };
+    }
 
     
     if (pathSeq > 0){
@@ -207,8 +208,8 @@ export function getApiDef(spec, filterPath, sectionHeading, tableLayout, localiz
       content.push(
         { 
           text: `${tagSeq}. ${tag.name.toUpperCase()}`, 
-          style:['h2', 'b', 'primary', 'tableMargin'], 
-          pageBreak:tagSeq==1?'none':'before' ,
+          style: ['h2', 'b', 'primary', 'tableMargin'],
+          pageBreak: tagSeq === 1 ? 'none' : 'before',
           tocItem: true,
           tocStyle: ['small', 'b'],
           tocMargin: [0, 10, 0, 0],
@@ -273,7 +274,7 @@ function getRequestBodyDef(requestBody, tableLayout, localize){
 //Parameter Table
 function getParameterTableDef(parameters, paramType, tableLayout, localize){
   //let filteredParams= parameters ? parameters.filter(param => param.in === paramType):[];
-  if (parameters.length == 0 ){
+  if (parameters.length === 0 ){
     return;
   }
   let tableContent = [
@@ -413,7 +414,7 @@ export function getApiListDef(spec, sectionHeading, tableLayout, localize) {
     });
 
     content.push(
-      {text: tag.name, style:['h6','b','primary','tableMargin'], pageBreak:i==0?'none':'before'},
+      {text: tag.name, style:['h6','b','primary','tableMargin'], pageBreak: i === 0 ? 'none' : 'before'},
       {text: tag.description, style:['p']},
       {
         table: {
@@ -464,7 +465,7 @@ export function getMarkDownDef(tokens){
       });
     }
     else if (v.type==='space'){
-      let headingStyle = []
+      let headingStyle = [];
       headingStyle.push(`h${v.depth}`);
       content.push({
         text:'\u200B ',
@@ -481,7 +482,7 @@ export function getMarkDownDef(tokens){
     else if (v.type==='list_start'){
       listInsert= v.ordered?'ol':'ul';
       if (v.ordered){
-        listInsert='ol'
+        listInsert='ol';
         oList.start =  v.start;
       }
       else{
@@ -523,7 +524,6 @@ export function getMarkDownDef(tokens){
     }
   });
   return content;
-
 }
 
 export function getInlineMarkDownDef(txt){
