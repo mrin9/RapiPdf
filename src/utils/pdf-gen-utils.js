@@ -307,7 +307,7 @@ function getParameterTableDef(parameters, paramType, tableLayout, localize){
       tableContent.push([
         { 
           text:[
-            {text:paramSchema.required?'*':'', style:['small','b','red','mono'] },
+            {text:param.required?'*':'', style:['small','b','red','mono'] },
             {text:param.name, style:['small','mono'] },
             (paramSchema.depricated ?{text:'\n'+localize.deprecated, style:['small','red','b'] }:undefined)
           ]

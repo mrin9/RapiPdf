@@ -27,7 +27,7 @@ export function getTypeInfo(schema, overrideAttributes=null){
     readOnly  : schema.readOnly ? 'read-only' : '',
     writeOnly : schema.writeOnly ? 'write-only' : '',
     depricated: schema.deprecated ? 'depricated' : '',
-    default   : schema.default==0 ? '0 ': (schema.default ? schema.default : ''),
+    default   : schema.default === 0 ? '0 ': (schema.default ? schema.default : ''),
     type      : '',
     arrayType : '',
     allowedValues:'',
@@ -39,11 +39,11 @@ export function getTypeInfo(schema, overrideAttributes=null){
   }
   // Set the Type
   if (schema.enum) {
-    let opt=""
+    let opt = "";
     schema.enum.map(function(v){
       opt = opt + `${v}, `
     });
-    returnObj.type='enum';
+    returnObj.type = 'enum';
     returnObj.allowedValues = opt.slice(0,-2);
   }
   else if (schema.type) {
@@ -53,9 +53,9 @@ export function getTypeInfo(schema, overrideAttributes=null){
   if (schema.type==="array" && schema.items){
     let arraySchema = schema.items;
     returnObj.arrayType = `${schema.type} of ${arraySchema.type}`;
-    returnObj.default = arraySchema.default==0 ? '0 ': (arraySchema.default ? arraySchema.default : '');
+    returnObj.default = arraySchema.default === 0 ? '0 ': (arraySchema.default ? arraySchema.default : '');
     if (arraySchema.enum){
-      let opt=""
+      let opt = "";
       arraySchema.enum.map(function(v){
         opt = opt + `${v}, `
       });
@@ -114,6 +114,9 @@ export function getTypeInfo(schema, overrideAttributes=null){
   if (returnObj.deprecated){
     html = html + `depricated`;
   }
+  if (returnObj.required){
+    html = html + `required`;
+  }
 
   if (returnObj.constrain){
     html = html + `\u00a0${returnObj.constrain}`;
@@ -154,7 +157,8 @@ export function schemaToModel (schema, obj) {
         let overrideAttrib = { 
           "readOnly":schema.readOnly, 
           "writeOnly":schema.writeOnly, 
-          "deprecated":schema.deprecated
+          "deprecated":schema.deprecated,
+          "required":schema.required
         };
         return `${ getTypeInfo(schema.allOf[0],overrideAttrib).html }~|~${schema.description?schema.description:''}`
       }
@@ -321,4 +325,4 @@ export function removeCircularReferences(level=0) {
     }
     return value;
   };
-};
+}
