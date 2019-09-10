@@ -254,7 +254,7 @@ function getRequestBodyDef(requestBody, tableLayout, localize){
             table: {
               widths:['*'],
               body: [
-                [{text:`${localize.requestBody} ${contentType}`, style:['small','b']}],
+                [{text:`${localize.requestBody} (${contentType})`, style:['small','b']}],
                 requestBodyTableDef
               ]
             }
