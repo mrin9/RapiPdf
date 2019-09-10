@@ -114,10 +114,6 @@ export function getTypeInfo(schema, overrideAttributes=null){
   if (returnObj.deprecated){
     html = html + `depricated`;
   }
-  if (returnObj.required){
-    html = html + `required`;
-  }
-
   if (returnObj.constrain){
     html = html + `\u00a0${returnObj.constrain}`;
   }
@@ -157,8 +153,7 @@ export function schemaToModel (schema, obj) {
         let overrideAttrib = { 
           "readOnly":schema.readOnly, 
           "writeOnly":schema.writeOnly, 
-          "deprecated":schema.deprecated,
-          "required":schema.required
+          "deprecated":schema.deprecated
         };
         return `${ getTypeInfo(schema.allOf[0],overrideAttrib).html }~|~${schema.description?schema.description:''}`
       }
