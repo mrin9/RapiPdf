@@ -78,7 +78,7 @@ export function getTypeInfo(schema, overrideAttributes=null){
   }
   else if (schema.type==="string"){
     if (schema.minLength !==undefined  && schema.maxLength !==undefined ){
-      returnObj.constrain = `${schema.minLength} to ${schema.maxLength} chars)`;
+      returnObj.constrain = `${schema.minLength} to ${schema.maxLength} chars`;
     }
     else if (schema.minLength!==undefined  && schema.maxLength===undefined ){
       returnObj.constrain = `min:${schema.minLength} chars`;
