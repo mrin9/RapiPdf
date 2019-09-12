@@ -33,6 +33,7 @@ export default async function createPdf(specUrl, options){
     primary:{color: (options.pdfPrimaryColor ? options.pdfPrimaryColor:'#b44646')},
     alternate:{color: (options.pdfAlternateColor ? options.pdfAlternateColor:'#005b96')},
     gray:{color: 'gray'},
+    lightGray:{color: '#aaaaaa'},
     red:{color:  'orangered'},
     blue:{color: '#005b96'},
     mono:{font:  'RobotoMono', fontSize:10},
@@ -75,6 +76,7 @@ export default async function createPdf(specUrl, options){
         style:['small'],
       }
     };
+    allContent.push({text:'', pageBreak:'after'});
     allContent.push(tocDef);
   }
   if (options.includeSecurity){

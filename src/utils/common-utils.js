@@ -129,10 +129,10 @@ export function getTypeInfo(schema, overrideAttributes=null){
 
 /* For changing JSON-Schema to a Object Model that can be represnted in a tree-view */ 
 export function schemaToModel (schema, obj) {
-  if (schema==null){
+  if (schema == null){
     return;
   }
-  if (schema.type==="object" || schema.properties){
+  if (schema.type === "object" || schema.properties){
     if (schema.description){
       obj[":description"] = schema.description;
     }
@@ -145,7 +145,7 @@ export function schemaToModel (schema, obj) {
     obj = [ schemaToModel(schema.items,{})  ]
   }
   else if (schema.allOf ){
-    if (schema.allOf.length===1){
+    if (schema.allOf.length === 1){
       if (!schema.allOf[0]){
         return `string~|~${schema.description?schema.description:''}`;
       }
@@ -175,8 +175,10 @@ export function schemaToModel (schema, obj) {
   return obj;
 }
 
-export function schemaToPdf (schema, obj=[], name) {
-  if (schema==null){ return; }
+export function schemaToPdf (schema, obj=[], name, level=0) {
+  if (schema === null){ return; }
+
+  // Object Type
   if (schema.type === "object" || schema.properties) {
     // Create a blank row for pdfMake to have the total count of columns
     let rows=[
@@ -184,7 +186,7 @@ export function schemaToPdf (schema, obj=[], name) {
     ];
 
     for( let key in schema.properties ){
-      rows.push(schemaToPdf(schema.properties[key],[], key));
+      rows.push(schemaToPdf(schema.properties[key],[], key, level+1));
     }
 
     if (rows.length > 1){
@@ -217,42 +219,52 @@ export function schemaToPdf (schema, obj=[], name) {
     else{
       obj = [ 
         {text:name, style:['small', 'mono']},
-        {text:(schema.type ? (schema.type + '{ }') :''), style:['small', 'mono']},
-        {text:(schema.description?schema.description:''), style:['small']}
+        {text:(schema.type ? `{${schema.type}}`:''), style:['small', 'mono', 'lightGray']},
+        {text:(schema.description?schema.description:''), style:['small', 'lightGray']}
       ];
     }
   }
   
+  // Array Type
   else if (schema.type === "array") {
     let typeOfArr ='';
     let rows=[
       [{text:'', margin:0}, {text:'', margin:0}, {text:'', margin:0}]
     ];
 
-    if (schema.items.properties){
+    if (schema.items.properties) {
       typeOfArr = "object";
       for( let key in schema.items.properties ){
-        rows.push(schemaToPdf(schema.items.properties[key],[], key));
+        rows.push(schemaToPdf(schema.items.properties[key],[], key, level+1));
       }
     }
+    else if (schema.items.allOf) {
+      typeOfArr = "all-Of";
+      schema.items.allOf.map(function(v) {
+        if (v && v.properties){
+          for( let key in v.properties ){
+            rows.push(schemaToPdf(v.properties[key],[], key, level+1));
+          }
+        }
+      });
+    }
     else {
-      typeOfArr = `${schema.items.type}` ? schema.items.type : 'allOf';
+      typeOfArr = schema.items.type ? `${schema.items.type}` : 'all-Of';
     }
 
-    if (rows.length > 1){
+    if (rows.length > 1) {
       obj = [
         { 
           colSpan: 3,
           stack:[
-            (name ? {
+            {
               text:[ 
                 {text:name, style:['small', 'mono', 'blue']}, 
-                {text:`${typeOfArr==='object'?'[{':'['}`, style:['small', 'mono', 'blue']},
+                {text:`${typeOfArr==='object'?'[{':'['}`, style:['small', 'mono', (typeOfArr === 'object'?'blue':'lightGray') ]},
               ],
               margin:0
-            }
-            :{text:`root [{`, style:['small', 'mono', 'blue'], margin:0}) ,
-            {text:(schema.description ? schema.description : ''), style:['small'],margin:[0,2,0,0]},
+            },
+            {text:(schema.description ? schema.description : ''), style:['small','lightGray'],margin:[0,2,0,0]},
             {
               margin: [10, 0, 0, 0],
               widths: [ 'auto', 'auto', '*' ],
@@ -262,7 +274,7 @@ export function schemaToPdf (schema, obj=[], name) {
                 body: rows
               }
             },
-            {text:`${typeOfArr==='object'?'}]':']'}`, style:['small', 'mono', 'blue']}
+            {text:(typeOfArr === 'object'?'}]':']'), style:['small', 'mono', (typeOfArr === 'object'?'blue':'lightGray')]}
           ]
         }
       ]
@@ -270,25 +282,66 @@ export function schemaToPdf (schema, obj=[], name) {
     else{
       obj = [ 
         {text:name, style:['small', 'mono', 'blue'],margin:0},
-        {
-          text:[
-            {text:'[', style:['small','mono','blue']} , 
-            {text:`${typeOfArr}`, style:['small','mono']},
-            {text:']', style:['small','mono','blue']} , 
-          ]
-          ,margin:0
-        },
-        {text:(schema.description?schema.description:''), style:['small'],margin:[0,2,0,0]}
+        {text:`[${typeOfArr}]`, style:['small','mono', 'lightGray'], margin:0},
+        {text:(schema.description?schema.description:''), style:['small', 'lightGray'],margin:[0,2,0,0]}
       ];
     }
-
   }
   
+
+  // allOf Type (Open API type composition)
+  else if (schema.allOf) {
+    let allOfRows=[
+      [{text:'', margin:0}, {text:'', margin:0}, {text:'', margin:0}]
+    ];
+
+    schema.allOf.map(function(v) {
+      if (v && v.properties){
+        for( let key in v.properties ){
+          allOfRows.push(schemaToPdf(v.properties[key],[], key, level+1));
+        }
+      }
+    });
+    
+    // This is problematic
+    if (allOfRows.length >= 1){
+      obj = [{ 
+        colSpan: 3,
+        stack:[
+          {text:`${name?name:'root'} {`, style:['small', 'mono', 'blue']},
+          {text:(schema.description ? schema.description : ''), style:['sub', 'blue'],margin:[0,2,0,0]},
+          {
+            margin: [10, 0, 0, 0],
+            widths: [ 'auto', 'auto', '*' ],
+            layout: rowLinesOnlyTableLayout,
+            table: {
+              dontBreakRows: true,
+              body: allOfRows
+            }
+          },
+          {text:`}`, style:['small', 'mono', 'blue']}
+        ]
+      }]
+    }
+    
+    /*
+    obj = [ 
+      {text:name,style:['small', 'mono'],margin:0},
+      {text:(schema.type ? schema.type:''), style:['small', 'mono', 'lightGray'],margin:0},
+      {text:(schema.description?schema.description:''), style:['small', 'lightGray'], margin:[0,2,0,0]}
+    ];
+    */
+    
+    
+
+  }
+
+  // Primitive Type (String, Integer, Boolean etc)
   else {
     obj = [ 
       {text:name,style:['small', 'mono'],margin:0},
-      {text:(schema.type ? schema.type:''), style:['small', 'mono'],margin:0},
-      {text:(schema.description?schema.description:''), style:['small'],margin:[0,2,0,0]}
+      {text:(schema.type ? schema.type:''), style:['small', 'mono', 'lightGray'],margin:0},
+      {text:(schema.description?schema.description:''), style:['small', 'lightGray'], margin:[0,2,0,0]}
     ];
   }
   return obj;
@@ -299,7 +352,7 @@ export function getBaseUrlFromUrl(url){
     return pathArray[0] + "//" + pathArray[2];
 }
 
-export function removeCircularReferences(level=0) {
+export function removeCircularReferences(level = 0) {
   const seen = new WeakSet();
   return (key, value) => {
     if (typeof value === "object" && value !== null) {

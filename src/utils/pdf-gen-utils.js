@@ -47,8 +47,7 @@ export function getInfoDef(spec, bookTitle, localize){
       (spec.info.title ? {text:spec.info.title, style:['title', 'right']} : ''),
       (spec.info.version ? {text:`${localize.apiVersion}: ${spec.info.version}`, style:['p','b', 'right', 'alternate']} : ''),
       specInfDescrMarkDef,
-      ...contactDef,
-      {text:'', pageBreak:'after'}
+      ...contactDef
     ];
 
   }
@@ -64,7 +63,7 @@ export function getInfoDef(spec, bookTitle, localize){
 export function getSecurityDef(spec, tableLayout, localize){
   let content =[];
   if (spec.securitySchemes){
-    content.push( {text:localize.securityAndAuthentication, style:['h3', 'b', 'primary','right', 'topMargin3']} );
+    content.push( {text:localize.securityAndAuthentication, style:['h3', 'b', 'primary','right', 'topMargin3'], pageBreak:'before'} );
     content.push({text:localize.securitySchemes, style:['b','tableMargin']});
     let tableContent = [
       [ {text: localize.type, style: ['small','b']}, {text: localize.description, style: ['small','b']} ]
@@ -82,8 +81,7 @@ export function getSecurityDef(spec, tableLayout, localize){
         body: tableContent,
       },
       layout: tableLayout,
-      style: 'tableMargin',
-      pageBreak: 'before'
+      style: 'tableMargin'
     });
   }
   return content;
@@ -209,7 +207,6 @@ export function getApiDef(spec, filterPath, sectionHeading, tableLayout, localiz
         { 
           text: `${tagSeq}. ${tag.name.toUpperCase()}`, 
           style: ['h2', 'b', 'primary', 'tableMargin'],
-          pageBreak: tagSeq === 1 ? 'none' : 'before',
           tocItem: true,
           tocStyle: ['small', 'b'],
           tocMargin: [0, 10, 0, 0],
