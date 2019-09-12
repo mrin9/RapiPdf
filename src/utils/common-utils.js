@@ -175,7 +175,8 @@ export function schemaToModel (schema, obj) {
   return obj;
 }
 
-export function schemaToPdf (schema, obj=[], name) {
+export function schemaToPdf (schema, name, colSpan = 3) {
+  let obj = [];
   if (schema==null){ return; }
   if (schema.type === "object" || schema.properties) {
     // Create a blank row for pdfMake to have the total count of columns
@@ -184,13 +185,13 @@ export function schemaToPdf (schema, obj=[], name) {
     ];
 
     for( let key in schema.properties ){
-      rows.push(schemaToPdf(schema.properties[key],[], key));
+      rows.push(schemaToPdf(schema.properties[key], key));
     }
 
     if (rows.length > 1){
       obj = [
         { 
-          colSpan: 3,
+          colSpan,
           stack:[
             (name ? {
               text:[ 
@@ -232,7 +233,7 @@ export function schemaToPdf (schema, obj=[], name) {
     if (schema.items.properties){
       typeOfArr = "object";
       for( let key in schema.items.properties ){
-        rows.push(schemaToPdf(schema.items.properties[key],[], key));
+        rows.push(schemaToPdf(schema.items.properties[key], key));
       }
     }
     else {
@@ -242,7 +243,7 @@ export function schemaToPdf (schema, obj=[], name) {
     if (rows.length > 1){
       obj = [
         { 
-          colSpan: 3,
+          colSpan,
           stack:[
             (name ? {
               text:[ 

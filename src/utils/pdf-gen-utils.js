@@ -245,12 +245,10 @@ function getRequestBodyDef(requestBody, tableLayout, localize){
       let origSchema = requestBody.content[contentType].schema;
       if (origSchema){
         origSchema = JSON.parse(JSON.stringify(origSchema, removeCircularReferences()));
-        requestBodyTableDef = schemaToPdf(origSchema);
+        requestBodyTableDef = schemaToPdf(origSchema, null, null);
         if (requestBodyTableDef && requestBodyTableDef[0] && requestBodyTableDef[0].stack){
-          requestBodyTableDef[0].colSpan=undefined;
           requestBodyTableDef = {
             margin:[0,5,0,0],
-            //layout:tableLayout,
             layout:'noBorders',
             table: {
               widths:['*'],
@@ -351,30 +349,6 @@ function getResponseDef(responses, tableLayout, localize){
   let respDef=[];
   let allResponseModelTabelDefs=[];
   for(let statusCode in responses) {
-    for(let contentType in responses[statusCode].content ) {
-      let reponseModelTableDef;
-      let origSchema = responses[statusCode].content[contentType].schema;
-      if (origSchema){
-        origSchema = JSON.parse(JSON.stringify(origSchema, removeCircularReferences()));
-        reponseModelTableDef = schemaToPdf(origSchema);
-        if (reponseModelTableDef && reponseModelTableDef[0] && reponseModelTableDef[0].stack){
-          reponseModelTableDef[0].colSpan=undefined;
-          reponseModelTableDef = {
-            margin:[0,5,0,0],
-            //layout:tableLayout,
-            layout:'noBorders',
-            table: {
-              widths:['*'],
-              body: [
-                [{text:`${localize.responseModel} (${contentType})`,style:['small','b']}],
-                reponseModelTableDef
-              ]
-            }
-          };
-          allResponseModelTabelDefs.push(reponseModelTableDef);
-        }
-      }
-    }
 
     respDef.push({
       text:[
@@ -384,9 +358,28 @@ function getResponseDef(responses, tableLayout, localize){
       margin:[0,10,0,0]
     });
 
-    allResponseModelTabelDefs.map(function(respModelTableDef){
-      respDef.push(respModelTableDef);
-    })
+    for(let contentType in responses[statusCode].content ) {
+      let reponseModelTableDef;
+      let origSchema = responses[statusCode].content[contentType].schema;
+      if (origSchema){
+        origSchema = JSON.parse(JSON.stringify(origSchema, removeCircularReferences()));
+        reponseModelTableDef = schemaToPdf(origSchema, null, null);
+        if (reponseModelTableDef && reponseModelTableDef[0] && reponseModelTableDef[0].stack){
+          const responseModelDef = {
+            margin:[0,5,0,0],
+            layout:'noBorders',
+            table: {
+              widths:['*'],
+              body: [
+                [{text:`${localize.responseModel} (${contentType})`,style:['small','b']}],
+                reponseModelTableDef
+              ]
+            }
+          };
+          respDef.push(responseModelDef);
+        }
+      }
+    }
   }
   return respDef;
 }
