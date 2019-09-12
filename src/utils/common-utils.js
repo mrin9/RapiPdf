@@ -191,15 +191,12 @@ export function schemaToPdf (schema, obj=[], name) {
       obj = [
         { 
           colSpan: 3,
-          stack:[
-            (name ? {
-              text:[ 
-                {text:name, style:['small', 'mono', 'blue']}, 
-                {text:` {`, style:['small', 'mono', 'blue']},
-              ],
-            }
-            :{text:`root { `, style:['small', 'mono', 'blue']}),
-            {text:(schema.description ? schema.description : ''), style:['sub', 'blue'],margin:[0,2,0,0]},
+          stack: [
+            {text: [
+                {text: name || schema.title, style:['small', 'mono', 'blue']},
+                {text: schema.description ? ` - ${schema.description}` : "", style:['sub', 'blue']}
+              ]},
+            {text:`{`, style:['small', 'mono', 'blue']},
             {
               margin: [10, 0, 0, 0],
               widths: [ 'auto', 'auto', '*' ],
@@ -251,7 +248,13 @@ export function schemaToPdf (schema, obj=[], name) {
               ],
               margin:0
             }
-            :{text:`root [{`, style:['small', 'mono', 'blue'], margin:0}) ,
+            : {stack: [
+                {text:[
+                    {text:`Array of ${schema.items.title}`, style:['small', 'mono', 'blue']},
+                    {text: schema.items.description ? ` - ${schema.items.description}` : "", style:['sub', 'blue']}
+                  ]},
+                {text: `[{`, style:['small', 'mono', 'blue']}
+              ]}),
             {text:(schema.description ? schema.description : ''), style:['small'],margin:[0,2,0,0]},
             {
               margin: [10, 0, 0, 0],
