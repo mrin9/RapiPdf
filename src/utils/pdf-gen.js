@@ -73,10 +73,11 @@ export default async function createPdf(specUrl, options){
       toc: {
         title: {text: options.localize.index, style:['b', 'h2']},
         numberStyle: {bold: true},
-        style:['small'],
-      }
+        style:['small']
+      },
+      pageBreak:'after'
     };
-    allContent.push({text:'', pageBreak:'after'});
+    // allContent.push({text:'', pageBreak:'after'});
     allContent.push(tocDef);
   }
   if (options.includeSecurity){

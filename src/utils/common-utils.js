@@ -194,13 +194,7 @@ export function schemaToPdf (schema, obj=[], name, level=0) {
         { 
           colSpan: 3,
           stack:[
-            (name ? {
-              text:[ 
-                {text:name, style:['small', 'mono', 'blue']}, 
-                {text:` {`, style:['small', 'mono', 'blue']},
-              ],
-            }
-            :{text:`root { `, style:['small', 'mono', 'blue']}),
+            {text:`${name?name:'object'} { `, style:['small', 'mono', 'blue']}, 
             {text:(schema.description ? schema.description : ''), style:['sub', 'blue'],margin:[0,2,0,0]},
             {
               margin: [10, 0, 0, 0],
@@ -257,13 +251,7 @@ export function schemaToPdf (schema, obj=[], name, level=0) {
         { 
           colSpan: 3,
           stack:[
-            {
-              text:[ 
-                {text:name, style:['small', 'mono', 'blue']}, 
-                {text:`${typeOfArr==='object'?'[{':'['}`, style:['small', 'mono', (typeOfArr === 'object'?'blue':'lightGray') ]},
-              ],
-              margin:0
-            },
+            {text:`${name?name:'array '} ${typeOfArr==='object'?'[{':'['}` , style:['small', 'mono', (typeOfArr === 'object'?'blue':'lightGray')], margin:0}, 
             {text:(schema.description ? schema.description : ''), style:['small','lightGray'],margin:[0,2,0,0]},
             {
               margin: [10, 0, 0, 0],
@@ -281,7 +269,7 @@ export function schemaToPdf (schema, obj=[], name, level=0) {
     }
     else{
       obj = [ 
-        {text:name, style:['small', 'mono', 'blue'],margin:0},
+        {text:name, style:['small', 'mono'],margin:0},
         {text:`[${typeOfArr}]`, style:['small','mono', 'lightGray'], margin:0},
         {text:(schema.description?schema.description:''), style:['small', 'lightGray'],margin:[0,2,0,0]}
       ];
@@ -303,37 +291,24 @@ export function schemaToPdf (schema, obj=[], name, level=0) {
       }
     });
     
-    // This is problematic
-    if (allOfRows.length >= 1){
-      obj = [{ 
-        colSpan: 3,
-        stack:[
-          {text:`${name?name:'root'} {`, style:['small', 'mono', 'blue']},
-          {text:(schema.description ? schema.description : ''), style:['sub', 'blue'],margin:[0,2,0,0]},
-          {
-            margin: [10, 0, 0, 0],
-            widths: [ 'auto', 'auto', '*' ],
-            layout: rowLinesOnlyTableLayout,
-            table: {
-              dontBreakRows: true,
-              body: allOfRows
-            }
-          },
-          {text:`}`, style:['small', 'mono', 'blue']}
-        ]
-      }]
-    }
+    obj = [{ 
+      colSpan: 3,
+      stack:[
+        {text:`${name?name:'object'} {`, style:['small', 'mono', 'blue']},
+        {text:(schema.description ? schema.description : ''), style:['sub', 'blue'],margin:[0,2,0,0]},
+        {
+          margin: [10, 0, 0, 0],
+          widths: [ 'auto', 'auto', '*' ],
+          layout: rowLinesOnlyTableLayout,
+          table: {
+            dontBreakRows: true,
+            body: allOfRows
+          }
+        },
+        {text:`}`, style:['small', 'mono', 'blue']}
+      ]
+    }]
     
-    /*
-    obj = [ 
-      {text:name,style:['small', 'mono'],margin:0},
-      {text:(schema.type ? schema.type:''), style:['small', 'mono', 'lightGray'],margin:0},
-      {text:(schema.description?schema.description:''), style:['small', 'lightGray'], margin:[0,2,0,0]}
-    ];
-    */
-    
-    
-
   }
 
   // Primitive Type (String, Integer, Boolean etc)

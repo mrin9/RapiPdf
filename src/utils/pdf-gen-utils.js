@@ -26,7 +26,7 @@ export function getInfoDef(spec, bookTitle, localize){
           contactEmail,
           contactUrl,
           termsOfService
-        ]}
+        ]},
       ]
     }
 
@@ -47,13 +47,14 @@ export function getInfoDef(spec, bookTitle, localize){
       (spec.info.title ? {text:spec.info.title, style:['title', 'right']} : ''),
       (spec.info.version ? {text:`${localize.apiVersion}: ${spec.info.version}`, style:['p','b', 'right', 'alternate']} : ''),
       specInfDescrMarkDef,
-      ...contactDef
+      ...contactDef,
+      {text:'', pageBreak:'after'},
     ];
-
   }
   else{
     content = [
-      {text:bookTitle?bookTitle:apiVersion.apiReference, style:['h1', 'bold', 'primary','right', 'topMargin1']}
+      {text:bookTitle?bookTitle:apiVersion.apiReference, style:['h1', 'bold', 'primary','right', 'topMargin1']},
+      {text:'', pageBreak:'after'},
     ];
   }
   return content;
@@ -63,7 +64,7 @@ export function getInfoDef(spec, bookTitle, localize){
 export function getSecurityDef(spec, tableLayout, localize){
   let content =[];
   if (spec.securitySchemes){
-    content.push( {text:localize.securityAndAuthentication, style:['h3', 'b', 'primary','right', 'topMargin3'], pageBreak:'before'} );
+    content.push( {text:localize.securityAndAuthentication, style:['h3', 'b', 'primary','right', 'topMargin3']} );
     content.push({text:localize.securitySchemes, style:['b','tableMargin']});
     let tableContent = [
       [ {text: localize.type, style: ['small','b']}, {text: localize.description, style: ['small','b']} ]
@@ -81,15 +82,17 @@ export function getSecurityDef(spec, tableLayout, localize){
         body: tableContent,
       },
       layout: tableLayout,
-      style: 'tableMargin'
+      style: 'tableMargin',
+      pageBreak:'after'
     });
+    
   }
   return content;
 }
 
 // API details def
 export function getApiDef(spec, filterPath, sectionHeading, tableLayout, localize){
-  let content =[{text: sectionHeading, style:['h2','b'],pageBreak:'before'}];
+  let content =[{text: sectionHeading, style:['h2','b']}];
   let tagSeq=0;
 
   // Sort by Tag name (allready sorted)
@@ -212,14 +215,14 @@ export function getApiDef(spec, filterPath, sectionHeading, tableLayout, localiz
           tocMargin: [0, 10, 0, 0],
         },
         tagDescrMarkDef,
-        operationContent
+        operationContent,
+        {text:'', pageBreak:'after'}
       );
     }
     
   });
-
+  //content.push({text:'', pageBreak:'after'});
   return content;
-
 }
 
 
@@ -276,9 +279,9 @@ function getParameterTableDef(parameters, paramType, tableLayout, localize){
   }
   let tableContent = [
     [ 
-      {text: localize.name, style: ['sub','b','alternate']}, 
-      {text: localize.type, style: ['sub','b','alternate']},
-      {text: localize.description, style: ['sub','b','alternate']}
+      {text: localize.name, style: ['sub', 'b', 'alternate']}, 
+      {text: localize.type, style: ['sub', 'b', 'alternate']},
+      {text: localize.description, style: ['sub', 'b', 'alternate']}
     ]
   ];
   
@@ -292,9 +295,9 @@ function getParameterTableDef(parameters, paramType, tableLayout, localize){
         type = "array of " + param.items.type;
       }
       tableContent.push([
-        { text:paramName, style:['small','mono'] },
-        { text:type + format, style:['small','mono'] },
-        { text:param.description, style:['small'],margin:[0,2,0,0]},
+        { text:paramName, style:['small', 'mono'] },
+        { text:type + format, style:['small', 'mono' ] },
+        { text:param.description, style:['small'], margin:[0,2,0,0]},
       ]);  
     }
 
@@ -312,11 +315,11 @@ function getParameterTableDef(parameters, paramType, tableLayout, localize){
         },
         {
           stack:[
-            { text: `${paramSchema.type==='array' ? paramSchema.arrayType:paramSchema.type}${paramSchema.format ? `(${paramSchema.format})`:'' }`, style:['small','mono']},
+            { text: `${paramSchema.type==='array' ? paramSchema.arrayType:paramSchema.type}${paramSchema.format ? `(${paramSchema.format})`:'' }`, style:['small','mono', 'gray']},
             ( paramSchema.constrain ? { text: paramSchema.constrain, style:['small', 'gray']}:''),
             ( paramSchema.allowedValues ? { text:[
                 {text: localize.allowed+': ', style:['b','small']},
-                {text: paramSchema.allowedValues, style:['small', 'gray']}
+                {text: paramSchema.allowedValues, style:['small']}
               ]} : ''
             ),
             ( paramSchema.pattern ? { text: `${localize.pattern}: ${paramSchema.pattern}`, style:['small','gray']}:''),
@@ -355,7 +358,7 @@ function getResponseDef(responses, tableLayout, localize){
         origSchema = JSON.parse(JSON.stringify(origSchema, removeCircularReferences()));
         reponseModelTableDef = schemaToPdf(origSchema);
         if (reponseModelTableDef && reponseModelTableDef[0] && reponseModelTableDef[0].stack){
-          reponseModelTableDef[0].colSpan=undefined;
+          reponseModelTableDef[0].colSpan = undefined;
           reponseModelTableDef = {
             margin:[0,5,0,0],
             //layout:tableLayout,
@@ -381,16 +384,19 @@ function getResponseDef(responses, tableLayout, localize){
       margin:[0,10,0,0]
     });
 
-    allResponseModelTabelDefs.map(function(respModelTableDef){
-      respDef.push(respModelTableDef);
-    })
+    if (responses[statusCode].content){
+      allResponseModelTabelDefs.map(function(respModelTableDef){
+        respDef.push(respModelTableDef);
+      })
+    }
   }
+  
   return respDef;
 }
 
 //API List Def
 export function getApiListDef(spec, sectionHeading, tableLayout, localize) {
-  let content =[{text: sectionHeading, style:['h3','b'],pageBreak:'before'}];
+  let content =[{text: sectionHeading, style:['h3','b'],pageBreak:'none'}];
   spec.tags.map(function(tag, i){
     let tableContent = [
       [ {text: localize.method, style: ['small','b']}, {text: localize.api, style: ['small','b']}]
@@ -411,7 +417,7 @@ export function getApiListDef(spec, sectionHeading, tableLayout, localize) {
     });
 
     content.push(
-      {text: tag.name, style:['h6','b','primary','tableMargin'], pageBreak: i === 0 ? 'none' : 'before'},
+      {text: tag.name, style:['h6','b','primary','tableMargin'], pageBreak: i === 0 ? 'none' : 'after'},
       {text: tag.description, style:['p']},
       {
         table: {
