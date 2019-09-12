@@ -64,7 +64,10 @@ export function getInfoDef(spec, bookTitle, localize){
 export function getSecurityDef(spec, tableLayout, localize){
   let content =[];
   if (spec.securitySchemes){
-    content.push( {text:localize.securityAndAuthentication, style:['h3', 'b', 'primary','right', 'topMargin3']} );
+    content.push({
+      text:localize.securityAndAuthentication,
+      style:['h3', 'b', 'primary','right', 'topMargin3'],
+      pageBreak: 'before'});
     content.push({text:localize.securitySchemes, style:['b','tableMargin']});
     let tableContent = [
       [ {text: localize.type, style: ['small','b']}, {text: localize.description, style: ['small','b']} ]
@@ -82,8 +85,7 @@ export function getSecurityDef(spec, tableLayout, localize){
         body: tableContent,
       },
       layout: tableLayout,
-      style: 'tableMargin',
-      pageBreak: 'before'
+      style: 'tableMargin'
     });
   }
   return content;
