@@ -440,7 +440,7 @@ export function getMarkDownDef(tokens){
     if (v.type==='paragraph'){
       let textArr = getInlineMarkDownDef(v.text);
       content.push({
-        text:textArr,
+        stack:textArr,
         style:['topMarginRegular']
       });
     }
@@ -535,6 +535,40 @@ export function getInlineMarkDownDef(txt){
   if (!txt.split){
     console.log(txt);
   }
+
+  function imageSplit(text, style){
+    let imageRegex = /([!@]?\[(?:\[[^\]]*\]|[^\[\]]|\](?=[^\[]*\]))*\]\(\s*<?[\s\S]*?>?(?:\s+['"][\s\S]*?['"])?\s*\))/;
+    let imageArgsGroup = /[!@]?\[(?<altText>(?:\[[^\]]*\]|[^\[\]]|\](?=[^\[]*\]))*)\]\(\s*<?(?<src>[\s\S]*?)>?(?:\s+['"](?<titleText>[\s\S]*?)['"])?(?:\s+=(?<width>[0-9]+)x(?<height>[0-9]+)?)?\s*\)/
+    text.split(imageRegex).forEach(function(val){
+      let match = val.match(imageArgsGroup);
+      if (match){
+        final.push(new Promise(function(resolve, reject){
+          fetch(match.groups.src).then(function(response){
+            response.blob().then(function(blob){
+              var reader = new FileReader();
+              reader.readAsDataURL(blob);
+              reader.onloadend = function(){
+                const result = {
+                  image: reader.result
+                }
+                if ('width' in match.groups && match.groups.width){
+                  result["width"] = parseInt(match.groups.width);
+                }
+                if ('height' in match.groups && match.groups.height){
+                  result["height"] = parseInt(match.groups.height);
+                }
+                resolve(result);
+              }
+            });
+          });
+        }));
+      }
+      else {
+        final.push({text:val, style:style});
+      }
+    });
+  };
+
   let bi_parts = txt.split(boldItalicDelimiter);
   bi_parts.forEach(function(bi_val,i){
     if (i%2 === 0){
@@ -547,12 +581,12 @@ export function getInlineMarkDownDef(txt){
               c_parts.forEach(function(c_val,k){
                 if (k%2 === 0){
                   if (c_val){
-                    final.push({ text:c_val,style:['small']});
+                    imageSplit(c_val, ['small']);
                   }
                 }
                 else{
                   if (c_val.trim){
-                    final.push({ text:c_val,style:['small','mono', 'gray']});
+                    imageSplit(c_val, ['small','mono','gray']);
                   }
                 }
               });
@@ -561,7 +595,7 @@ export function getInlineMarkDownDef(txt){
           }
           else{
             if (b_val){
-              final.push({text:b_val,style:['small','bold']});
+              imageSplit(b_val, ['small','bold']);
             }
           }
         });
@@ -569,7 +603,7 @@ export function getInlineMarkDownDef(txt){
     }
     else{
       if(bi_val){
-        final.push({ text:bi_val, style:['small','bold', 'italics']});
+        imageSplit(bi_val, ['small','bold','italics']);
       }
     }
   });
