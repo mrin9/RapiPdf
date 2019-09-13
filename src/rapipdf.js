@@ -114,7 +114,7 @@ export default customElements.define('rapi-pdf', class RapiPdf extends HTMLEleme
       'responseModel':'RESPONSE MODEL',
       'statusCode':'STATUS CODE',
       'deprecated':'DEPRECATED',
-      'allowed':'allowed',
+      'allowed':'ALLOWED',
       'pattern':'pattern',
       'parameters':'Parameters',
       'noRequestParameters': 'No request parameters',

@@ -112,36 +112,30 @@ export function getApiDef(spec, filterPath, sectionHeading, tableLayout, localiz
       pathSeq = pathSeq + 1;
       operationContent.push({ 
         text:`${tagSeq+1}.${pathSeq} ${path.method.toUpperCase()} ${path.path}`,
-        style:['topMargin3','mono','p', 'primary'],
+        style:['topMargin3','mono','p', 'primary','b'],
         tocItem: true,
         tocStyle: ['small','blue','mono'],
         tocNumberStyle:['small','blue','mono'],
       });
+      operationContent.push({text:'', style:['topMarginRegular']})
 
-      if (path.description || path.summary){
-
-        let pathDescrMarkDef, tokens;
-        if (path.description) {
-          tokens = marked.lexer(path.description);
-          pathDescrMarkDef = {
-            stack: getMarkDownDef(tokens),
-            style:['topMarginRegular'],
-          }
+      let pathSummaryMarkDef, pathDescrMarkDef, tokens;
+      if (path.summary){
+        tokens = marked.lexer(path.summary);
+        pathSummaryMarkDef = {
+          stack: getMarkDownDef(tokens),
+          style:['primary', 'b'],
         }
-        else {
-          if (path.summary){
-            tokens = marked.lexer(path.summary);
-            pathDescrMarkDef = {
-              stack: getMarkDownDef(tokens),
-              style:['topMarginRegular'],
-            }
-          }
-          pathDescrMarkDef='';
-        }
-        if (pathDescrMarkDef){
-          operationContent.push(pathDescrMarkDef);
-        }
+        operationContent.push(pathSummaryMarkDef);
       }
+      if (path.description && path.description.trim() !== path.summary.trim()) {
+        tokens = marked.lexer(path.description);
+        pathDescrMarkDef = {
+          stack: getMarkDownDef(tokens),
+        }
+        operationContent.push(pathDescrMarkDef);
+      }
+      
       let requestSetDef = [];
       const pathParams   = path.parameters ? path.parameters.filter(param => param.in === 'path'):null;
       const queryParams  = path.parameters ? path.parameters.filter(param => param.in === 'query'):null;
@@ -182,12 +176,14 @@ export function getApiDef(spec, filterPath, sectionHeading, tableLayout, localiz
         stack:requestSetDef,
         margin:[10, 0, 0, 0]
       });
-      let respDef = getResponseDef(path.responses, tableLayout, localize)
+      let respDef = getResponseDef(path.responses, tableLayout, localize);
+
       operationContent.push({ text: localize.response, style:['p', 'b', 'alternate'], margin:[0, 10, 0, 0]});
       operationContent.push({
         stack:respDef,
         margin:[10, 5, 0, 5]
       });
+      operationContent.push({canvas: [{ type: 'line', x1: 0, y1: 5, x2: 595-2*35, y2: 5, lineWidth: 0.5, lineColor: '#cccccc' }]});
     }
 
     
@@ -221,7 +217,6 @@ export function getApiDef(spec, filterPath, sectionHeading, tableLayout, localiz
     }
     
   });
-  //content.push({text:'', pageBreak:'after'});
   return content;
 }
 
@@ -315,11 +310,11 @@ function getParameterTableDef(parameters, paramType, tableLayout, localize){
         },
         {
           stack:[
-            { text: `${paramSchema.type==='array' ? paramSchema.arrayType:paramSchema.type}${paramSchema.format ? `(${paramSchema.format})`:'' }`, style:['small','mono', 'gray']},
+            { text: `${paramSchema.type==='array' ? paramSchema.arrayType:paramSchema.type}${paramSchema.format ? `(${paramSchema.format})`:'' }`, style:['small','mono']},
             ( paramSchema.constrain ? { text: paramSchema.constrain, style:['small', 'gray']}:''),
             ( paramSchema.allowedValues ? { text:[
-                {text: localize.allowed+': ', style:['b','small']},
-                {text: paramSchema.allowedValues, style:['small']}
+                {text: localize.allowed+': ', style:['b','sub']},
+                {text: paramSchema.allowedValues, style:['small', 'lightGray']}
               ]} : ''
             ),
             ( paramSchema.pattern ? { text: `${localize.pattern}: ${paramSchema.pattern}`, style:['small','gray']}:''),
