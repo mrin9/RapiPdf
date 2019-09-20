@@ -82,7 +82,7 @@ export default customElements.define('rapi-pdf', class RapiPdf extends HTMLEleme
     // Add Event Listeners
     this.inputEl.addEventListener('change', (e) => this.onChangeInput(e));
     this.inputEl.addEventListener('keyup', (e) => this.onKeyUp(e));
-    this.btnEl.addEventListener('click', (e) => this.generatePdf());
+    this.btnEl.addEventListener('click', () => this.generatePdf());
     let localizeObj = {};
     if (this.children[0]) {
       const localizeStr = this.children[0].content.textContent;
@@ -92,38 +92,7 @@ export default customElements.define('rapi-pdf', class RapiPdf extends HTMLEleme
         localizeObj = {};
       }
     }
-<<<<<<< Updated upstream
-    this.localize = Object.assign({
-      'index':'INDEX',
-      'api':'API',
-      'apiList':'API List',
-      'apiReference':'API Reference',
-      'apiVersion':'API Version',
-      'contact':'CONTACT',
-      'name':'NAME',
-      'email':'EMAIL',
-      'url':'URL',
-      'termsOfService':'Terms of service',
-      'securityAndAuthentication':'Security and Authentication',
-      'securitySchemes':'SECURITY SCHEMES',
-      'key':'KEY',
-      'type':'TYPE',
-      'description':'DESCRIPTION',
-      'request':'REQUEST',
-      'requestBody':'REQUEST BODY',
-      'response':'RESPONSE',
-      'responseModel':'RESPONSE MODEL',
-      'statusCode':'STATUS CODE',
-      'deprecated':'DEPRECATED',
-      'allowed':'ALLOWED',
-      'enumValues':'ENUM',
-      'pattern':'pattern',
-      'parameters':'Parameters',
-      'noRequestParameters': 'No request parameters',
-      'method':'METHOD'
-    }, localizeObj)
-    
-=======
+
     this.localize = {
       index: 'INDEX',
       api: 'API',
@@ -137,6 +106,7 @@ export default customElements.define('rapi-pdf', class RapiPdf extends HTMLEleme
       termsOfService: 'Terms of service',
       securityAndAuthentication: 'Security and Authentication',
       securitySchemes: 'SECURITY SCHEMES',
+      key: 'KEY',
       type: 'TYPE',
       description: 'DESCRIPTION',
       request: 'REQUEST',
@@ -146,13 +116,13 @@ export default customElements.define('rapi-pdf', class RapiPdf extends HTMLEleme
       statusCode: 'STATUS CODE',
       deprecated: 'DEPRECATED',
       allowed: 'ALLOWED',
+      enumValues: 'ENUM',
       pattern: 'pattern',
       parameters: 'Parameters',
       noRequestParameters: 'No request parameters',
       method: 'METHOD',
       ...localizeObj,
     };
->>>>>>> Stashed changes
   }
 
   disconnectedCallback() {
@@ -173,11 +143,13 @@ export default customElements.define('rapi-pdf', class RapiPdf extends HTMLEleme
           this.inputEl.value = newValue;
           return true;
         }
+        break;
       case 'button-label':
         if (oldValue !== newValue) {
           this.btnEl.innerText = newValue;
           return true;
         }
+        break;
       case 'hide-input':
         if (oldValue !== newValue) {
           if (newValue === 'true') {
@@ -187,6 +159,7 @@ export default customElements.define('rapi-pdf', class RapiPdf extends HTMLEleme
           }
           return true;
         }
+        break;
       case 'button-bg':
         this.btnEl.style.backgroundColor = newValue;
         this.inputEl.style.borderColor = newValue;
@@ -199,6 +172,8 @@ export default customElements.define('rapi-pdf', class RapiPdf extends HTMLEleme
         return true;
       case 'input-color':
         this.inputEl.style.color = newValue;
+        return true;
+      default:
         return true;
     }
     return true;
@@ -223,27 +198,8 @@ export default customElements.define('rapi-pdf', class RapiPdf extends HTMLEleme
     }
   }
 
-<<<<<<< Updated upstream
-  generatePdf(jsonObj){
-    let pdfSortTags       = this.getAttribute('pdf-sort-tags')==='false'?false:true;
-    let pdfPrimaryColor   = this.getAttribute('pdf-primary-color');
-    let pdfAlternateColor = this.getAttribute('pdf-alternate-color');
-    let pdfTitle          = this.getAttribute('pdf-title')===null?'API Reference':this.getAttribute('pdf-title');
-    let pdfCoverText      = this.getAttribute('pdf-cover-text')?this.getAttribute('pdf-cover-text'):'';
-    let pdfSecurityText   = this.getAttribute('pdf-security-text')?this.getAttribute('pdf-security-text'):'';
-    let pdfApiText        = this.getAttribute('pdf-api-text')?this.getAttribute('pdf-api-text'):'';
-    let pdfFooterText     = this.getAttribute('pdf-footer-text')?this.getAttribute('pdf-footer-text'):'';
-    let includeInfo       = this.getAttribute('include-info')==='false'?false:true;
-    let includeToc        = this.getAttribute('include-toc')==='false'?false:true;
-    let includeSecurity   = this.getAttribute('include-security')==='false'?false:true;
-    let includeApiDetails = this.getAttribute('include-api-details')==='false'?false:true;
-    let includeApiList    = this.getAttribute('include-api-list')==='true'?true:false;
-
-    let localize = this.localize;
-    let options = {
-      pdfSortTags,
-=======
   generatePdf(jsonObj) {
+    const pdfSortTags = this.getAttribute('pdf-sort-tags') !== 'false';
     const pdfPrimaryColor = this.getAttribute('pdf-primary-color');
     const pdfAlternateColor = this.getAttribute('pdf-alternate-color');
     const pdfTitle = this.getAttribute('pdf-title') === null ? 'API Reference' : this.getAttribute('pdf-title');
@@ -257,9 +213,9 @@ export default customElements.define('rapi-pdf', class RapiPdf extends HTMLEleme
     const includeApiDetails = this.getAttribute('include-api-details') !== 'false';
     const includeApiList = this.getAttribute('include-api-list') === 'true';
 
-    const { localize } = this;
+    const localize = this.localize;
     const options = {
->>>>>>> Stashed changes
+      pdfSortTags,
       pdfPrimaryColor,
       pdfAlternateColor,
       pdfTitle,
