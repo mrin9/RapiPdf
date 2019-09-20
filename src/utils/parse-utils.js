@@ -1,7 +1,7 @@
 import JsonRefs from 'json-refs';
 import converter from 'swagger2openapi';
 
-export default async function ProcessSpec(specUrl) {
+export default async function ProcessSpec(specUrl, sortTags) {
   let jsonParsedSpec, convertedSpec, resolvedRefSpec;
   let convertOptions = { patch:true, warnOnly:true };
   let resolveOptions = { resolveCirculars: false }
@@ -148,7 +148,9 @@ export default async function ProcessSpec(specUrl) {
     })
   }
   servers = openApiSpec.servers;
-  tags.sort((a, b) =>  (a.name < b.name ? -1 : (a.name > b.name ? 1: 0)) );
+  if (sortTags) {
+    tags.sort((a, b) =>  (a.name < b.name ? -1 : (a.name > b.name ? 1: 0)) );
+  }
   let parsedSpec = {
     "info"    : openApiSpec.info,
     "tags"    : tags,
