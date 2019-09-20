@@ -319,6 +319,28 @@ export function schemaToPdf (schema, obj=[], name, level=0) {
       {text:(schema.description?schema.description:''), style:['small', 'lightGray'], margin:[0,2,0,0]}
     ];
   }
+
+  // Convert single primary type to expected output
+  if (level == 0 && obj && obj.length === 3 && !obj[0].stack){
+    obj = [
+      {
+        colSpan: 3,
+        stack:[
+          {
+            margin: [0, 0, 0, 0],
+            widths: [ 'auto', 'auto', '*' ],
+            layout: rowLinesOnlyTableLayout,
+            table: {
+              dontBreakRows: true,
+              body: [obj]
+            }
+          },
+        ]
+      }
+    ]
+  }
+
+
   return obj;
 }
 
