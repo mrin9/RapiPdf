@@ -106,6 +106,7 @@ export default customElements.define('rapi-pdf', class RapiPdf extends HTMLEleme
       'termsOfService':'Terms of service',
       'securityAndAuthentication':'Security and Authentication',
       'securitySchemes':'SECURITY SCHEMES',
+      'key':'KEY',
       'type':'TYPE',
       'description':'DESCRIPTION',
       'request':'REQUEST',

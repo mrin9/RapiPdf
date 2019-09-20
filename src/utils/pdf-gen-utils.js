@@ -67,11 +67,12 @@ export function getSecurityDef(spec, tableLayout, localize){
     content.push( {text:localize.securityAndAuthentication, style:['h3', 'b', 'primary','right', 'topMargin3']} );
     content.push({text:localize.securitySchemes, style:['b','tableMargin']});
     let tableContent = [
-      [ {text: localize.type, style: ['small','b']}, {text: localize.description, style: ['small','b']} ]
+      [ {text: localize.key, style: ['small','b']}, {text: localize.type, style: ['small','b']}, {text: localize.description, style: ['small','b']} ]
     ];
     for (const key in spec.securitySchemes) {
       tableContent.push([
-        spec.securitySchemes[key].type,
+        key,
+        spec.securitySchemes[key].type+(spec.securitySchemes[key].scheme?(', '+spec.securitySchemes[key].scheme): '')+(spec.securitySchemes[key].bearerFormat?(', '+spec.securitySchemes[key].bearerFormat): ''),
         spec.securitySchemes[key].description?spec.securitySchemes[key].description:"",
       ]);
     }
