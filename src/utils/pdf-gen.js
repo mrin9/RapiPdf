@@ -7,7 +7,7 @@ import { getInfoDef, getSecurityDef, getApiDef, getApiListDef, getMarkDownDef } 
 
 export default async function createPdf(specUrl, options){
 
-  let parsedSpec = await ProcessSpec(specUrl);
+  let parsedSpec = await ProcessSpec(specUrl, options.pdfSortTags);
 
   let pdfStyles={
     title:{fontSize:32},
