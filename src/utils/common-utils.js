@@ -175,8 +175,10 @@ export function schemaToModel (schema, obj) {
   return obj;
 }
 
-export function schemaToPdf (schema, obj=[], name, level=0) {
+export function schemaToPdf (schema, localize, obj=[], name, level=0) {
   if (schema === null){ return; }
+
+  let schemaInfo = getTypeInfo(schema);
 
   // Object Type
   if (schema.type === "object" || schema.properties) {
@@ -186,7 +188,7 @@ export function schemaToPdf (schema, obj=[], name, level=0) {
     ];
 
     for( let key in schema.properties ){
-      rows.push(schemaToPdf(schema.properties[key],[], key, level+1));
+      rows.push(schemaToPdf(schema.properties[key], localize, [], key, level+1));
     }
 
     if (rows.length > 1){
@@ -214,7 +216,16 @@ export function schemaToPdf (schema, obj=[], name, level=0) {
       obj = [ 
         {text:name, style:['small', 'mono']},
         {text:(schema.type ? `{${schema.type}}`:''), style:['small', 'mono', 'lightGray']},
-        {text:(schema.description?schema.description:''), style:['small', 'lightGray']}
+        {
+          stack:[
+            {text:(schema.description?schema.description:''), style:['small', 'lightGray'],margin:[0,2,0,0]},
+            ( schemaInfo.allowedValues ? { text:[
+                {text: localize.enumValues+': ', style:['b','sub']},
+                {text: schemaInfo.allowedValues, style:['small', 'lightGray']}
+              ]} : ''
+            )
+          ]
+        }
       ];
     }
   }
@@ -229,7 +240,7 @@ export function schemaToPdf (schema, obj=[], name, level=0) {
     if (schema.items.properties) {
       typeOfArr = "object";
       for( let key in schema.items.properties ){
-        rows.push(schemaToPdf(schema.items.properties[key],[], key, level+1));
+        rows.push(schemaToPdf(schema.items.properties[key], localize, [], key, level+1));
       }
     }
     else if (schema.items.allOf) {
@@ -237,7 +248,7 @@ export function schemaToPdf (schema, obj=[], name, level=0) {
       schema.items.allOf.map(function(v) {
         if (v && v.properties){
           for( let key in v.properties ){
-            rows.push(schemaToPdf(v.properties[key],[], key, level+1));
+            rows.push(schemaToPdf(v.properties[key], localize, [], key, level+1));
           }
         }
       });
@@ -271,7 +282,16 @@ export function schemaToPdf (schema, obj=[], name, level=0) {
       obj = [ 
         {text:name, style:['small', 'mono'],margin:0},
         {text:`[${typeOfArr}]`, style:['small','mono', 'lightGray'], margin:0},
-        {text:(schema.description?schema.description:''), style:['small', 'lightGray'],margin:[0,2,0,0]}
+        {
+          stack:[
+            {text:(schema.description?schema.description:''), style:['small', 'lightGray'],margin:[0,2,0,0]},
+            ( schemaInfo.allowedValues ? { text:[
+                {text: localize.enumValues+': ', style:['b','sub']},
+                {text: schemaInfo.allowedValues, style:['small', 'lightGray']}
+              ]} : ''
+            )
+          ]
+        }
       ];
     }
   }
@@ -286,7 +306,7 @@ export function schemaToPdf (schema, obj=[], name, level=0) {
     schema.allOf.map(function(v) {
       if (v && v.properties){
         for( let key in v.properties ){
-          allOfRows.push(schemaToPdf(v.properties[key],[], key, level+1));
+          allOfRows.push(schemaToPdf(v.properties[key], localize, [], key, level+1));
         }
       }
     });
@@ -316,7 +336,16 @@ export function schemaToPdf (schema, obj=[], name, level=0) {
     obj = [ 
       {text:name,style:['small', 'mono'],margin:0},
       {text:(schema.type ? schema.type:''), style:['small', 'mono', 'lightGray'],margin:0},
-      {text:(schema.description?schema.description:''), style:['small', 'lightGray'], margin:[0,2,0,0]}
+      {
+        stack:[
+          {text:(schema.description?schema.description:''), style:['small', 'lightGray'],margin:[0,2,0,0]},
+          ( schemaInfo.allowedValues ? { text:[
+              {text: localize.enumValues+': ', style:['b','sub']},
+              {text: schemaInfo.allowedValues, style:['small', 'lightGray']}
+            ]} : ''
+          )
+        ]
+      }
     ];
   }
   return obj;

@@ -241,7 +241,7 @@ function getRequestBodyDef(requestBody, tableLayout, localize){
       let origSchema = requestBody.content[contentType].schema;
       if (origSchema){
         origSchema = JSON.parse(JSON.stringify(origSchema, removeCircularReferences()));
-        requestBodyTableDef = schemaToPdf(origSchema);
+        requestBodyTableDef = schemaToPdf(origSchema, localize);
         if (requestBodyTableDef && requestBodyTableDef[0] && requestBodyTableDef[0].stack){
           requestBodyTableDef[0].colSpan=undefined;
           requestBodyTableDef = {
@@ -352,7 +352,7 @@ function getResponseDef(responses, tableLayout, localize){
       let origSchema = responses[statusCode].content[contentType].schema;
       if (origSchema){
         origSchema = JSON.parse(JSON.stringify(origSchema, removeCircularReferences()));
-        reponseModelTableDef = schemaToPdf(origSchema);
+        reponseModelTableDef = schemaToPdf(origSchema, localize);
         if (reponseModelTableDef && reponseModelTableDef[0] && reponseModelTableDef[0].stack){
           reponseModelTableDef[0].colSpan = undefined;
           reponseModelTableDef = {
