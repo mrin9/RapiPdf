@@ -193,6 +193,7 @@ export default customElements.define('rapi-pdf', class RapiPdf extends HTMLEleme
   }
 
   generatePdf(jsonObj){
+    let pdfSortTags       = this.getAttribute('pdf-sort-tags')==='false'?false:true;
     let pdfPrimaryColor   = this.getAttribute('pdf-primary-color');
     let pdfAlternateColor = this.getAttribute('pdf-alternate-color');
     let pdfTitle          = this.getAttribute('pdf-title')===null?'API Reference':this.getAttribute('pdf-title');
@@ -208,6 +209,7 @@ export default customElements.define('rapi-pdf', class RapiPdf extends HTMLEleme
 
     let localize = this.localize;
     let options = {
+      pdfSortTags,
       pdfPrimaryColor,
       pdfAlternateColor,
       pdfTitle,
