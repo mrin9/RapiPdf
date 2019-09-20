@@ -1,6 +1,6 @@
 import createPdf from '@/utils/pdf-gen';
 
-let tmpl = document.createElement('template');
+const tmpl = document.createElement('template');
 tmpl.innerHTML = `
   <style>
   :host{
@@ -63,36 +63,36 @@ tmpl.innerHTML = `
 export default customElements.define('rapi-pdf', class RapiPdf extends HTMLElement {
   constructor() {
     super(); // always call super() first in the constructor.
-    let shadowRoot = this.attachShadow({mode: 'open'});
-    let elFromTemplate = tmpl.content.cloneNode(true);
-    this.inputEl = elFromTemplate.querySelector(".spec-input");
-    this.btnEl = elFromTemplate.querySelector(".btn-default");
-    
-    // Initialize attributes if not defined 
+    const shadowRoot = this.attachShadow({ mode: 'open' });
+    const elFromTemplate = tmpl.content.cloneNode(true);
+    this.inputEl = elFromTemplate.querySelector('.spec-input');
+    this.btnEl = elFromTemplate.querySelector('.btn-default');
+
+    // Initialize attributes if not defined
     shadowRoot.appendChild(elFromTemplate);
   }
 
-  static get properties() { 
-    return { 
-      localize: { type: Object }
+  static get properties() {
+    return {
+      localize: { type: Object },
     };
   }
 
   connectedCallback() {
     // Add Event Listeners
-    this.inputEl.addEventListener('change', e => this.onChangeInput(e) );    
-    this.inputEl.addEventListener('keyup',  e => this.onKeyUp(e) );    
-    this.btnEl.addEventListener('click',  e => this.generatePdf() );
+    this.inputEl.addEventListener('change', (e) => this.onChangeInput(e));
+    this.inputEl.addEventListener('keyup', (e) => this.onKeyUp(e));
+    this.btnEl.addEventListener('click', (e) => this.generatePdf());
     let localizeObj = {};
-    if (this.children[0]){
-      let localizeStr = this.children[0].content.textContent;
+    if (this.children[0]) {
+      const localizeStr = this.children[0].content.textContent;
       try {
         localizeObj = JSON.parse(localizeStr);
-      }
-      catch(e) {
+      } catch (e) {
         localizeObj = {};
       }
     }
+<<<<<<< Updated upstream
     this.localize = Object.assign({
       'index':'INDEX',
       'api':'API',
@@ -123,13 +123,43 @@ export default customElements.define('rapi-pdf', class RapiPdf extends HTMLEleme
       'method':'METHOD'
     }, localizeObj)
     
+=======
+    this.localize = {
+      index: 'INDEX',
+      api: 'API',
+      apiList: 'API List',
+      apiReference: 'API Reference',
+      apiVersion: 'API Version',
+      contact: 'CONTACT',
+      name: 'NAME',
+      email: 'EMAIL',
+      url: 'URL',
+      termsOfService: 'Terms of service',
+      securityAndAuthentication: 'Security and Authentication',
+      securitySchemes: 'SECURITY SCHEMES',
+      type: 'TYPE',
+      description: 'DESCRIPTION',
+      request: 'REQUEST',
+      requestBody: 'REQUEST BODY',
+      response: 'RESPONSE',
+      responseModel: 'RESPONSE MODEL',
+      statusCode: 'STATUS CODE',
+      deprecated: 'DEPRECATED',
+      allowed: 'ALLOWED',
+      pattern: 'pattern',
+      parameters: 'Parameters',
+      noRequestParameters: 'No request parameters',
+      method: 'METHOD',
+      ...localizeObj,
+    };
+>>>>>>> Stashed changes
   }
 
   disconnectedCallback() {
     // Remove Event Listeners
-    this.inputEl.removeEventListener('change', this.inputOnChange );    
-    this.inputEl.removeEventListener('keyup', this.onKeyUp );    
-    this.btnEl.removeEventListener('click', this.generatePdf );
+    this.inputEl.removeEventListener('change', this.inputOnChange);
+    this.inputEl.removeEventListener('keyup', this.onKeyUp);
+    this.btnEl.removeEventListener('click', this.generatePdf);
   }
 
   static get observedAttributes() {
@@ -138,39 +168,38 @@ export default customElements.define('rapi-pdf', class RapiPdf extends HTMLEleme
 
   attributeChangedCallback(name, oldValue, newValue) {
     switch (name) {
-    case 'spec-url':
-      if (oldValue !== newValue){
-        this.inputEl.value = newValue;
-        return true;
-      }
-    case 'button-label':
-      if (oldValue !== newValue){
-        this.btnEl.innerText = newValue;
-        return true;
-      }
-    case 'hide-input':
-      if (oldValue !== newValue){
-        if (newValue==='true'){
-          this.inputEl.style.display='none';
+      case 'spec-url':
+        if (oldValue !== newValue) {
+          this.inputEl.value = newValue;
+          return true;
         }
-        else{
-          this.inputEl.style.display='block';
+      case 'button-label':
+        if (oldValue !== newValue) {
+          this.btnEl.innerText = newValue;
+          return true;
         }
+      case 'hide-input':
+        if (oldValue !== newValue) {
+          if (newValue === 'true') {
+            this.inputEl.style.display = 'none';
+          } else {
+            this.inputEl.style.display = 'block';
+          }
+          return true;
+        }
+      case 'button-bg':
+        this.btnEl.style.backgroundColor = newValue;
+        this.inputEl.style.borderColor = newValue;
         return true;
-      }
-    case 'button-bg':
-      this.btnEl.style.backgroundColor = newValue;
-      this.inputEl.style.borderColor = newValue;
-      return true;
-    case 'button-color':
-      this.btnEl.style.color = newValue;
-      return true;
-    case 'input-bg':
-      this.inputEl.style.backgroundColor = newValue;
-      return true;
-    case 'input-color':
-      this.inputEl.style.color = newValue;
-      return true;
+      case 'button-color':
+        this.btnEl.style.color = newValue;
+        return true;
+      case 'input-bg':
+        this.inputEl.style.backgroundColor = newValue;
+        return true;
+      case 'input-color':
+        this.inputEl.style.color = newValue;
+        return true;
     }
     return true;
   }
@@ -179,21 +208,22 @@ export default customElements.define('rapi-pdf', class RapiPdf extends HTMLEleme
     return this.getAttribute('spec-url');
   }
 
-  set specUrl(newSpecUrl){
+  set specUrl(newSpecUrl) {
     this.setAttribute('spec-url', newSpecUrl);
   }
 
-  onChangeInput(e){
+  onChangeInput(e) {
     this.specUrl = e.target.value;
   }
 
-  onKeyUp(e){
-    if (e.keyCode === 13){
+  onKeyUp(e) {
+    if (e.keyCode === 13) {
       // In case of input keyup - first change event will fire which will set the new specUrl URL
       this.generatePdf();
     }
   }
 
+<<<<<<< Updated upstream
   generatePdf(jsonObj){
     let pdfSortTags       = this.getAttribute('pdf-sort-tags')==='false'?false:true;
     let pdfPrimaryColor   = this.getAttribute('pdf-primary-color');
@@ -212,6 +242,24 @@ export default customElements.define('rapi-pdf', class RapiPdf extends HTMLEleme
     let localize = this.localize;
     let options = {
       pdfSortTags,
+=======
+  generatePdf(jsonObj) {
+    const pdfPrimaryColor = this.getAttribute('pdf-primary-color');
+    const pdfAlternateColor = this.getAttribute('pdf-alternate-color');
+    const pdfTitle = this.getAttribute('pdf-title') === null ? 'API Reference' : this.getAttribute('pdf-title');
+    const pdfCoverText = this.getAttribute('pdf-cover-text') ? this.getAttribute('pdf-cover-text') : '';
+    const pdfSecurityText = this.getAttribute('pdf-security-text') ? this.getAttribute('pdf-security-text') : '';
+    const pdfApiText = this.getAttribute('pdf-api-text') ? this.getAttribute('pdf-api-text') : '';
+    const pdfFooterText = this.getAttribute('pdf-footer-text') ? this.getAttribute('pdf-footer-text') : '';
+    const includeInfo = this.getAttribute('include-info') !== 'false';
+    const includeToc = this.getAttribute('include-toc') !== 'false';
+    const includeSecurity = this.getAttribute('include-security') !== 'false';
+    const includeApiDetails = this.getAttribute('include-api-details') !== 'false';
+    const includeApiList = this.getAttribute('include-api-list') === 'true';
+
+    const { localize } = this;
+    const options = {
+>>>>>>> Stashed changes
       pdfPrimaryColor,
       pdfAlternateColor,
       pdfTitle,
@@ -225,9 +273,8 @@ export default customElements.define('rapi-pdf', class RapiPdf extends HTMLEleme
       includeApiDetails,
       includeApiList,
       localize,
-    }
-    let spec = this.specUrl || jsonObj;
+    };
+    const spec = this.specUrl || jsonObj;
     createPdf(spec, options);
   }
-
 });

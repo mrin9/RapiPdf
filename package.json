@@ -26,15 +26,16 @@
   "main": "rapipdf.js",
   "module": "rapipdf.js",
   "dependencies": {
-    "@babel/plugin-syntax-dynamic-import": "^7.2.0",
     "json-refs": "^3.0.13",
     "marked": "^0.7.0",
     "pdfmake": "^0.1.59",
-    "swagger2openapi": "^4.0.2"
+    "swagger2openapi": "^5.3.1"
   },
   "scripts": {
     "build": "NODE_ENV=production webpack",
-    "serve": "webpack-dev-server --mode=development"
+    "serve": "webpack-dev-server --mode=development",
+    "lint" : "./node_modules/eslint/bin/eslint.js ./src/**/*.js",
+    "lint-fix" : "./node_modules/eslint/bin/eslint.js --fix ./src/**/*.js"
   },
   "devDependencies": {
     "@babel/core": "^7.6.0",
@@ -43,6 +44,11 @@
     "clean-webpack-plugin": "^3.0.0",
     "compression-webpack-plugin": "^3.0.0",
     "css-loader": "^3.2.0",
+    "eslint": "^6.4.0",
+    "eslint-config-airbnb": "^18.0.1",
+    "eslint-loader": "^3.0.0",
+    "eslint-import-resolver-webpack":"^0.11.1",
+    "eslint-plugin-import": "^2.18.2",
     "file-loader": "^4.2.0",
     "filemanager-webpack-plugin": "^2.0.5",
     "html-webpack-plugin": "^3.2.0",
@@ -50,9 +56,9 @@
     "node-sass": "^4.12.0",
     "sass-loader": "^8.0.0",
     "style-loader": "^1.0.0",
-    "webpack": "^4.39.3",
-    "webpack-bundle-analyzer": "^3.4.1",
-    "webpack-cli": "^3.3.7",
-    "webpack-dev-server": "^3.8.0"
+    "webpack": "^4.40.2",
+    "webpack-bundle-analyzer": "^3.5.1",
+    "webpack-cli": "^3.3.9",
+    "webpack-dev-server": "^3.8.1"
   }
 }
