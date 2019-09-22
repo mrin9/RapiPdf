@@ -202,7 +202,7 @@ export function objectToTree(obj, keyDataType = 'object', keyName = 'object', ke
   if (typeof obj !== 'object') {
     const typeAndDescr = obj.split('~|~');
     return [
-      { text: `${keyName}`, style: ['small', 'mono'], margin: 0 },
+      { text: keyName, style: ['small', 'mono'], margin: 0 },
       { text: (typeAndDescr[0] ? typeAndDescr[0] : ''), style: ['small', 'mono', 'lightGray'], margin: 0 },
       { text: (typeAndDescr[1] ? typeAndDescr[1] : ''), style: ['small', 'lightGray'], margin: [0, 2, 0, 0] },
     ];
@@ -236,17 +236,16 @@ export function objectToTree(obj, keyDataType = 'object', keyName = 'object', ke
         },
       ];
     }
-
     if (typeof obj[key] === 'object') {
       if (Array.isArray(obj[key])) {
-        const arrayDef = objectToTree(obj[key][0], 'array', key);
+        const arrayDef = objectToTree(obj[key], 'array', (key === '0' ? '' : key));
         rows.push(arrayDef);
       } else {
-        const objectDef = objectToTree(obj[key], 'object', key);
+        const objectDef = objectToTree(obj[key], 'object', (key === '0' ? '' : key));
         rows.push(objectDef);
       }
     } else {
-      const primitiveDef = objectToTree(obj[key], 'primitive', key);
+      const primitiveDef = objectToTree(obj[key], 'primitive', (key === '0' ? '' : key));
       rows.push(primitiveDef);
     }
   }
@@ -256,11 +255,11 @@ export function objectToTree(obj, keyDataType = 'object', keyName = 'object', ke
     keyDef = {
       text: [
         { text: `${keyName.replace(':', ' ')}`, style: ['sub', 'b', 'blue'] },
-        { text: `${keyDataType === 'array' ? '[{' : '{'}`, style: ['small', 'mono'] },
+        { text: `${keyDataType === 'array' ? '[' : '{'}`, style: ['small', 'mono'] },
       ],
     };
   } else {
-    keyDef = { text: `${keyName} ${keyDataType === 'array' ? '[{' : '{'}`, style: ['small', 'mono'] };
+    keyDef = { text: `${keyName} ${keyDataType === 'array' ? '[' : '{'}`, style: ['small', 'mono'] };
   }
 
   return [{
@@ -277,7 +276,7 @@ export function objectToTree(obj, keyDataType = 'object', keyName = 'object', ke
           body: rows,
         },
       },
-      { text: `${keyDataType === 'array' ? '}]' : '}'}`, style: ['small', 'mono'] },
+      { text: `${keyDataType === 'array' ? ']' : '}'}`, style: ['small', 'mono'] },
     ],
   }];
 }

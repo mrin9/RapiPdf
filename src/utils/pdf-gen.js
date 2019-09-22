@@ -2,10 +2,10 @@ import pdfMake from 'pdfmake/build/pdfmake.min';
 import pdfFonts from '@/utils/vfs_fonts';
 // import pdfFonts from "pdfmake/build/vfs_fonts";
 
-import ProcessSpec from '@/utils/parse-utils';
+import ProcessSpec from '@/utils/spec-parser';
 import {
   getInfoDef, getSecurityDef, getApiDef, getApiListDef,
-} from '@/utils/pdf-gen-utils';
+} from '@/utils/pdf-parts-gen';
 
 export default async function createPdf(specUrl, options) {
   const parsedSpec = await ProcessSpec(specUrl, options.pdfSortTags);

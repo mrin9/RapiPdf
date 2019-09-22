@@ -1,7 +1,7 @@
 import marked from 'marked';
 import {
   getTypeInfo, schemaToObject, objectToTree,
-} from '@/utils/common-utils';
+} from '@/utils/object-tree-gen';
 
 // Inline Markdown
 export function getInlineMarkDownDef(txt) {
@@ -256,7 +256,7 @@ function getParameterTableDef(parameters, paramType, tableLayout, localize) {
         },
         {
           stack: [
-            { text: `${paramSchema.type === 'array' ? paramSchema.arrayType : paramSchema.type}${paramSchema.format ? `(${paramSchema.format})` : ''}`, style: ['small', 'mono'] },
+            { text: `${paramSchema.type === 'array' ? paramSchema.arrayType : (paramSchema.format ? paramSchema.format : paramSchema.type)}`, style: ['small', 'mono'] },
             (paramSchema.constrain ? { text: paramSchema.constrain, style: ['small', 'gray'] } : ''),
             (paramSchema.allowedValues ? {
               text: [
@@ -295,7 +295,6 @@ function getRequestBodyDef(requestBody, tableLayout, localize) {
   }
   const content = [];
   let formParamTableDef;
-
   for (const contentType in requestBody.content) {
     const contentTypeObj = requestBody.content[contentType];
     let requestBodyTableDef;
@@ -304,7 +303,7 @@ function getRequestBodyDef(requestBody, tableLayout, localize) {
       content.push(formParamTableDef);
     } else if (contentType.includes('json') || contentType.includes('xml')) {
       let origSchema = requestBody.content[contentType].schema;
-      if (origSchema && (origSchema.properties || origSchema.items)) {
+      if (origSchema) {
         origSchema = JSON.parse(JSON.stringify(origSchema));
         const schemaInObjectNotaion = schemaToObject(origSchema);
         requestBodyTableDef = [
@@ -323,27 +322,26 @@ function getRequestBodyDef(requestBody, tableLayout, localize) {
 // Response Def
 function getResponseDef(responses, tableLayout, localize) {
   const respDef = [];
-  const allResponseModelTabelDefs = [];
   for (const statusCode in responses) {
+    const allResponseModelTabelDefs = [];
     for (const contentType in responses[statusCode].content) {
       let responseBodyTableDef;
       let origSchema = responses[statusCode].content[contentType].schema;
-      if (origSchema && (origSchema.properties || origSchema.items)) {
+      if (origSchema) {
         origSchema = JSON.parse(JSON.stringify(origSchema));
         const schemaInObjectNotaion = schemaToObject(origSchema);
         const respBody = objectToTree(schemaInObjectNotaion);
         responseBodyTableDef = [
-          { text: `${localize.responseModel} - ${contentType}`, margin: [0, 10, 0, 0], style: ['small', 'b'] },
-          respBody,
+          { text: `${localize.responseModel} - ${contentType}`, margin: [10, 10, 0, 0], style: ['small', 'b'] },
+          { stack: respBody, margin: [10, 0, 0, 0] },
         ];
       } else {
         responseBodyTableDef = [
-          { text: `${localize.responseModel} - ${contentType}`, margin: [0, 5, 0, 0], style: ['small', 'b'] },
+          { text: `${localize.responseModel} - ${contentType}`, margin: [10, 5, 0, 0], style: ['small', 'b'] },
         ];
       }
       allResponseModelTabelDefs.push(responseBodyTableDef);
     }
-
     respDef.push({
       text: [
         { text: `${localize.statusCode} - ${statusCode}: `, style: ['small', 'b'] },
