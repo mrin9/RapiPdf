@@ -308,7 +308,7 @@ function getRequestBodyDef(requestBody, tableLayout, localize) {
         origSchema = JSON.parse(JSON.stringify(origSchema));
         const schemaInObjectNotaion = schemaToObject(origSchema);
         requestBodyTableDef = [
-          { text: contentType, margin: [0, 5, 0, 0], style: ['small', 'b', 'blue'] },
+          { text: `${localize.requestBody} - ${contentType}`, margin: [0, 10, 0, 0], style: ['small', 'b'] },
           objectToTree(schemaInObjectNotaion),
         ];
       }
@@ -333,12 +333,12 @@ function getResponseDef(responses, tableLayout, localize) {
         const schemaInObjectNotaion = schemaToObject(origSchema);
         const respBody = objectToTree(schemaInObjectNotaion);
         responseBodyTableDef = [
-          { text: contentType, margin: [0, 5, 0, 0], style: ['small', 'b', 'blue'] },
+          { text: `${localize.responseModel} - ${contentType}`, margin: [0, 10, 0, 0], style: ['small', 'b'] },
           respBody,
         ];
       } else {
         responseBodyTableDef = [
-          { text: contentType, margin: [0, 5, 0, 0], style: ['small', 'b', 'blue'] },
+          { text: `${localize.responseModel} - ${contentType}`, margin: [0, 5, 0, 0], style: ['small', 'b'] },
         ];
       }
       allResponseModelTabelDefs.push(responseBodyTableDef);
