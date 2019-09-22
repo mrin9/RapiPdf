@@ -18,7 +18,6 @@ export default async function ProcessSpec(specUrl, sortTags) {
     console.info('%c There was an issue while parsing the spec %o ', 'color:orangered', err);
   }
 
-  console.info('%c Spec Conversion - Success !!! ', 'color:cornflowerblue');
   const openApiSpec = jsonParsedSpec;
   const methods = ['get', 'put', 'post', 'delete', 'patch', 'options', 'head'];
   const tags = [];

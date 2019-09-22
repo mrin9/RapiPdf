@@ -52,8 +52,12 @@ export default async function createPdf(specUrl, options) {
     },
   };
 
-  const allContent = []; let infoDef = {}; let tocDef = {}; let securityDef = {}; let apiListDef = {}; let
-    apiDef = {};
+  const allContent = [];
+  let infoDef = {};
+  let tocDef = {};
+  let securityDef = {};
+  let apiListDef = {};
+  let apiDef = {};
 
   if (options.includeInfo) {
     infoDef = getInfoDef(parsedSpec, options.pdfTitle, options.localize);

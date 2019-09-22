@@ -1,6 +1,6 @@
 import marked from 'marked';
 import {
-  getTypeInfo, schemaToPdf, removeCircularReferences,
+  getTypeInfo, schemaToObject, objectToTree,
 } from '@/utils/common-utils';
 
 // Inline Markdown
@@ -12,9 +12,6 @@ export function getInlineMarkDownDef(txt) {
   const boldItalicDelimiter = new RegExp('\\*{3}|\\_{3}');
   const boldDelimiter = new RegExp('\\*{2}|\\_{2}');
   const codeDelimiter = new RegExp('`');
-  if (!txt.split) {
-    console.log(txt);
-  }
   const biParts = txt.split(boldItalicDelimiter);
   biParts.forEach((biVal, i) => {
     if (i % 2 === 0) {
@@ -96,8 +93,6 @@ export function getMarkDownDef(tokens) {
       } else {
         listInsert = 'ul';
       }
-    } else if (v.type === 'list_item_start' || v.type === 'list_item_end') {
-      console.log(v.type);
     } else if (v.type === 'text') {
       const textArr = getInlineMarkDownDef(v.text);
       if (listInsert === 'ul') {
@@ -307,32 +302,20 @@ function getRequestBodyDef(requestBody, tableLayout, localize) {
     if ((contentType.includes('form') || contentType.includes('multipart-form')) && contentTypeObj.schema) {
       formParamTableDef = getParameterTableDef(contentTypeObj.schema.properties, 'FORM DATA', tableLayout, localize);
       content.push(formParamTableDef);
-    } else {
+    } else if (contentType.includes('json') || contentType.includes('xml')) {
       let origSchema = requestBody.content[contentType].schema;
-      if (origSchema) {
-        origSchema = JSON.parse(JSON.stringify(origSchema, removeCircularReferences()));
-        requestBodyTableDef = schemaToPdf(origSchema, localize);
-        if (requestBodyTableDef && requestBodyTableDef[0] && requestBodyTableDef[0].stack) {
-          requestBodyTableDef[0].colSpan = undefined;
-          requestBodyTableDef = {
-            margin: [0, 5, 0, 0],
-            // layout:tableLayout,
-            layout: 'noBorders',
-            table: {
-              widths: ['*'],
-              body: [
-                [{ text: `${localize.requestBody} (${contentType})`, style: ['small', 'b'] }],
-                requestBodyTableDef,
-              ],
-            },
-          };
-        } else {
-          requestBodyTableDef = { text: '' };
-        }
+      if (origSchema && (origSchema.properties || origSchema.items)) {
+        origSchema = JSON.parse(JSON.stringify(origSchema));
+        const schemaInObjectNotaion = schemaToObject(origSchema);
+        requestBodyTableDef = [
+          { text: contentType, margin: [0, 5, 0, 0], style: ['small', 'b', 'blue'] },
+          objectToTree(schemaInObjectNotaion),
+        ];
       }
       content.push(requestBodyTableDef);
     }
   }
+  // content = [{ text: 'no request body model' }];
   return content;
 }
 
@@ -343,28 +326,22 @@ function getResponseDef(responses, tableLayout, localize) {
   const allResponseModelTabelDefs = [];
   for (const statusCode in responses) {
     for (const contentType in responses[statusCode].content) {
-      let reponseModelTableDef;
+      let responseBodyTableDef;
       let origSchema = responses[statusCode].content[contentType].schema;
-      if (origSchema) {
-        origSchema = JSON.parse(JSON.stringify(origSchema, removeCircularReferences()));
-        reponseModelTableDef = schemaToPdf(origSchema, localize);
-        if (reponseModelTableDef && reponseModelTableDef[0] && reponseModelTableDef[0].stack) {
-          reponseModelTableDef[0].colSpan = undefined;
-          reponseModelTableDef = {
-            margin: [0, 5, 0, 0],
-            // layout:tableLayout,
-            layout: 'noBorders',
-            table: {
-              widths: ['*'],
-              body: [
-                [{ text: `${localize.responseModel} (${contentType})`, style: ['small', 'b'] }],
-                reponseModelTableDef,
-              ],
-            },
-          };
-          allResponseModelTabelDefs.push(reponseModelTableDef);
-        }
+      if (origSchema && (origSchema.properties || origSchema.items)) {
+        origSchema = JSON.parse(JSON.stringify(origSchema));
+        const schemaInObjectNotaion = schemaToObject(origSchema);
+        const respBody = objectToTree(schemaInObjectNotaion);
+        responseBodyTableDef = [
+          { text: contentType, margin: [0, 5, 0, 0], style: ['small', 'b', 'blue'] },
+          respBody,
+        ];
+      } else {
+        responseBodyTableDef = [
+          { text: contentType, margin: [0, 5, 0, 0], style: ['small', 'b', 'blue'] },
+        ];
       }
+      allResponseModelTabelDefs.push(responseBodyTableDef);
     }
 
     respDef.push({
@@ -374,14 +351,11 @@ function getResponseDef(responses, tableLayout, localize) {
       ],
       margin: [0, 10, 0, 0],
     });
-
-    if (responses[statusCode].content) {
-      allResponseModelTabelDefs.map((respModelTableDef) => {
-        respDef.push(respModelTableDef);
-      });
+    if (allResponseModelTabelDefs.length > 0) {
+      respDef.push(allResponseModelTabelDefs);
     }
   }
-
+  // respDef = [{ text: 'no response model' }];
   return respDef;
 }
 
@@ -389,9 +363,6 @@ function getResponseDef(responses, tableLayout, localize) {
 export function getApiDef(spec, filterPath, sectionHeading, tableLayout, localize) {
   const content = [{ text: sectionHeading, style: ['h2', 'b'] }];
   let tagSeq = 0;
-
-  // Sort by Tag name (allready sorted)
-  // spec.tags.sort((a, b) =>  (a.name < b.name ? -1 : (a.name > b.name ? 1: 0)) );
 
   spec.tags.map((tag) => {
     const operationContent = [];
@@ -432,6 +403,7 @@ export function getApiDef(spec, filterPath, sectionHeading, tableLayout, localiz
         operationContent.push(pathDescrMarkDef);
       }
 
+      // Generate Request Defs
       const requestSetDef = [];
       const pathParams = path.parameters ? path.parameters.filter((param) => param.in === 'path') : null;
       const queryParams = path.parameters ? path.parameters.filter((param) => param.in === 'query') : null;
@@ -465,25 +437,30 @@ export function getApiDef(spec, filterPath, sectionHeading, tableLayout, localiz
       } else {
         requestSetDef.push({ text: localize.noRequestParameters, style: ['small', 'gray'], margin: [0, 5, 0, 0] });
       }
+      if (requestSetDef && requestSetDef.length > 0) {
+        operationContent.push({
+          stack: requestSetDef,
+          margin: [10, 0, 0, 0],
+        });
+      }
 
-      operationContent.push({
-        stack: requestSetDef,
-        margin: [10, 0, 0, 0],
-      });
-      const respDef = getResponseDef(path.responses, tableLayout, localize);
-
+      // Generate Response Defs
       operationContent.push({ text: localize.response, style: ['p', 'b', 'alternate'], margin: [0, 10, 0, 0] });
-      operationContent.push({
-        stack: respDef,
-        margin: [10, 5, 0, 5],
-      });
+      const respDef = getResponseDef(path.responses, tableLayout, localize);
+      if (respDef && respDef.length > 0) {
+        operationContent.push({
+          stack: respDef,
+          margin: [10, 5, 0, 5],
+        });
+      }
+
+      // End of Operation - Line
       operationContent.push({
         canvas: [{
           type: 'line', x1: 0, y1: 5, x2: 595 - 2 * 35, y2: 5, lineWidth: 0.5, lineColor: '#cccccc',
         }],
       });
     }
-
 
     if (pathSeq > 0) {
       tagSeq += 1;

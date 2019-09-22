@@ -5,13 +5,22 @@
     <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes">
     <script type="text/javascript" src="../rapipdf-min.js"></script>
     <style>
+      rapi-pdf {
+        margin:2px;
+        width:600px;
+      }
     </style>
   </head>
   <body>
-    <rapi-pdf id='thedoc' spec-url="../specs/allof.json" button-label="all-of"></rapi-pdf>
-    <rapi-pdf id='thedoc' spec-url="../specs/oneof.json" button-label="one-of"></rapi-pdf>
-    <rapi-pdf id='thedoc' spec-url="../specs/basic.json" button-label="Basic"></rapi-pdf>
-    <rapi-pdf id='thedoc' spec-url="../specs/petstore_extended.yaml" button-label="All Cases"></rapi-pdf>
+    <rapi-pdf spec-url="../specs/basic.json" button-label="Basic"></rapi-pdf>
+    <rapi-pdf spec-url="../specs/allof.json" button-label="all-of"></rapi-pdf>
+    <rapi-pdf spec-url="../specs/oneof.json" button-label="one-of"></rapi-pdf>
+    <rapi-pdf spec-url="../specs/petstore_extended.yaml" button-label="Extended"></rapi-pdf>
+    <rapi-pdf spec-url="../specs/test-specs/petstore_experimental.yaml" button-label="Experimental"></rapi-pdf>
+    <rapi-pdf spec-url="../specs/test-specs/petstore_complex_request.yaml" button-label="Complex"></rapi-pdf>
+    <rapi-pdf spec-url="../specs/bitbucket.json" button-label="BitBucket"></rapi-pdf>
+    <rapi-pdf spec-url="https://api.apis.guru/v2/specs/github.com/v3/swagger.json" button-label="GitHub"></rapi-pdf>
+
   </body>
 
 

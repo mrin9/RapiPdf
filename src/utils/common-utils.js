@@ -1,4 +1,3 @@
-/* Generates an schema object containing type and constraint info */
 const rowLinesOnlyTableLayout = {
   hLineWidth() {
     // return (i === 0 || i === 1 || i === node.table.body.length) ? 0 : 0.5;
@@ -7,21 +6,19 @@ const rowLinesOnlyTableLayout = {
   vLineWidth() {
     return 0;
   },
-  /*
-  hLineColor: function (i, node) {
-    return (i === 0 || i === node.table.body.length) ? 'black' : 'lightgray';
-  },
-  */
+  // hLineColor: function (i, node) {
+  //   return (i === 0 || i === node.table.body.length) ? 'black' : 'lightgray';
+  // },
   paddingTop() { return 0; },
   paddingBottom() { return 0; },
 };
 
+/* Generates an object containing type and constraint info */
 export function getTypeInfo(schema, overrideAttributes = null) {
   if (!schema) {
     return;
   }
-  const returnObj = {
-    hasCircularRefs: schema.type === 'circular',
+  const typeProps = {
     format: schema.format ? schema.format : '',
     pattern: (schema.pattern && !schema.enum) ? schema.pattern : '',
     readOnly: schema.readOnly ? 'read-only' : '',
@@ -32,327 +29,255 @@ export function getTypeInfo(schema, overrideAttributes = null) {
     arrayType: '',
     allowedValues: '',
     constrain: '',
-    html: '',
+    typeInfoText: '',
   };
-  if (returnObj.hasCircularRefs) {
-    return returnObj;
-  }
+
   // Set the Type
   if (schema.enum) {
     let opt = '';
     schema.enum.map((v) => {
       opt += `${v}, `;
     });
-    returnObj.type = 'enum';
-    returnObj.allowedValues = opt.slice(0, -2);
+    typeProps.type = 'enum';
+    typeProps.allowedValues = opt.slice(0, -2);
   } else if (schema.type) {
-    returnObj.type = schema.type;
+    typeProps.type = schema.type;
   }
 
-  if (schema.type === 'array' && schema.items) {
+  if (schema.type === 'array' || schema.items) {
     const arraySchema = schema.items;
-    returnObj.arrayType = `${schema.type} of ${arraySchema.type}`;
-    returnObj.default = arraySchema.default === 0 ? '0 ' : (arraySchema.default ? arraySchema.default : '');
+    typeProps.arrayType = `${schema.type} of ${arraySchema.type}`;
+    typeProps.default = arraySchema.default === 0 ? '0 ' : (arraySchema.default ? arraySchema.default : '');
     if (arraySchema.enum) {
       let opt = '';
       arraySchema.enum.map((v) => {
         opt += `${v}, `;
       });
-      returnObj.allowedValues = opt.slice(0, -2);
+      typeProps.allowedValues = opt.slice(0, -2);
     }
   } else if (schema.type === 'integer' || schema.type === 'number') {
     if (schema.minimum !== undefined && schema.maximum !== undefined) {
-      returnObj.constrain = `${schema.exclusiveMinimum ? '>' : 'between '}${schema.minimum} and ${schema.exclusiveMaximum ? '<' : ''} ${schema.maximum}`;
+      typeProps.constrain = `${schema.exclusiveMinimum ? '>' : 'between '}${schema.minimum} and ${schema.exclusiveMaximum ? '<' : ''} ${schema.maximum}`;
     } else if (schema.minimum !== undefined && schema.maximum === undefined) {
-      returnObj.constrain = `${schema.exclusiveMinimum ? '>' : '>='}${schema.minimum}`;
+      typeProps.constrain = `${schema.exclusiveMinimum ? '>' : '>='}${schema.minimum}`;
     } else if (schema.minimum === undefined && schema.maximum !== undefined) {
-      returnObj.constrain = `${schema.exclusiveMaximum ? '<' : '<='}${schema.maximum}`;
+      typeProps.constrain = `${schema.exclusiveMaximum ? '<' : '<='}${schema.maximum}`;
     }
     if (schema.multipleOf !== undefined) {
-      returnObj.constrain = `multiple of ${schema.multipleOf}`;
+      typeProps.constrain = `multiple of ${schema.multipleOf}`;
     }
   } else if (schema.type === 'string') {
     if (schema.minLength !== undefined && schema.maxLength !== undefined) {
-      returnObj.constrain = `${schema.minLength} to ${schema.maxLength} chars`;
+      typeProps.constrain = `${schema.minLength} to ${schema.maxLength} chars`;
     } else if (schema.minLength !== undefined && schema.maxLength === undefined) {
-      returnObj.constrain = `min:${schema.minLength} chars`;
+      typeProps.constrain = `min:${schema.minLength} chars`;
     } else if (schema.minLength === undefined && schema.maxLength !== undefined) {
-      returnObj.constrain = `max:${schema.maxLength} chars`;
+      typeProps.constrain = `max:${schema.maxLength} chars`;
     }
   }
 
   if (overrideAttributes) {
     if (overrideAttributes.readOnly) {
-      returnObj.readOnly = 'read-only';
+      typeProps.readOnly = 'read-only';
     }
     if (overrideAttributes.writeOnly) {
-      returnObj.writeOnly = 'write-only';
+      typeProps.writeOnly = 'write-only';
     }
     if (overrideAttributes.deprecated) {
-      returnObj.deprecated = 'depricated';
+      typeProps.deprecated = 'depricated';
     }
   }
 
-  // ${returnObj.readOnly}${returnObj.writeOnly}${returnObj.deprecated}\u00a0
-  let html = `${returnObj.type}`;
-  if (returnObj.allowedValues) {
-    html += `:(${returnObj.allowedValues})`;
+  let typeInfoText = `${typeProps.format ? typeProps.format : typeProps.type}`;
+  if (typeProps.allowedValues) {
+    typeInfoText += `:(${typeProps.allowedValues})`;
   }
-  if (returnObj.readOnly) {
-    html += 'read-only';
+  if (typeProps.readOnly) {
+    typeInfoText += ' read-only';
   }
-  if (returnObj.writeOnly) {
-    html += 'write-only';
+  if (typeProps.writeOnly) {
+    typeInfoText += ' write-only';
   }
-  if (returnObj.deprecated) {
-    html += 'depricated';
+  if (typeProps.deprecated) {
+    typeInfoText += ' depricated';
   }
-  if (returnObj.constrain) {
-    html += `\u00a0${returnObj.constrain}`;
+  if (typeProps.constrain) {
+    typeInfoText += `\u00a0${typeProps.constrain}`;
   }
-  if (returnObj.format) {
-    html += `\u00a0${returnObj.format}`;
+  if (typeProps.pattern) {
+    typeInfoText += `\u00a0${typeProps.pattern}`;
   }
-  if (returnObj.pattern) {
-    html += `\u00a0${returnObj.pattern}`;
-  }
-  returnObj.html = html;
-  return returnObj;
+  typeProps.typeInfoText = typeInfoText;
+  return typeProps;
 }
 
-/* For changing JSON-Schema to a Object Model that can be represnted in a tree-view */
-export function schemaToModel(schema, obj) {
-  if (schema == null) {
+/**
+ * For changing OpenAPI-Schema to an Object Notation,
+ * This Object would further be an input to `objectToTree()` to generate a pdfDefs representing an Object-Tree
+ * @param {object} schema - Schema object from OpenAPI spec
+ * @param {number} level - contains the recursion depth
+ */
+export function schemaToObject(schema, level = 0) {
+  let obj = {};
+  if (schema === null) {
     return;
   }
   if (schema.type === 'object' || schema.properties) {
-    if (schema.description) {
-      obj[':description'] = schema.description;
-    }
+    // obj[':object_description'] = schema.description ? schema.description : '';
     for (const key in schema.properties) {
-      obj[key] = schemaToModel(schema.properties[key], {});
+      obj[`${key}${schema.required && schema.required.includes(key) ? '*' : ''}`] = schemaToObject(schema.properties[key], {});
     }
   } else if (schema.type === 'array' || schema.items) {
-    // let temp = Object.assign({}, schema.items );
-    obj = [schemaToModel(schema.items, {})];
+    if (level === 0) {
+      // if root level schema is of type array, then convert to object
+      obj = schemaToObject(schema.items, level + 1);
+    } else {
+      obj = [schemaToObject(schema.items, level + 1)];
+    }
   } else if (schema.allOf) {
-    if (schema.allOf.length === 1) {
-      if (!schema.allOf[0]) {
-        return `string~|~${schema.description ? schema.description : ''}`;
-      }
-
-      const overrideAttrib = {
-        readOnly: schema.readOnly,
-        writeOnly: schema.writeOnly,
-        deprecated: schema.deprecated,
-      };
-      return `${getTypeInfo(schema.allOf[0], overrideAttrib).html}~|~${schema.description ? schema.description : ''}`;
-    }
-
-    // If allOf is an array of multiple elements, then they are the keys of an object
     const objWithAllProps = {};
+    if (schema.allOf.length === 1 && !schema.allOf[0].properties && !schema.allOf[0].items) {
+      // If allOf has single item and the type is not an object or array, then its a primitive
+      if (schema.allOf[0].$ref) {
+        const objType = schema.allOf[0].$ref.substring(schema.allOf[0].$ref.lastIndexOf('/') + 1);
+        return `{ ${objType} } ~|~ Recursive Object`;
+      }
+      const tempSchema = schema.allOf[0];
+      return `${getTypeInfo(tempSchema).typeInfoText}~|~${tempSchema.description ? tempSchema.description : ''}`;
+    }
+    // If allOf is an array of multiple elements, then all the keys makes a single object
     schema.allOf.map((v) => {
-      if (v && v.properties) {
-        const partialObj = schemaToModel(v, {});
+      if (v.type === 'object' || v.properties || v.allOf || v.anyOf || v.oneOf) {
+        const partialObj = schemaToObject(v, level + 1);
         Object.assign(objWithAllProps, partialObj);
+      } else if (v.type === 'array' || v.items) {
+        const partialObj = [schemaToObject(v, level + 1)];
+        Object.assign(objWithAllProps, partialObj);
+      } else if (v.type) {
+        const prop = `prop${Object.keys(objWithAllProps).length}`;
+        const typeObj = getTypeInfo(v);
+        objWithAllProps[prop] = `${typeObj.typeInfoText}~|~${v.description ? v.description : ''}`;
+      } else {
+        return '';
       }
     });
+
     obj = objWithAllProps;
-  } else {
-    return `${getTypeInfo(schema).html}~|~${schema.description ? schema.description : ''}`;
-  }
-  return obj;
-}
-
-export function schemaToPdf(schema, localize, obj = [], name, level = 0) {
-  if (schema === null) { return; }
-
-  const schemaInfo = getTypeInfo(schema);
-
-  // Object Type
-  if (schema.type === 'object' || schema.properties) {
-    // Create a blank row for pdfMake to have the total count of columns
-    const rows = [
-      [{ text: '', margin: 0 }, { text: '', margin: 0 }, { text: '', margin: 0 }],
-    ];
-
-    for (const key in schema.properties) {
-      rows.push(schemaToPdf(schema.properties[key], localize, [], key, level + 1));
-    }
-
-    if (rows.length > 1) {
-      obj = [
-        {
-          colSpan: 3,
-          stack: [
-            { text: `${name || 'object'} { `, style: ['small', 'mono', 'blue'] },
-            { text: (schema.description ? schema.description : ''), style: ['sub', 'blue'], margin: [0, 2, 0, 0] },
-            {
-              margin: [10, 0, 0, 0],
-              widths: ['auto', 'auto', '*'],
-              layout: rowLinesOnlyTableLayout,
-              table: {
-                dontBreakRows: true,
-                body: rows,
-              },
-            },
-            { text: '}', style: ['small', 'mono', 'blue'] },
-          ],
-        },
-      ];
-    } else {
-      obj = [
-        { text: name, style: ['small', 'mono'] },
-        { text: (schema.type ? `{${schema.type}}` : ''), style: ['small', 'mono', 'lightGray'] },
-        {
-          stack: [
-            { text: (schema.description ? schema.description : ''), style: ['small', 'lightGray'], margin: [0, 2, 0, 0] },
-            (schemaInfo.allowedValues ? {
-              text: [
-                { text: `${localize.enumValues}: `, style: ['b', 'sub'] },
-                { text: schemaInfo.allowedValues, style: ['small', 'lightGray'] },
-              ],
-            } : ''
-            ),
-          ],
-        },
-      ];
-    }
-  } else if (schema.type === 'array') { // Array Type
-    let typeOfArr = '';
-    const rows = [
-      [{ text: '', margin: 0 }, { text: '', margin: 0 }, { text: '', margin: 0 }],
-    ];
-
-    if (schema.items.properties) {
-      typeOfArr = 'object';
-      for (const key in schema.items.properties) {
-        rows.push(schemaToPdf(schema.items.properties[key], localize, [], key, level + 1));
-      }
-    } else if (schema.items.allOf) {
-      typeOfArr = 'all-Of';
-      schema.items.allOf.map((v) => {
-        if (v && v.properties) {
-          for (const key in v.properties) {
-            rows.push(schemaToPdf(v.properties[key], localize, [], key, level + 1));
-          }
-        }
-      });
-    } else {
-      typeOfArr = schema.items.type ? `${schema.items.type}` : 'all-Of';
-    }
-
-    if (rows.length > 1) {
-      obj = [
-        {
-          colSpan: 3,
-          stack: [
-            { text: `${name || 'array '} ${typeOfArr === 'object' ? '[{' : '['}`, style: ['small', 'mono', (typeOfArr === 'object' ? 'blue' : 'lightGray')], margin: 0 },
-            { text: (schema.description ? schema.description : ''), style: ['small', 'lightGray'], margin: [0, 2, 0, 0] },
-            {
-              margin: [10, 0, 0, 0],
-              widths: ['auto', 'auto', '*'],
-              layout: rowLinesOnlyTableLayout,
-              table: {
-                dontBreakRows: true,
-                body: rows,
-              },
-            },
-            { text: (typeOfArr === 'object' ? '}]' : ']'), style: ['small', 'mono', (typeOfArr === 'object' ? 'blue' : 'lightGray')] },
-          ],
-        },
-      ];
-    } else {
-      obj = [
-        { text: name, style: ['small', 'mono'], margin: 0 },
-        { text: `[${typeOfArr}]`, style: ['small', 'mono', 'lightGray'], margin: 0 },
-        {
-          stack: [
-            { text: (schema.description ? schema.description : ''), style: ['small', 'lightGray'], margin: [0, 2, 0, 0] },
-            (schemaInfo.allowedValues ? {
-              text: [
-                { text: `${localize.enumValues}: `, style: ['b', 'sub'] },
-                { text: schemaInfo.allowedValues, style: ['small', 'lightGray'] },
-              ],
-            } : ''
-            ),
-          ],
-        },
-      ];
-    }
-  } else if (schema.allOf) { // allOf Type (Open API type composition)
-    const allOfRows = [
-      [{ text: '', margin: 0 }, { text: '', margin: 0 }, { text: '', margin: 0 }],
-    ];
-
-    schema.allOf.map((v) => {
-      if (v && v.properties) {
-        for (const key in v.properties) {
-          allOfRows.push(schemaToPdf(v.properties[key], localize, [], key, level + 1));
-        }
+  } else if (schema.anyOf || schema.oneOf) {
+    let i = 1;
+    const objWithAnyOfProps = {};
+    const xxxOf = schema.anyOf ? 'anyOf' : 'oneOf';
+    schema[xxxOf].map((v) => {
+      if (v.type === 'object' || v.properties || v.allOf || v.anyOf || v.oneOf) {
+        const partialObj = schemaToObject(v, level + 1);
+        objWithAnyOfProps[`OPTION:${i}`] = partialObj;
+        i++;
+      } else if (v.type === 'array' || v.items) {
+        const partialObj = [schemaToObject(v, level + 1)];
+        Object.assign(objWithAnyOfProps, partialObj);
+      } else {
+        const prop = `prop${Object.keys(objWithAnyOfProps).length}`;
+        objWithAnyOfProps[prop] = `${getTypeInfo(v).typeInfoText}~|~${v.description ? v.description : ''}`;
       }
     });
-
-    obj = [{
-      colSpan: 3,
-      stack: [
-        { text: `${name || 'object'} {`, style: ['small', 'mono', 'blue'] },
-        { text: (schema.description ? schema.description : ''), style: ['sub', 'blue'], margin: [0, 2, 0, 0] },
-        {
-          margin: [10, 0, 0, 0],
-          widths: ['auto', 'auto', '*'],
-          layout: rowLinesOnlyTableLayout,
-          table: {
-            dontBreakRows: true,
-            body: allOfRows,
-          },
-        },
-        { text: '}', style: ['small', 'mono', 'blue'] },
-      ],
-    }];
-  } else { // Primitive Type (String, Integer, Boolean etc)
-    obj = [
-      { text: name, style: ['small', 'mono'], margin: 0 },
-      { text: (schema.type ? schema.type : ''), style: ['small', 'mono', 'lightGray'], margin: 0 },
-      {
-        stack: [
-          { text: (schema.description ? schema.description : ''), style: ['small', 'lightGray'], margin: [0, 2, 0, 0] },
-          (schemaInfo.allowedValues ? {
-            text: [
-              { text: `${localize.enumValues}: `, style: ['b', 'sub'] },
-              { text: schemaInfo.allowedValues, style: ['small', 'lightGray'] },
-            ],
-          } : ''
-          ),
-        ],
-      },
-    ];
+    obj[(schema.anyOf ? 'ANY:OF' : 'ONE:OF')] = objWithAnyOfProps;
+  } else {
+    const typeObj = getTypeInfo(schema);
+    if (typeObj.typeInfoText) {
+      return `${typeObj.typeInfoText}~|~${schema.description ? schema.description : ''}`;
+    }
+    return '~|~';
   }
   return obj;
 }
 
-export function getBaseUrlFromUrl(url) {
-  const pathArray = url.split('/');
-  return `${pathArray[0]}//${pathArray[2]}`;
-}
+/**
+ * For changing an object to Tree (array of pdfDefs, which when feeded to pdfMake would produce a indented object tree)
+ * @param {object} obj - keys to iterate
+ * @param {string} keyDataType  - is 'primitive', 'object' or 'array', based on this appropriate braces are used
+ * @param {string} keyName  - name of the key from previous recursive call stack
+ * @param {string} keyDescr - description of the key
+ */
+export function objectToTree(obj, keyDataType = 'object', keyName = 'object', keyDescr = '') {
+  if (typeof obj !== 'object') {
+    const typeAndDescr = obj.split('~|~');
+    return [
+      { text: `${keyName}`, style: ['small', 'mono'], margin: 0 },
+      { text: (typeAndDescr[0] ? typeAndDescr[0] : ''), style: ['small', 'mono', 'lightGray'], margin: 0 },
+      { text: (typeAndDescr[1] ? typeAndDescr[1] : ''), style: ['small', 'lightGray'], margin: [0, 2, 0, 0] },
+    ];
+  }
 
-export function removeCircularReferences(level = 0) {
-  const seen = new WeakSet();
-  return (key, value) => {
-    if (typeof value === 'object' && value !== null) {
-      if (seen.has(value)) {
-        // let dupVal = Object.assign({}, value);
-        // return;
-        if (level > 0) {
-          return {};
-        }
+  // Important - pdfMake needs one row with all the cells for colSpan to work properly
+  const rows = [
+    [{ text: '', margin: 0 }, { text: '', margin: 0 }, { text: '', margin: 0 }],
+  ];
 
-        const dupVal = JSON.parse(JSON.stringify(value, removeCircularReferences(level + 1)));
-        seen.add(dupVal);
-        return dupVal;
+  for (const key in obj) {
+    // If ANY_OF or ONE_OF
+    if (key === 'ANY:OF' || key === 'ONE:OF') {
+      const allOptions = [];
+      for (const k in obj[key]) {
+        allOptions.push(objectToTree(obj[key][k], 'object', k));
       }
-      seen.add(value);
+      return [
+        {
+          colSpan: 3,
+          stack: [
+            { text: `${keyName}`, style: ['small', 'mono'] },
+            {
+              margin: [10, 0, 0, 0],
+              stack: [
+                { text: `${key.replace(':', ' ')}`, style: ['sub', 'blue', 'b'], margin: [0, 5, 0, 0] },
+                ...allOptions,
+              ],
+            },
+          ],
+        },
+      ];
     }
-    return value;
-  };
+
+    if (typeof obj[key] === 'object') {
+      if (Array.isArray(obj[key])) {
+        const arrayDef = objectToTree(obj[key][0], 'array', key);
+        rows.push(arrayDef);
+      } else {
+        const objectDef = objectToTree(obj[key], 'object', key);
+        rows.push(objectDef);
+      }
+    } else {
+      const primitiveDef = objectToTree(obj[key], 'primitive', key);
+      rows.push(primitiveDef);
+    }
+  }
+
+  let keyDef;
+  if (keyName.startsWith('OPTION:')) {
+    keyDef = {
+      text: [
+        { text: `${keyName.replace(':', ' ')}`, style: ['sub', 'b', 'blue'] },
+        { text: `${keyDataType === 'array' ? '[{' : '{'}`, style: ['small', 'mono'] },
+      ],
+    };
+  } else {
+    keyDef = { text: `${keyName} ${keyDataType === 'array' ? '[{' : '{'}`, style: ['small', 'mono'] };
+  }
+
+  return [{
+    colSpan: 3,
+    stack: [
+      keyDef,
+      { text: keyDescr, style: ['sub', 'blue'], margin: [0, 2, 0, 0] },
+      {
+        margin: [10, 0, 0, 0],
+        widths: ['auto', '10', '*'],
+        layout: rowLinesOnlyTableLayout,
+        table: {
+          dontBreakRows: true,
+          body: rows,
+        },
+      },
+      { text: `${keyDataType === 'array' ? '}]' : '}'}`, style: ['small', 'mono'] },
+    ],
+  }];
 }
