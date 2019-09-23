@@ -1,17 +1,30 @@
-const rowLinesOnlyTableLayout = {
-  hLineWidth() {
+/* eslint-disable no-unused-vars */
+const indentGuideLayout = {
+  hLineWidth(i, node) {
     // return (i === 0 || i === 1 || i === node.table.body.length) ? 0 : 0.5;
     return 0;
   },
-  vLineWidth() {
-    return 0;
+  hLineColor(i, node) {
+    return (i === 0 || i === node.table.body.length) ? 'black' : 'lightgray';
   },
-  // hLineColor: function (i, node) {
-  //   return (i === 0 || i === node.table.body.length) ? 'black' : 'lightgray';
-  // },
+  vLineWidth(i, node) {
+    return (i === 0 && node.table.body.length > 3) ? 1 : 0;
+  },
+  vLineColor(i, node) {
+    return (i === 0) ? 'lightgray' : 'none';
+  },
   paddingTop() { return 0; },
   paddingBottom() { return 0; },
 };
+
+const noBorderLayout = {
+  hLineWidth(i, node) { return 0; },
+  vLineWidth(i, node) { return 0; },
+  paddingTop() { return 0; },
+  paddingBottom() { return 0; },
+};
+
+/* eslint-enable no-unused-vars */
 
 /* Generates an object containing type and constraint info */
 export function getTypeInfo(schema, overrideAttributes = null) {
@@ -204,7 +217,7 @@ export function objectToTree(obj, keyDataType = 'object', keyName = 'object', ke
     return [
       { text: keyName, style: ['small', 'mono'], margin: 0 },
       { text: (typeAndDescr[0] ? typeAndDescr[0] : ''), style: ['small', 'mono', 'lightGray'], margin: 0 },
-      { text: (typeAndDescr[1] ? typeAndDescr[1] : ''), style: ['small', 'lightGray'], margin: [0, 2, 0, 0] },
+      { text: (typeAndDescr[1] ? typeAndDescr[1] : ''), style: ['small', 'mono', 'lightGray'], margin: [0, 2, 0, 0] },
     ];
   }
 
@@ -269,8 +282,8 @@ export function objectToTree(obj, keyDataType = 'object', keyName = 'object', ke
       { text: keyDescr, style: ['sub', 'blue'], margin: [0, 2, 0, 0] },
       {
         margin: [10, 0, 0, 0],
-        widths: ['auto', '10', '*'],
-        layout: rowLinesOnlyTableLayout,
+        widths: ['auto', 'auto', '*'],
+        layout: noBorderLayout,
         table: {
           dontBreakRows: true,
           body: rows,
