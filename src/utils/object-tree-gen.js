@@ -10,9 +10,7 @@ const indentGuideLayout = {
   vLineWidth(i, node) {
     return (i === 0 && node.table.body.length > 3) ? 1 : 0;
   },
-  vLineColor(i, node) {
-    return (i === 0) ? 'lightgray' : 'none';
-  },
+  vLineColor(i, node) { return '#F9EBEA'; },
   paddingTop() { return 0; },
   paddingBottom() { return 0; },
 };
@@ -27,7 +25,7 @@ const noBorderLayout = {
 /* eslint-enable no-unused-vars */
 
 /* Generates an object containing type and constraint info */
-export function getTypeInfo(schema, overrideAttributes = null) {
+export function getTypeInfo(schema) {
   if (!schema) {
     return;
   }
@@ -89,18 +87,6 @@ export function getTypeInfo(schema, overrideAttributes = null) {
     }
   }
 
-  if (overrideAttributes) {
-    if (overrideAttributes.readOnly) {
-      typeProps.readOnly = 'read-only';
-    }
-    if (overrideAttributes.writeOnly) {
-      typeProps.writeOnly = 'write-only';
-    }
-    if (overrideAttributes.deprecated) {
-      typeProps.deprecated = 'depricated';
-    }
-  }
-
   let typeInfoText = `${typeProps.format ? typeProps.format : typeProps.type}`;
   if (typeProps.allowedValues) {
     typeInfoText += `:(${typeProps.allowedValues})`;
@@ -115,10 +101,10 @@ export function getTypeInfo(schema, overrideAttributes = null) {
     typeInfoText += ' depricated';
   }
   if (typeProps.constrain) {
-    typeInfoText += `\u00a0${typeProps.constrain}`;
+    typeInfoText += ` ${typeProps.constrain}`;
   }
   if (typeProps.pattern) {
-    typeInfoText += `\u00a0${typeProps.pattern}`;
+    typeInfoText += ` ${typeProps.pattern}`;
   }
   typeProps.typeInfoText = typeInfoText;
   return typeProps;
@@ -136,7 +122,7 @@ export function schemaToObject(schema, level = 0) {
     return;
   }
   if (schema.type === 'object' || schema.properties) {
-    // obj[':object_description'] = schema.description ? schema.description : '';
+    obj[':object_description'] = schema.description ? schema.description : '';
     for (const key in schema.properties) {
       obj[`${key}${schema.required && schema.required.includes(key) ? '*' : ''}`] = schemaToObject(schema.properties[key], {});
     }
@@ -217,7 +203,7 @@ export function objectToTree(obj, keyDataType = 'object', keyName = 'object', ke
     return [
       { text: keyName, style: ['small', 'mono'], margin: 0 },
       { text: (typeAndDescr[0] ? typeAndDescr[0] : ''), style: ['small', 'mono', 'lightGray'], margin: 0 },
-      { text: (typeAndDescr[1] ? typeAndDescr[1] : ''), style: ['small', 'mono', 'lightGray'], margin: [0, 2, 0, 0] },
+      { text: (typeAndDescr[1] ? typeAndDescr[1] : ''), style: ['small', 'lightGray'], margin: [0, 2, 0, 0] },
     ];
   }
 
@@ -257,7 +243,7 @@ export function objectToTree(obj, keyDataType = 'object', keyName = 'object', ke
         const objectDef = objectToTree(obj[key], 'object', (key === '0' ? '' : key));
         rows.push(objectDef);
       }
-    } else {
+    } else if (key !== ':object_description') {
       const primitiveDef = objectToTree(obj[key], 'primitive', (key === '0' ? '' : key));
       rows.push(primitiveDef);
     }
@@ -272,7 +258,12 @@ export function objectToTree(obj, keyDataType = 'object', keyName = 'object', ke
       ],
     };
   } else {
-    keyDef = { text: `${keyName} ${keyDataType === 'array' ? '[' : '{'}`, style: ['small', 'mono'] };
+    keyDef = {
+      stack: [
+        { text: `${keyName} ${keyDataType === 'array' ? '[' : '{'}`, style: ['small', 'mono'] },
+        { text: `${obj[':object_description'] ? obj[':object_description'] : ''}`, style: ['sub', 'gray'] },
+      ],
+    };
   }
 
   return [{
@@ -282,9 +273,11 @@ export function objectToTree(obj, keyDataType = 'object', keyName = 'object', ke
       { text: keyDescr, style: ['sub', 'blue'], margin: [0, 2, 0, 0] },
       {
         margin: [10, 0, 0, 0],
-        widths: ['auto', 'auto', '*'],
         layout: noBorderLayout,
+        // layout: indentGuideLayout,
         table: {
+          headerRows: 0,
+          widths: ['auto', 'auto', '*'],
           dontBreakRows: true,
           body: rows,
         },

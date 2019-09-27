@@ -125,18 +125,8 @@ export default async function ProcessSpec(specUrl, sortTags) {
   }
 
   let securitySchemes = {};
-  let servers = [];
 
   securitySchemes = (openApiSpec.components ? openApiSpec.components.securitySchemes : {});
-  if (openApiSpec.servers) {
-    openApiSpec.servers.map((v) => {
-      if (v.url && v.url.substr(0, 1) === '/') {
-        const paths = specUrl.split('/');
-        v.url = `${paths[0]}//${paths[2]}${v.url}`;
-      }
-    });
-  }
-  servers = openApiSpec.servers;
   if (sortTags) {
     tags.sort((a, b) => (a.name < b.name ? -1 : (a.name > b.name ? 1 : 0)));
   }
@@ -145,7 +135,6 @@ export default async function ProcessSpec(specUrl, sortTags) {
     tags,
     externalDocs: openApiSpec.externalDocs,
     securitySchemes,
-    servers, // In swagger 2, its generated from schemes, host and basePath properties
     basePath: openApiSpec.basePath, // Only available in swagger V2
     totalPathCount,
   };
