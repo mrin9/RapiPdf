@@ -4,6 +4,12 @@
 <head>
   <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes">
   <title>RapiPdf</title>
+  <style>
+    rapi-pdf {
+      margin:2px;
+      width:600px;
+    }
+  </style>  
 </head>
 
 <body>
@@ -20,7 +26,9 @@
   <!--
   <rapi-pdf id='rapipdf' spec-url="./examples/specs/test.json" include-info="false" include-security="false" include-toc="false"> </rapi-pdf>
   -->
-  <rapi-pdf id='rapipdf' spec-url="./examples/specs/petstore.json"> </rapi-pdf>
+  <rapi-pdf id='rapipdf' spec-url="./specs/petstore.json"> </rapi-pdf>
+  <rapi-pdf id='rapipdf' spec-url="./specs/bitbucket.json"> </rapi-pdf>
+  <rapi-pdf id='rapipdf' spec-url="./specs/data-types.yaml"> </rapi-pdf>
   
 
   <button onclick="changeSpec()">Change Spec</button>
