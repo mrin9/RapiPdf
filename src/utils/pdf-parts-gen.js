@@ -1,6 +1,6 @@
 import marked from 'marked';
 import {
-  getTypeInfo, schemaToObject, objectToTree,
+  getTypeInfo, schemaInObjectNotation, objectToTree,
 } from '@/utils/object-tree-gen';
 
 // Inline Markdown
@@ -305,7 +305,7 @@ function getRequestBodyDef(requestBody, tableLayout, localize) {
       let origSchema = requestBody.content[contentType].schema;
       if (origSchema) {
         origSchema = JSON.parse(JSON.stringify(origSchema));
-        const schemaInObjectNotaion = schemaToObject(origSchema);
+        const schemaInObjectNotaion = schemaInObjectNotation(origSchema);
         requestBodyTableDef = [
           { text: `${localize.requestBody} - ${contentType}`, margin: [0, 10, 0, 0], style: ['small', 'b'] },
           objectToTree(schemaInObjectNotaion),
@@ -314,7 +314,6 @@ function getRequestBodyDef(requestBody, tableLayout, localize) {
       content.push(requestBodyTableDef);
     }
   }
-  // content = [{ text: 'no request body model' }];
   return content;
 }
 
@@ -329,8 +328,8 @@ function getResponseDef(responses, tableLayout, localize) {
       let origSchema = responses[statusCode].content[contentType].schema;
       if (origSchema) {
         origSchema = JSON.parse(JSON.stringify(origSchema));
-        const schemaInObjectNotaion = schemaToObject(origSchema);
-        const respBody = objectToTree(schemaInObjectNotaion);
+        const schemaInObjtNotation = schemaInObjectNotation(origSchema);
+        const respBody = objectToTree(schemaInObjtNotation);
         responseBodyTableDef = [
           { text: `${localize.responseModel} - ${contentType}`, margin: [10, 10, 0, 0], style: ['small', 'b'] },
           { stack: respBody, margin: [10, 0, 0, 0] },
@@ -353,7 +352,6 @@ function getResponseDef(responses, tableLayout, localize) {
       respDef.push(allResponseModelTabelDefs);
     }
   }
-  // respDef = [{ text: 'no response model' }];
   return respDef;
 }
 
@@ -474,7 +472,6 @@ export function getApiDef(spec, filterPath, sectionHeading, tableLayout, localiz
         tagDescrMarkDef = { text: '' };
       }
 
-      // tag.description = tag.description.replace(/ /g, '\u200B ');
       content.push(
         {
           text: `${tagSeq}. ${tag.name.toUpperCase()}`,

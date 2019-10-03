@@ -35,6 +35,7 @@ export default async function createPdf(specUrl, options) {
     alternate: { color: (options.pdfAlternateColor ? options.pdfAlternateColor : '#005b96') },
     gray: { color: 'gray' },
     lightGray: { color: '#aaaaaa' },
+    darkGray: { color: '#666666' },
     red: { color: 'orangered' },
     blue: { color: '#005b96' },
     mono: { font: 'RobotoMono', fontSize: 10 },

@@ -29,19 +29,32 @@ export function getTypeInfo(schema) {
   if (!schema) {
     return;
   }
-  const typeProps = {
+  const info = {
+    type: schema.$ref
+      ? '{recursive}'
+      : schema.enum
+        ? 'enum'
+        : schema.format
+          ? schema.format
+          : schema.type,
     format: schema.format ? schema.format : '',
     pattern: (schema.pattern && !schema.enum) ? schema.pattern : '',
-    readOnly: schema.readOnly ? 'read-only' : '',
-    writeOnly: schema.writeOnly ? 'write-only' : '',
-    depricated: schema.deprecated ? 'depricated' : '',
-    default: schema.default === 0 ? '0 ' : (schema.default ? schema.default : ''),
-    type: '',
-    arrayType: '',
+    readOrWriteOnly: schema.readOnly
+      ? 'read-only'
+      : schema.writeOnly
+        ? 'write-only'
+        : '',
+    deprecated: schema.deprecated ? 'deprecated' : '',
+    default: schema.default === 0 ? '0' : (schema.default ? schema.default : ''),
+    description: schema.description ? schema.description : '',
     allowedValues: '',
     constrain: '',
+    arrayType: '',
     typeInfoText: '',
   };
+  if (info.type === '{recursive}') {
+    info.description = schema.$ref.substring(schema.$ref.lastIndexOf('/') + 1);
+  }
 
   // Set the Type
   if (schema.enum) {
@@ -49,113 +62,93 @@ export function getTypeInfo(schema) {
     schema.enum.map((v) => {
       opt += `${v}, `;
     });
-    typeProps.type = 'enum';
-    typeProps.allowedValues = opt.slice(0, -2);
+    info.type = 'enum';
+    info.allowedValues = opt.slice(0, -2);
   } else if (schema.type) {
-    typeProps.type = schema.type;
+    info.type = schema.type;
   }
 
   if (schema.type === 'array' || schema.items) {
     const arraySchema = schema.items;
-    typeProps.arrayType = `${schema.type} of ${arraySchema.type}`;
-    typeProps.default = arraySchema.default === 0 ? '0 ' : (arraySchema.default ? arraySchema.default : '');
+    info.arrayType = `${schema.type} of ${arraySchema.type}`;
+    info.default = arraySchema.default === 0 ? '0 ' : (arraySchema.default ? arraySchema.default : '');
     if (arraySchema.enum) {
       let opt = '';
       arraySchema.enum.map((v) => {
         opt += `${v}, `;
       });
-      typeProps.allowedValues = opt.slice(0, -2);
+      info.allowedValues = opt.slice(0, -2);
     }
   } else if (schema.type === 'integer' || schema.type === 'number') {
     if (schema.minimum !== undefined && schema.maximum !== undefined) {
-      typeProps.constrain = `${schema.exclusiveMinimum ? '>' : 'between '}${schema.minimum} and ${schema.exclusiveMaximum ? '<' : ''} ${schema.maximum}`;
+      info.constrain = `${schema.exclusiveMinimum ? '>' : 'between '}${schema.minimum} and ${schema.exclusiveMaximum ? '<' : ''} ${schema.maximum}`;
     } else if (schema.minimum !== undefined && schema.maximum === undefined) {
-      typeProps.constrain = `${schema.exclusiveMinimum ? '>' : '>='}${schema.minimum}`;
+      info.constrain = `${schema.exclusiveMinimum ? '>' : '>='}${schema.minimum}`;
     } else if (schema.minimum === undefined && schema.maximum !== undefined) {
-      typeProps.constrain = `${schema.exclusiveMaximum ? '<' : '<='}${schema.maximum}`;
+      info.constrain = `${schema.exclusiveMaximum ? '<' : '<='}${schema.maximum}`;
     }
     if (schema.multipleOf !== undefined) {
-      typeProps.constrain = `multiple of ${schema.multipleOf}`;
+      info.constrain = `multiple of ${schema.multipleOf}`;
     }
   } else if (schema.type === 'string') {
     if (schema.minLength !== undefined && schema.maxLength !== undefined) {
-      typeProps.constrain = `${schema.minLength} to ${schema.maxLength} chars`;
+      info.constrain = `${schema.minLength} to ${schema.maxLength} chars`;
     } else if (schema.minLength !== undefined && schema.maxLength === undefined) {
-      typeProps.constrain = `min:${schema.minLength} chars`;
+      info.constrain = `min:${schema.minLength} chars`;
     } else if (schema.minLength === undefined && schema.maxLength !== undefined) {
-      typeProps.constrain = `max:${schema.maxLength} chars`;
+      info.constrain = `max:${schema.maxLength} chars`;
     }
   }
-
-  let typeInfoText = `${typeProps.format ? typeProps.format : typeProps.type}`;
-  if (typeProps.allowedValues) {
-    typeInfoText += `:(${typeProps.allowedValues})`;
-  }
-  if (typeProps.readOnly) {
-    typeInfoText += ' read-only';
-  }
-  if (typeProps.writeOnly) {
-    typeInfoText += ' write-only';
-  }
-  if (typeProps.deprecated) {
-    typeInfoText += ' depricated';
-  }
-  if (typeProps.constrain) {
-    typeInfoText += ` ${typeProps.constrain}`;
-  }
-  if (typeProps.pattern) {
-    typeInfoText += ` ${typeProps.pattern}`;
-  }
-  typeProps.typeInfoText = typeInfoText;
-  return typeProps;
+  info.typeInfoText = `${info.type}~|~${info.readOrWriteOnly} ${info.deprecated}~|~${info.constrain}~|~${info.default}~|~${info.allowedValues}~|~${info.pattern}~|~${info.description}`;
+  return info;
 }
 
 /**
  * For changing OpenAPI-Schema to an Object Notation,
  * This Object would further be an input to `objectToTree()` to generate a pdfDefs representing an Object-Tree
  * @param {object} schema - Schema object from OpenAPI spec
+ * @param {object} obj - recursivly pass this object to generate object notation
  * @param {number} level - contains the recursion depth
  */
-export function schemaToObject(schema, level = 0) {
-  let obj = {};
-  if (schema === null) {
+export function schemaInObjectNotation(schema, obj = {}, level = 0) {
+  if (!schema) {
     return;
   }
   if (schema.type === 'object' || schema.properties) {
     obj[':object_description'] = schema.description ? schema.description : '';
     for (const key in schema.properties) {
-      obj[`${key}${schema.required && schema.required.includes(key) ? '*' : ''}`] = schemaToObject(schema.properties[key], {});
+      if (schema.required && schema.required.includes(key)) {
+        obj[`${key}*`] = schemaInObjectNotation(schema.properties[key], {});
+      } else {
+        obj[key] = schemaInObjectNotation(schema.properties[key], {});
+      }
     }
   } else if (schema.type === 'array' || schema.items) {
     if (level === 0) {
       // if root level schema is of type array, then convert to object
-      obj = schemaToObject(schema.items, level + 1);
+      obj = schemaInObjectNotation(schema.items, {}, level + 1);
     } else {
-      obj = [schemaToObject(schema.items, level + 1)];
+      obj = [schemaInObjectNotation(schema.items, {}, level + 1)];
     }
   } else if (schema.allOf) {
     const objWithAllProps = {};
     if (schema.allOf.length === 1 && !schema.allOf[0].properties && !schema.allOf[0].items) {
       // If allOf has single item and the type is not an object or array, then its a primitive
-      if (schema.allOf[0].$ref) {
-        const objType = schema.allOf[0].$ref.substring(schema.allOf[0].$ref.lastIndexOf('/') + 1);
-        return `{ ${objType} } ~|~ Recursive Object`;
-      }
       const tempSchema = schema.allOf[0];
-      return `${getTypeInfo(tempSchema).typeInfoText}~|~${tempSchema.description ? tempSchema.description : ''}`;
+      return `${getTypeInfo(tempSchema).typeInfoText}`;
     }
     // If allOf is an array of multiple elements, then all the keys makes a single object
     schema.allOf.map((v) => {
       if (v.type === 'object' || v.properties || v.allOf || v.anyOf || v.oneOf) {
-        const partialObj = schemaToObject(v, level + 1);
+        const partialObj = schemaInObjectNotation(v, {}, level + 1);
         Object.assign(objWithAllProps, partialObj);
       } else if (v.type === 'array' || v.items) {
-        const partialObj = [schemaToObject(v, level + 1)];
+        const partialObj = [schemaInObjectNotation(v, {}, level + 1)];
         Object.assign(objWithAllProps, partialObj);
       } else if (v.type) {
         const prop = `prop${Object.keys(objWithAllProps).length}`;
         const typeObj = getTypeInfo(v);
-        objWithAllProps[prop] = `${typeObj.typeInfoText}~|~${v.description ? v.description : ''}`;
+        objWithAllProps[prop] = `${typeObj.typeInfoText}`;
       } else {
         return '';
       }
@@ -168,24 +161,24 @@ export function schemaToObject(schema, level = 0) {
     const xxxOf = schema.anyOf ? 'anyOf' : 'oneOf';
     schema[xxxOf].map((v) => {
       if (v.type === 'object' || v.properties || v.allOf || v.anyOf || v.oneOf) {
-        const partialObj = schemaToObject(v, level + 1);
+        const partialObj = schemaInObjectNotation(v, {}, level + 1);
         objWithAnyOfProps[`OPTION:${i}`] = partialObj;
         i++;
       } else if (v.type === 'array' || v.items) {
-        const partialObj = [schemaToObject(v, level + 1)];
+        const partialObj = [schemaInObjectNotation(v, {}, level + 1)];
         Object.assign(objWithAnyOfProps, partialObj);
       } else {
         const prop = `prop${Object.keys(objWithAnyOfProps).length}`;
-        objWithAnyOfProps[prop] = `${getTypeInfo(v).typeInfoText}~|~${v.description ? v.description : ''}`;
+        objWithAnyOfProps[prop] = `${getTypeInfo(v).typeInfoText}`;
       }
     });
     obj[(schema.anyOf ? 'ANY:OF' : 'ONE:OF')] = objWithAnyOfProps;
   } else {
     const typeObj = getTypeInfo(schema);
     if (typeObj.typeInfoText) {
-      return `${typeObj.typeInfoText}~|~${schema.description ? schema.description : ''}`;
+      return `${typeObj.typeInfoText}`;
     }
-    return '~|~';
+    return '';
   }
   return obj;
 }
@@ -200,10 +193,53 @@ export function schemaToObject(schema, level = 0) {
 export function objectToTree(obj, keyDataType = 'object', keyName = 'object', keyDescr = '') {
   if (typeof obj !== 'object') {
     const typeAndDescr = obj.split('~|~');
+    const descrStack = [];
+    if (typeAndDescr[1].trim()) {
+      descrStack.push({
+        text: `${typeAndDescr[1]}`, style: ['sub', 'b', 'darkGray'],
+      });
+    }
+    if (typeAndDescr[2]) {
+      descrStack.push({
+        text: `${typeAndDescr[2]}`, style: ['sub', 'mono', 'darkGray'],
+      });
+    }
+    if (typeAndDescr[3]) {
+      descrStack.push({
+        text: [
+          { text: 'DEFAULT: ', style: ['sub', 'b', 'darkGray'] },
+          { text: typeAndDescr[3], style: ['sub', 'lightGray', 'mono', 'darkGray'] },
+        ],
+      });
+    }
+    if (typeAndDescr[4]) {
+      descrStack.push({
+        text: [
+          { text: 'ALLOWED: ', style: ['sub', 'b', 'darkGray'] },
+          { text: typeAndDescr[4], style: ['sub', 'lightGray', 'mono', 'darkGray'] },
+        ],
+      });
+    }
+    if (typeAndDescr[5]) {
+      descrStack.push({
+        text: [
+          { text: 'PATTERN: ', style: ['sub', 'b', 'darkGray'] },
+          { text: typeAndDescr[5], style: ['sub', 'lightGray', 'mono', 'darkGray'] },
+        ],
+      });
+    }
+    if (typeAndDescr[6]) {
+      descrStack.push({
+        text: `${typeAndDescr[6]}`,
+        style: ['sub', 'lightGray'],
+        margin: [0, 3, 0, 0],
+      });
+    }
+
     return [
-      { text: keyName, style: ['small', 'mono'], margin: 0 },
-      { text: (typeAndDescr[0] ? typeAndDescr[0] : ''), style: ['small', 'mono', 'lightGray'], margin: 0 },
-      { text: (typeAndDescr[1] ? typeAndDescr[1] : ''), style: ['small', 'lightGray'], margin: [0, 2, 0, 0] },
+      { text: keyName, style: ['sub', 'mono'], margin: 0 },
+      { text: (typeAndDescr[0] ? typeAndDescr[0] : ''), style: ['sub', 'mono', 'lightGray'], margin: 0 },
+      { stack: descrStack, margin: 0 },
     ];
   }
 
