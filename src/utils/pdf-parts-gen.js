@@ -1,6 +1,6 @@
 import marked from 'marked';
 import {
-  getTypeInfo, schemaInObjectNotation, objectToTree,
+  getTypeInfo, schemaInObjectNotation, objectToTree, objectToTableTree,
 } from '@/utils/object-tree-gen';
 
 // Inline Markdown
@@ -308,7 +308,7 @@ function getRequestBodyDef(requestBody, tableLayout, localize) {
         const schemaInObjectNotaion = schemaInObjectNotation(origSchema);
         requestBodyTableDef = [
           { text: `${localize.requestBody} - ${contentType}`, margin: [0, 10, 0, 0], style: ['small', 'b'] },
-          objectToTree(schemaInObjectNotaion),
+          objectToTree(schemaInObjectNotaion, localize),
         ];
       }
       content.push(requestBodyTableDef);
@@ -329,10 +329,26 @@ function getResponseDef(responses, tableLayout, localize) {
       if (origSchema) {
         origSchema = JSON.parse(JSON.stringify(origSchema));
         const schemaInObjtNotation = schemaInObjectNotation(origSchema);
+        const respBody = objectToTableTree(schemaInObjtNotation);
+        /*
         const respBody = objectToTree(schemaInObjtNotation);
         responseBodyTableDef = [
           { text: `${localize.responseModel} - ${contentType}`, margin: [10, 10, 0, 0], style: ['small', 'b'] },
-          { stack: respBody, margin: [10, 0, 0, 0] },
+          { stack: respBody, margin: [10, 5, 0, 0] },
+        ];
+        */
+        responseBodyTableDef = [
+          { text: `${localize.responseModel} - ${contentType}`, margin: [10, 10, 0, 0], style: ['small', 'b'] },
+          {
+            stack: [
+              {
+                table: {
+                  body: (respBody && respBody.length > 0) ? respBody : [{ text: 'c1' }, { text: 'c2' }, { text: 'c3' }],
+                },
+              },
+            ],
+            margin: [10, 10, 0, 0],
+          },
         ];
       } else {
         responseBodyTableDef = [

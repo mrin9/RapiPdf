@@ -114,22 +114,20 @@ export function schemaInObjectNotation(schema, obj = {}, level = 0) {
   if (!schema) {
     return;
   }
-  if (schema.type === 'object' || schema.properties) {
-    obj[':object_description'] = schema.description ? schema.description : '';
+  if (schema.type === 'object' || schema.properties) { // If Object
+    obj['::description'] = schema.description ? schema.description : '';
+    obj['::type'] = 'object';
     for (const key in schema.properties) {
       if (schema.required && schema.required.includes(key)) {
-        obj[`${key}*`] = schemaInObjectNotation(schema.properties[key], {});
+        obj[`${key}*`] = schemaInObjectNotation(schema.properties[key], {}, (level + 1), key);
       } else {
-        obj[key] = schemaInObjectNotation(schema.properties[key], {});
+        obj[key] = schemaInObjectNotation(schema.properties[key], {}, (level + 1), key);
       }
     }
-  } else if (schema.type === 'array' || schema.items) {
-    if (level === 0) {
-      // if root level schema is of type array, then convert to object
-      obj = schemaInObjectNotation(schema.items, {}, level + 1);
-    } else {
-      obj = [schemaInObjectNotation(schema.items, {}, level + 1)];
-    }
+  } else if (schema.items) { // If Array
+    obj['::description'] = schema.description ? schema.description : '';
+    obj['::type'] = 'array';
+    obj['::props'] = schemaInObjectNotation(schema.items, {}, (level + 1));
   } else if (schema.allOf) {
     const objWithAllProps = {};
     if (schema.allOf.length === 1 && !schema.allOf[0].properties && !schema.allOf[0].items) {
@@ -140,10 +138,10 @@ export function schemaInObjectNotation(schema, obj = {}, level = 0) {
     // If allOf is an array of multiple elements, then all the keys makes a single object
     schema.allOf.map((v) => {
       if (v.type === 'object' || v.properties || v.allOf || v.anyOf || v.oneOf) {
-        const partialObj = schemaInObjectNotation(v, {}, level + 1);
+        const partialObj = schemaInObjectNotation(v, {}, (level + 1));
         Object.assign(objWithAllProps, partialObj);
       } else if (v.type === 'array' || v.items) {
-        const partialObj = [schemaInObjectNotation(v, {}, level + 1)];
+        const partialObj = [schemaInObjectNotation(v, {}, (level + 1))];
         Object.assign(objWithAllProps, partialObj);
       } else if (v.type) {
         const prop = `prop${Object.keys(objWithAllProps).length}`;
@@ -161,11 +159,11 @@ export function schemaInObjectNotation(schema, obj = {}, level = 0) {
     const xxxOf = schema.anyOf ? 'anyOf' : 'oneOf';
     schema[xxxOf].map((v) => {
       if (v.type === 'object' || v.properties || v.allOf || v.anyOf || v.oneOf) {
-        const partialObj = schemaInObjectNotation(v, {}, level + 1);
+        const partialObj = schemaInObjectNotation(v, {}, (level + 1));
         objWithAnyOfProps[`OPTION:${i}`] = partialObj;
         i++;
       } else if (v.type === 'array' || v.items) {
-        const partialObj = [schemaInObjectNotation(v, {}, level + 1)];
+        const partialObj = [schemaInObjectNotation(v, {}, (level + 1))];
         Object.assign(objWithAnyOfProps, partialObj);
       } else {
         const prop = `prop${Object.keys(objWithAnyOfProps).length}`;
@@ -186,37 +184,40 @@ export function schemaInObjectNotation(schema, obj = {}, level = 0) {
 /**
  * For changing an object to Tree (array of pdfDefs, which when feeded to pdfMake would produce a indented object tree)
  * @param {object} obj - keys to iterate
- * @param {string} keyDataType  - is 'primitive', 'object' or 'array', based on this appropriate braces are used
- * @param {string} keyName  - name of the key from previous recursive call stack
- * @param {string} keyDescr - description of the key
+ * @param {string} prevKeyDataType  - data-type of previous key, it is either 'primitive', 'object' or 'array', based on this appropriate braces are used
+ * @param {string} prevKey  - name of the key from previous recursive call stack
  */
-export function objectToTree(obj, keyDataType = 'object', keyName = 'object', keyDescr = '') {
+export function objectToTree(obj, localize, prevKeyDataType = 'object', prevKey = 'object') {
   if (typeof obj !== 'object') {
     const typeAndDescr = obj.split('~|~');
     const descrStack = [];
+    if (prevKeyDataType === 'array') {
+      typeAndDescr[0] = `[${typeAndDescr[0]}]`;
+    }
     if (typeAndDescr[1].trim()) {
       descrStack.push({
-        text: `${typeAndDescr[1]}`, style: ['sub', 'b', 'darkGray'],
+        text: `${typeAndDescr[1]}`, margin: [0, 1, 0, 0], style: ['small', 'b', 'darkGray'],
       });
     }
     if (typeAndDescr[2]) {
       descrStack.push({
-        text: `${typeAndDescr[2]}`, style: ['sub', 'mono', 'darkGray'],
+        text: `${typeAndDescr[2]}`, margin: [0, 1, 0, 0], style: ['small', 'mono', 'darkGray'],
       });
     }
     if (typeAndDescr[3]) {
       descrStack.push({
         text: [
           { text: 'DEFAULT: ', style: ['sub', 'b', 'darkGray'] },
-          { text: typeAndDescr[3], style: ['sub', 'lightGray', 'mono', 'darkGray'] },
+          { text: typeAndDescr[3], style: ['small', 'lightGray', 'mono', 'darkGray'] },
         ],
+        margin: [0, 1, 0, 0],
       });
     }
     if (typeAndDescr[4]) {
       descrStack.push({
         text: [
           { text: 'ALLOWED: ', style: ['sub', 'b', 'darkGray'] },
-          { text: typeAndDescr[4], style: ['sub', 'lightGray', 'mono', 'darkGray'] },
+          { text: typeAndDescr[4], style: ['small', 'lightGray', 'mono', 'darkGray'] },
         ],
       });
     }
@@ -224,7 +225,7 @@ export function objectToTree(obj, keyDataType = 'object', keyName = 'object', ke
       descrStack.push({
         text: [
           { text: 'PATTERN: ', style: ['sub', 'b', 'darkGray'] },
-          { text: typeAndDescr[5], style: ['sub', 'lightGray', 'mono', 'darkGray'] },
+          { text: typeAndDescr[5], style: ['small', 'lightGray', 'mono', 'darkGray'] },
         ],
       });
     }
@@ -237,7 +238,7 @@ export function objectToTree(obj, keyDataType = 'object', keyName = 'object', ke
     }
 
     return [
-      { text: keyName, style: ['sub', 'mono'], margin: 0 },
+      { text: prevKey, style: ['sub', 'mono'], margin: 0 },
       { text: (typeAndDescr[0] ? typeAndDescr[0] : ''), style: ['sub', 'mono', 'lightGray'], margin: 0 },
       { stack: descrStack, margin: 0 },
     ];
@@ -253,13 +254,13 @@ export function objectToTree(obj, keyDataType = 'object', keyName = 'object', ke
     if (key === 'ANY:OF' || key === 'ONE:OF') {
       const allOptions = [];
       for (const k in obj[key]) {
-        allOptions.push(objectToTree(obj[key][k], 'object', k));
+        allOptions.push(objectToTree(obj[key][k], localize, 'object', k));
       }
       return [
         {
           colSpan: 3,
           stack: [
-            { text: `${keyName}`, style: ['small', 'mono'] },
+            { text: `${prevKey}`, style: ['small', 'mono'] },
             {
               margin: [10, 0, 0, 0],
               stack: [
@@ -271,33 +272,33 @@ export function objectToTree(obj, keyDataType = 'object', keyName = 'object', ke
         },
       ];
     }
-    if (typeof obj[key] === 'object') {
-      if (Array.isArray(obj[key])) {
-        const arrayDef = objectToTree(obj[key], 'array', (key === '0' ? '' : key));
-        rows.push(arrayDef);
+    if (typeof obj[key] === 'object' && obj[key]['::type']) {
+      let objectDef;
+      if (obj[key]['::type'] === 'array') {
+        objectDef = objectToTree(obj[key]['::props'], localize, obj[key]['::type'], key);
       } else {
-        const objectDef = objectToTree(obj[key], 'object', (key === '0' ? '' : key));
-        rows.push(objectDef);
+        objectDef = objectToTree(obj[key], localize, obj[key]['::type'], key);
       }
-    } else if (key !== ':object_description') {
-      const primitiveDef = objectToTree(obj[key], 'primitive', (key === '0' ? '' : key));
+      rows.push(objectDef);
+    } else if (key.startsWith('::') === false) {
+      const primitiveDef = objectToTree(obj[key], localize, 'primitive', key);
       rows.push(primitiveDef);
     }
   }
 
   let keyDef;
-  if (keyName.startsWith('OPTION:')) {
+  if (prevKey.startsWith('OPTION:')) {
     keyDef = {
       text: [
-        { text: `${keyName.replace(':', ' ')}`, style: ['sub', 'b', 'blue'] },
-        { text: `${keyDataType === 'array' ? '[' : '{'}`, style: ['small', 'mono'] },
+        { text: `${prevKey.replace(':', ' ')}`, style: ['sub', 'b', 'blue'] },
+        { text: `${prevKeyDataType === 'array' ? '[{' : '{'}`, style: ['small', 'mono'] },
       ],
     };
   } else {
     keyDef = {
       stack: [
-        { text: `${keyName} ${keyDataType === 'array' ? '[' : '{'}`, style: ['small', 'mono'] },
-        { text: `${obj[':object_description'] ? obj[':object_description'] : ''}`, style: ['sub', 'gray'] },
+        { text: `${prevKey} ${prevKeyDataType === 'array' ? '[{' : '{'}`, style: ['small', 'mono'] },
+        { text: `${prevKeyDataType === 'array' ? 'Array of object: ' : ''} ${obj['::description'] ? obj['::description'] : ''}`, style: ['sub', 'gray'] },
       ],
     };
   }
@@ -306,7 +307,6 @@ export function objectToTree(obj, keyDataType = 'object', keyName = 'object', ke
     colSpan: 3,
     stack: [
       keyDef,
-      { text: keyDescr, style: ['sub', 'blue'], margin: [0, 2, 0, 0] },
       {
         margin: [10, 0, 0, 0],
         layout: noBorderLayout,
@@ -318,7 +318,99 @@ export function objectToTree(obj, keyDataType = 'object', keyName = 'object', ke
           body: rows,
         },
       },
-      { text: `${keyDataType === 'array' ? ']' : '}'}`, style: ['small', 'mono'] },
+      { text: `${prevKeyDataType === 'array' ? '}]' : '}'}`, style: ['small', 'mono'] },
     ],
   }];
+}
+
+
+/**
+ * For changing an object to Table-Tree (array of pdfDefs, which when feeded to pdfMake would produce a indented table tree)
+ * @param {object} obj - keys to iterate
+ * @param {string} keyDataType  - is 'primitive', 'object' or 'array', based on this appropriate braces are used
+ * @param {string} keyName  - name of the key from previous recursive call stack
+ * @param {string} keyDescr - description of the key
+ */
+
+export function objectToTableTree(obj, allRows = [], level = 0) {
+  const leftMargin = level * 10;
+  // let retunRows = [];
+  if (!obj || typeof obj === 'string') {
+    return [{ text: '' }];
+  }
+  for (const key in obj) {
+    if (typeof obj[key] === 'object' && Array.isArray(obj[key]) === false) {
+      const objRow = [
+        { text: key, style: ['sub', 'mono'], margin: [leftMargin, 0, 0, 0] },
+        { text: 'object', style: ['sub', 'mono', 'lightGray'], margin: 0 },
+        { text: '', margin: 0 },
+      ];
+      allRows.push(objRow);
+      /*
+      if (Array.isArray(obj[key])) {
+        if ( typeof )
+      }
+      */
+      objectToTableTree(obj[key], allRows, (level + 1));
+    } else if (typeof obj[key] === 'object' && Array.isArray(obj[key])) {
+      const objRow = [
+        { text: key, style: ['sub', 'mono'], margin: [leftMargin, 0, 0, 0] },
+        { text: 'array', style: ['sub', 'mono', 'lightGray'], margin: 0 },
+        { text: '', margin: 0 },
+      ];
+      allRows.push(objRow);
+      objectToTableTree(obj[key][0], allRows, (level + 1));
+    } else if (typeof obj[key] === 'string' && (key.startsWith('::') === false)) {
+      const typeAndDescr = obj[key].split('~|~');
+      const descrStack = [];
+      if (typeAndDescr[1].trim()) {
+        descrStack.push({
+          text: `${typeAndDescr[1]}`, style: ['sub', 'b', 'darkGray'],
+        });
+      }
+      if (typeAndDescr[2]) {
+        descrStack.push({
+          text: `${typeAndDescr[2]}`, style: ['sub', 'mono', 'darkGray'],
+        });
+      }
+      if (typeAndDescr[3]) {
+        descrStack.push({
+          text: [
+            { text: 'DEFAULT: ', style: ['sub', 'b', 'darkGray'] },
+            { text: typeAndDescr[3], style: ['sub', 'lightGray', 'mono', 'darkGray'] },
+          ],
+        });
+      }
+      if (typeAndDescr[4]) {
+        descrStack.push({
+          text: [
+            { text: 'ALLOWED: ', style: ['sub', 'b', 'darkGray'] },
+            { text: typeAndDescr[4], style: ['sub', 'lightGray', 'mono', 'darkGray'] },
+          ],
+        });
+      }
+      if (typeAndDescr[5]) {
+        descrStack.push({
+          text: [
+            { text: 'PATTERN: ', style: ['sub', 'b', 'darkGray'] },
+            { text: typeAndDescr[5], style: ['sub', 'lightGray', 'mono', 'darkGray'] },
+          ],
+        });
+      }
+      if (typeAndDescr[6]) {
+        descrStack.push({
+          text: `${typeAndDescr[6]}`,
+          style: ['sub', 'lightGray'],
+          margin: [0, 3, 0, 0],
+        });
+      }
+      allRows.push([
+        { text: key, style: ['sub', 'mono'], margin: [leftMargin, 0, 0, 0] },
+        { text: (typeAndDescr[0] ? typeAndDescr[0] : ''), style: ['sub', 'mono', 'lightGray'], margin: 0 },
+        { text: (typeAndDescr[1] ? typeAndDescr[1] : ''), style: ['sub', 'mono', 'lightGray'], margin: 0 },
+        // { stack: ((descrStack && descrStack.length) > 0 ? descrStack : [{ text: '' }]), margin: 0 },
+      ]);
+    }
+  }
+  return allRows;
 }
