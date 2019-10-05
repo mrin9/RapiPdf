@@ -216,7 +216,7 @@ export function schemaInObjectNotation(schema, obj = {}, level = 0) {
  * @param {string} prevKeyDataType  - data-type of previous key, it is either 'primitive', 'object' or 'array', based on this appropriate braces are used
  * @param {string} prevKey  - name of the key from previous recursive call stack
  */
-export function objectToTree(obj, localize, prevKeyDataType = 'object', prevKey = 'object') {
+export function objectToTree(obj, localize, prevKeyDataType = 'object', prevKey = '') {
   if (typeof obj !== 'object') {
     const propDescrArray = obj.split('~|~');
     if (prevKeyDataType === 'array') {
@@ -262,7 +262,7 @@ export function objectToTree(obj, localize, prevKeyDataType = 'object', prevKey 
     if (typeof obj[key] === 'object' && obj[key]['::type']) {
       let objectDef;
       if (obj[key]['::type'] === 'array') {
-        objectDef = objectToTree(obj[key]['::props'], localize, obj[key]['::type'], key);
+        objectDef = objectToTree(obj[key]['::props'], localize, obj[key]['::type'], key, 'array');
       } else {
         objectDef = objectToTree(obj[key], localize, obj[key]['::type'], key);
       }
@@ -315,7 +315,7 @@ export function objectToTree(obj, localize, prevKeyDataType = 'object', prevKey 
         table: {
           headerRows: 0,
           widths: ['auto', 'auto', '*'],
-          dontBreakRows: true,
+          dontBreakRows: false,
           body: rows,
         },
       },

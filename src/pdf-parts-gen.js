@@ -181,7 +181,7 @@ function getRequestBodyDef(requestBody, schemaStyle, localize) {
   for (const contentType in requestBody.content) {
     const contentTypeObj = requestBody.content[contentType];
     const requestBodyDef = [
-      { text: `${localize.requestBody} - ${contentType}`, margin: [0, 10, 0, 10], style: ['small', 'b'] },
+      { text: `${localize.requestBody} - ${contentType}`, margin: [0, 10, 0, 0], style: ['small', 'b'] },
     ];
 
     if ((contentType.includes('form') || contentType.includes('multipart-form')) && contentTypeObj.schema) {
@@ -202,18 +202,27 @@ function getRequestBodyDef(requestBody, schemaStyle, localize) {
           }
           requestBodyDef.push(treeDef);
         } else {
+          // if Schema Style is Tree
           let schemaTableTreeDef;
           if (schemaInObjectNotaion['::type'] && schemaInObjectNotaion['::type'] === 'array') {
             schemaTableTreeDef = objectToTableTree(schemaInObjectNotaion['::prop'], localize, 'array');
           } else {
             schemaTableTreeDef = objectToTableTree(schemaInObjectNotaion, localize);
           }
-          if (schemaTableTreeDef && schemaTableTreeDef.length > 0) {
+          if (schemaTableTreeDef && schemaTableTreeDef.length > 0 && Array.isArray(schemaTableTreeDef[0]) && schemaTableTreeDef[0].length > 0) {
+            schemaTableTreeDef.unshift([
+              { text: localize.name, style: ['sub', 'b', 'alternate'] },
+              { text: localize.type, style: ['sub', 'b', 'alternate'] },
+              { text: localize.description, style: ['sub', 'b', 'alternate'] },
+            ]);
+
             requestBodyDef.push({
               table: {
+                headerRows: 1,
                 body: schemaTableTreeDef,
               },
-              margin: [10, 10, 0, 0],
+              layout: rowLinesTableLayout,
+              margin: [0, 3, 0, 0],
             });
           }
         }
@@ -245,19 +254,30 @@ function getResponseDef(responses, schemaStyle, localize) {
           } else {
             schemaTreeDef = objectToTree(schemaInObjectNotaion, localize);
           }
-          responseDef.push(schemaTreeDef);
+          if (Array.isArray(schemaTreeDef) && schemaTreeDef.length > 0) {
+            schemaTreeDef[0].margin = [10, 5, 0, 0];
+            responseDef.push(schemaTreeDef);
+          }
         } else {
+          // If Schema style is Tree
           let schemaTableTreeDef;
           if (schemaInObjectNotaion['::type'] && schemaInObjectNotaion['::type'] === 'array') {
             schemaTableTreeDef = objectToTableTree(schemaInObjectNotaion['::prop'], localize, 'array');
           } else {
             schemaTableTreeDef = objectToTableTree(schemaInObjectNotaion, localize);
           }
-          if (schemaTableTreeDef && schemaTableTreeDef.length > 0) {
+          if (schemaTableTreeDef && schemaTableTreeDef.length > 0 && Array.isArray(schemaTableTreeDef[0]) && schemaTableTreeDef[0].length > 0) {
+            schemaTableTreeDef.unshift([
+              { text: localize.name, style: ['sub', 'b', 'alternate'] },
+              { text: localize.type, style: ['sub', 'b', 'alternate'] },
+              { text: localize.description, style: ['sub', 'b', 'alternate'] },
+            ]);
             responseDef.push({
               table: {
+                headerRows: 1,
                 body: schemaTableTreeDef,
               },
+              layout: rowLinesTableLayout,
               margin: [10, 3, 0, 0],
             });
           }
