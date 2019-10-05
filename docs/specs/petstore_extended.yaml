@@ -622,6 +622,7 @@ components:
             - huntingSkill
     Category:
       type: object
+      description: Classification Id and Name
       properties:
         id:
           description: Category ID
@@ -771,6 +772,7 @@ components:
         name: Pet
     Tag:
       type: object
+      description: Used for taging resources
       properties:
         id:
           description: Tag ID

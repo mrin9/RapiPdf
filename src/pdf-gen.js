@@ -1,11 +1,11 @@
 import pdfMake from 'pdfmake/build/pdfmake.min';
-import pdfFonts from '@/utils/vfs_fonts';
+import pdfFonts from '@/vfs_fonts';
 // import pdfFonts from "pdfmake/build/vfs_fonts";
 
-import ProcessSpec from '@/utils/spec-parser';
+import ProcessSpec from '@/spec-parser';
 import {
   getInfoDef, getSecurityDef, getApiDef, getApiListDef,
-} from '@/utils/pdf-parts-gen';
+} from '@/pdf-parts-gen';
 
 export default async function createPdf(specUrl, options) {
   const parsedSpec = await ProcessSpec(specUrl, options.pdfSortTags);
@@ -41,18 +41,6 @@ export default async function createPdf(specUrl, options) {
     mono: { font: 'RobotoMono', fontSize: 10 },
   };
 
-  const rowLinesTableLayout = {
-    hLineWidth(i, node) {
-      return (i === 1 || i === node.table.body.length) ? 1 : 0.5;
-    },
-    vLineWidth() {
-      return 0;
-    },
-    hLineColor(i, node) {
-      return (i === 0 || i === 1 || i === node.table.body.length) ? 'black' : 'lightgray';
-    },
-  };
-
   const allContent = [];
   let infoDef = {};
   let tocDef = {};
@@ -77,15 +65,15 @@ export default async function createPdf(specUrl, options) {
     allContent.push(tocDef);
   }
   if (options.includeSecurity) {
-    securityDef = getSecurityDef(parsedSpec, rowLinesTableLayout, options.localize);
+    securityDef = getSecurityDef(parsedSpec, options.localize);
     allContent.push(securityDef);
   }
   if (options.includeApiDetails) {
-    apiDef = getApiDef(parsedSpec, '', options.localize.api, rowLinesTableLayout, options.localize);
+    apiDef = getApiDef(parsedSpec, '', options.pdfSchemaStyle, options.localize);
     allContent.push(apiDef);
   }
   if (options.includeApiList) {
-    apiListDef = getApiListDef(parsedSpec, options.localize.apiList, rowLinesTableLayout, options.localize);
+    apiListDef = getApiListDef(parsedSpec, options.localize.apiList, options.localize);
     allContent.push(apiListDef);
   }
 

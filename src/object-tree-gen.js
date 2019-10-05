@@ -1,29 +1,3 @@
-/* eslint-disable no-unused-vars */
-const indentGuideLayout = {
-  hLineWidth(i, node) {
-    // return (i === 0 || i === 1 || i === node.table.body.length) ? 0 : 0.5;
-    return 0;
-  },
-  hLineColor(i, node) {
-    return (i === 0 || i === node.table.body.length) ? 'black' : 'lightgray';
-  },
-  vLineWidth(i, node) {
-    return (i === 0 && node.table.body.length > 3) ? 1 : 0;
-  },
-  vLineColor(i, node) { return '#F9EBEA'; },
-  paddingTop() { return 0; },
-  paddingBottom() { return 0; },
-};
-
-const noBorderLayout = {
-  hLineWidth(i, node) { return 0; },
-  vLineWidth(i, node) { return 0; },
-  paddingTop() { return 0; },
-  paddingBottom() { return 0; },
-};
-
-/* eslint-enable no-unused-vars */
-
 /* Generates an object containing type and constraint info */
 export function getTypeInfo(schema) {
   if (!schema) {
@@ -40,11 +14,11 @@ export function getTypeInfo(schema) {
     format: schema.format ? schema.format : '',
     pattern: (schema.pattern && !schema.enum) ? schema.pattern : '',
     readOrWriteOnly: schema.readOnly
-      ? 'read-only'
+      ? 'READ-ONLY'
       : schema.writeOnly
-        ? 'write-only'
+        ? 'WRITE-ONLY'
         : '',
-    deprecated: schema.deprecated ? 'deprecated' : '',
+    deprecated: schema.deprecated ? 'DEPRECATED' : '',
     default: schema.default === 0 ? '0' : (schema.default ? schema.default : ''),
     description: schema.description ? schema.description : '',
     allowedValues: '',
@@ -101,6 +75,61 @@ export function getTypeInfo(schema) {
   }
   info.typeInfoText = `${info.type}~|~${info.readOrWriteOnly} ${info.deprecated}~|~${info.constrain}~|~${info.default}~|~${info.allowedValues}~|~${info.pattern}~|~${info.description}`;
   return info;
+}
+
+function generatePropDescription(propDescrArray, localize) {
+  const descrStack = [];
+  // Set Read or Write only
+  if (propDescrArray[1].trim()) {
+    descrStack.push({
+      text: `${propDescrArray[1]}`, style: ['sub', 'b', 'darkGray'], margin: [0, 3, 0, 0],
+    });
+  }
+
+  // Set Constraints
+  if (propDescrArray[2]) {
+    descrStack.push({
+      text: `${propDescrArray[2]}`, style: ['small', 'mono', 'darkGray'],
+    });
+  }
+
+  // Set Default
+  if (propDescrArray[3]) {
+    descrStack.push({
+      text: [
+        { text: `${localize.default}:`, style: ['sub', 'b', 'darkGray'] },
+        { text: propDescrArray[3], style: ['small', 'darkGray', 'mono'] },
+      ],
+    });
+  }
+
+  // Set Allowed
+  if (propDescrArray[4]) {
+    descrStack.push({
+      text: [
+        { text: `${localize.allowed}:`, style: ['sub', 'b', 'darkGray'] },
+        { text: propDescrArray[4], style: ['small', 'lightGray', 'mono'] },
+      ],
+    });
+  }
+
+  // Set Pattern
+  if (propDescrArray[5]) {
+    descrStack.push({
+      text: [
+        { text: `${localize.pattern}:`, style: ['sub', 'b', 'darkGray'] },
+        { text: propDescrArray[5], style: ['small', 'lightGray', 'mono'] },
+      ],
+    });
+  }
+  if (propDescrArray[6]) {
+    descrStack.push({
+      text: `${propDescrArray[6]}`,
+      style: ['sub', 'lightGray'],
+      margin: [0, 3, 0, 0],
+    });
+  }
+  return descrStack;
 }
 
 /**
@@ -189,57 +218,15 @@ export function schemaInObjectNotation(schema, obj = {}, level = 0) {
  */
 export function objectToTree(obj, localize, prevKeyDataType = 'object', prevKey = 'object') {
   if (typeof obj !== 'object') {
-    const typeAndDescr = obj.split('~|~');
-    const descrStack = [];
+    const propDescrArray = obj.split('~|~');
     if (prevKeyDataType === 'array') {
-      typeAndDescr[0] = `[${typeAndDescr[0]}]`;
+      propDescrArray[0] = `[${propDescrArray[0]}]`;
     }
-    if (typeAndDescr[1].trim()) {
-      descrStack.push({
-        text: `${typeAndDescr[1]}`, margin: [0, 1, 0, 0], style: ['small', 'b', 'darkGray'],
-      });
-    }
-    if (typeAndDescr[2]) {
-      descrStack.push({
-        text: `${typeAndDescr[2]}`, margin: [0, 1, 0, 0], style: ['small', 'mono', 'darkGray'],
-      });
-    }
-    if (typeAndDescr[3]) {
-      descrStack.push({
-        text: [
-          { text: 'DEFAULT: ', style: ['sub', 'b', 'darkGray'] },
-          { text: typeAndDescr[3], style: ['small', 'lightGray', 'mono', 'darkGray'] },
-        ],
-        margin: [0, 1, 0, 0],
-      });
-    }
-    if (typeAndDescr[4]) {
-      descrStack.push({
-        text: [
-          { text: 'ALLOWED: ', style: ['sub', 'b', 'darkGray'] },
-          { text: typeAndDescr[4], style: ['small', 'lightGray', 'mono', 'darkGray'] },
-        ],
-      });
-    }
-    if (typeAndDescr[5]) {
-      descrStack.push({
-        text: [
-          { text: 'PATTERN: ', style: ['sub', 'b', 'darkGray'] },
-          { text: typeAndDescr[5], style: ['small', 'lightGray', 'mono', 'darkGray'] },
-        ],
-      });
-    }
-    if (typeAndDescr[6]) {
-      descrStack.push({
-        text: `${typeAndDescr[6]}`,
-        style: ['sub', 'lightGray'],
-        margin: [0, 3, 0, 0],
-      });
-    }
+    const descrStack = generatePropDescription(propDescrArray, localize);
 
     return [
       { text: prevKey, style: ['sub', 'mono'], margin: 0 },
-      { text: (typeAndDescr[0] ? typeAndDescr[0] : ''), style: ['sub', 'mono', 'lightGray'], margin: 0 },
+      { text: (propDescrArray[0] ? propDescrArray[0] : ''), style: ['sub', 'mono', 'lightGray'], margin: 0 },
       { stack: descrStack, margin: 0 },
     ];
   }
@@ -298,9 +285,18 @@ export function objectToTree(obj, localize, prevKeyDataType = 'object', prevKey 
     keyDef = {
       stack: [
         { text: `${prevKey} ${prevKeyDataType === 'array' ? '[{' : '{'}`, style: ['small', 'mono'] },
-        { text: `${prevKeyDataType === 'array' ? 'Array of object: ' : ''} ${obj['::description'] ? obj['::description'] : ''}`, style: ['sub', 'gray'] },
       ],
     };
+
+    if (obj['::description'] || prevKeyDataType === 'array') {
+      keyDef.stack.push(
+        {
+          text: `${prevKeyDataType === 'array' ? 'Array of object: ' : ''} ${obj['::description'] ? obj['::description'] : ''}`,
+          style: ['sub', 'gray'],
+          margin: [0, 0, 0, 4],
+        },
+      );
+    }
   }
 
   return [{
@@ -309,8 +305,13 @@ export function objectToTree(obj, localize, prevKeyDataType = 'object', prevKey 
       keyDef,
       {
         margin: [10, 0, 0, 0],
-        layout: noBorderLayout,
-        // layout: indentGuideLayout,
+        layout: {
+          defaultBorder: false,
+          hLineWidth() { return 0; },
+          vLineWidth() { return 0; },
+          paddingTop() { return 0; },
+          paddingBottom() { return 0; },
+        },
         table: {
           headerRows: 0,
           widths: ['auto', 'auto', '*'],
@@ -323,7 +324,6 @@ export function objectToTree(obj, localize, prevKeyDataType = 'object', prevKey 
   }];
 }
 
-
 /**
  * For changing an object to Table-Tree (array of pdfDefs, which when feeded to pdfMake would produce a indented table tree)
  * @param {object} obj - keys to iterate
@@ -331,84 +331,38 @@ export function objectToTree(obj, localize, prevKeyDataType = 'object', prevKey 
  * @param {string} keyName  - name of the key from previous recursive call stack
  * @param {string} keyDescr - description of the key
  */
-
-export function objectToTableTree(obj, allRows = [], level = 0) {
+export function objectToTableTree(obj, localize, allRows = [], level = 0) {
   const leftMargin = level * 10;
-  // let retunRows = [];
   if (!obj || typeof obj === 'string') {
     return [{ text: '' }];
   }
   for (const key in obj) {
-    if (typeof obj[key] === 'object' && Array.isArray(obj[key]) === false) {
-      const objRow = [
-        { text: key, style: ['sub', 'mono'], margin: [leftMargin, 0, 0, 0] },
-        { text: 'object', style: ['sub', 'mono', 'lightGray'], margin: 0 },
-        { text: '', margin: 0 },
-      ];
-      allRows.push(objRow);
-      /*
-      if (Array.isArray(obj[key])) {
-        if ( typeof )
+    if (typeof obj[key] === 'object') {
+      let objType;
+      if (obj[key]['::type'] === 'array') {
+        objType = 'array';
+      } else {
+        objType = 'object';
       }
-      */
-      objectToTableTree(obj[key], allRows, (level + 1));
-    } else if (typeof obj[key] === 'object' && Array.isArray(obj[key])) {
       const objRow = [
-        { text: key, style: ['sub', 'mono'], margin: [leftMargin, 0, 0, 0] },
-        { text: 'array', style: ['sub', 'mono', 'lightGray'], margin: 0 },
+        { text: key, style: ['sub', 'mono', 'b'], margin: [leftMargin, 0, 0, 0] },
+        { text: objType, style: ['sub', 'mono', 'lightGray'], margin: 0 },
         { text: '', margin: 0 },
       ];
       allRows.push(objRow);
-      objectToTableTree(obj[key][0], allRows, (level + 1));
+      if (obj[key]['::type'] === 'array') {
+        objectToTableTree(obj[key]['::props'], localize, allRows, (level + 1));
+      } else {
+        objectToTableTree(obj[key], localize, allRows, (level + 1));
+      }
     } else if (typeof obj[key] === 'string' && (key.startsWith('::') === false)) {
       const typeAndDescr = obj[key].split('~|~');
-      const descrStack = [];
-      if (typeAndDescr[1].trim()) {
-        descrStack.push({
-          text: `${typeAndDescr[1]}`, style: ['sub', 'b', 'darkGray'],
-        });
-      }
-      if (typeAndDescr[2]) {
-        descrStack.push({
-          text: `${typeAndDescr[2]}`, style: ['sub', 'mono', 'darkGray'],
-        });
-      }
-      if (typeAndDescr[3]) {
-        descrStack.push({
-          text: [
-            { text: 'DEFAULT: ', style: ['sub', 'b', 'darkGray'] },
-            { text: typeAndDescr[3], style: ['sub', 'lightGray', 'mono', 'darkGray'] },
-          ],
-        });
-      }
-      if (typeAndDescr[4]) {
-        descrStack.push({
-          text: [
-            { text: 'ALLOWED: ', style: ['sub', 'b', 'darkGray'] },
-            { text: typeAndDescr[4], style: ['sub', 'lightGray', 'mono', 'darkGray'] },
-          ],
-        });
-      }
-      if (typeAndDescr[5]) {
-        descrStack.push({
-          text: [
-            { text: 'PATTERN: ', style: ['sub', 'b', 'darkGray'] },
-            { text: typeAndDescr[5], style: ['sub', 'lightGray', 'mono', 'darkGray'] },
-          ],
-        });
-      }
-      if (typeAndDescr[6]) {
-        descrStack.push({
-          text: `${typeAndDescr[6]}`,
-          style: ['sub', 'lightGray'],
-          margin: [0, 3, 0, 0],
-        });
-      }
+      const descrStack = generatePropDescription(typeAndDescr, localize);
+
       allRows.push([
         { text: key, style: ['sub', 'mono'], margin: [leftMargin, 0, 0, 0] },
         { text: (typeAndDescr[0] ? typeAndDescr[0] : ''), style: ['sub', 'mono', 'lightGray'], margin: 0 },
-        { text: (typeAndDescr[1] ? typeAndDescr[1] : ''), style: ['sub', 'mono', 'lightGray'], margin: 0 },
-        // { stack: ((descrStack && descrStack.length) > 0 ? descrStack : [{ text: '' }]), margin: 0 },
+        { stack: ((descrStack && descrStack.length) > 0 ? descrStack : [{ text: '' }]), margin: 0 },
       ]);
     }
   }

@@ -1,4 +1,4 @@
-import createPdf from '@/utils/pdf-gen';
+import createPdf from '@/pdf-gen';
 
 const tmpl = document.createElement('template');
 tmpl.innerHTML = `
@@ -116,8 +116,11 @@ export default customElements.define('rapi-pdf', class RapiPdf extends HTMLEleme
       statusCode: 'STATUS CODE',
       deprecated: 'DEPRECATED',
       allowed: 'ALLOWED',
+      default: 'DEFAULT',
+      readOnly: 'READ ONLY',
+      writeOnly: 'WRITE ONLY',
       enumValues: 'ENUM',
-      pattern: 'pattern',
+      pattern: 'PATTERN',
       parameters: 'Parameters',
       noRequestParameters: 'No request parameters',
       method: 'METHOD',
@@ -206,6 +209,7 @@ export default customElements.define('rapi-pdf', class RapiPdf extends HTMLEleme
     const pdfCoverText = this.getAttribute('pdf-cover-text') ? this.getAttribute('pdf-cover-text') : '';
     const pdfSecurityText = this.getAttribute('pdf-security-text') ? this.getAttribute('pdf-security-text') : '';
     const pdfApiText = this.getAttribute('pdf-api-text') ? this.getAttribute('pdf-api-text') : '';
+    const pdfSchemaStyle = this.getAttribute('pdf-schema-style') === 'table' ? 'table' : 'object';
     const pdfFooterText = this.getAttribute('pdf-footer-text') ? this.getAttribute('pdf-footer-text') : '';
     const includeInfo = this.getAttribute('include-info') !== 'false';
     const includeToc = this.getAttribute('include-toc') !== 'false';
@@ -222,6 +226,7 @@ export default customElements.define('rapi-pdf', class RapiPdf extends HTMLEleme
       pdfCoverText,
       pdfSecurityText,
       pdfApiText,
+      pdfSchemaStyle,
       pdfFooterText,
       includeInfo,
       includeToc,

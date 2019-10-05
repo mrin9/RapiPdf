@@ -1,129 +1,12 @@
 import marked from 'marked';
+import { rowLinesTableLayout } from '@/table-layouts';
+import { getMarkDownDef } from '@/markdown';
 import {
-  getTypeInfo, schemaInObjectNotation, objectToTree, objectToTableTree,
-} from '@/utils/object-tree-gen';
-
-// Inline Markdown
-export function getInlineMarkDownDef(txt) {
-  const final = [];
-  if (!txt) {
-    return [];
-  }
-  const boldItalicDelimiter = new RegExp('\\*{3}|\\_{3}');
-  const boldDelimiter = new RegExp('\\*{2}|\\_{2}');
-  const codeDelimiter = new RegExp('`');
-  const biParts = txt.split(boldItalicDelimiter);
-  biParts.forEach((biVal, i) => {
-    if (i % 2 === 0) {
-      if (biVal) {
-        const bParts = biVal.split(boldDelimiter);
-        bParts.forEach((bVal, j) => {
-          if (j % 2 === 0) {
-            if (bVal) {
-              const cParts = bVal.split(codeDelimiter);
-              cParts.forEach((cVal, k) => {
-                if (k % 2 === 0) {
-                  if (cVal) {
-                    final.push({ text: cVal, style: ['small'] });
-                  }
-                } else if (cVal.trim) {
-                  final.push({ text: cVal, style: ['small', 'mono', 'gray'] });
-                }
-              });
-            }
-          } else if (bVal) {
-            final.push({ text: bVal, style: ['small', 'bold'] });
-          }
-        });
-      }
-    } else if (biVal) {
-      final.push({ text: biVal, style: ['small', 'bold', 'italics'] });
-    }
-  });
-  return final;
-}
-
-// Markdown
-export function getMarkDownDef(tokens) {
-  const content = [];
-  let uList = { ul: [], style: ['topMarginRegular'] };
-  let oList = { ol: [], style: ['topMarginRegular'] };
-  let listInsert = '';
-
-  tokens.forEach((v) => {
-    if (v.type === 'paragraph') {
-      const textArr = getInlineMarkDownDef(v.text);
-      content.push({
-        text: textArr,
-        style: ['topMarginRegular'],
-      });
-    } else if (v.type === 'heading') {
-      let headingStyle = [];
-      if (v.depth === 6) {
-        headingStyle = ['small', 'b', 'topMarginRegular'];
-      } else if (v.depth === 5) {
-        headingStyle = ['p', 'b', 'topMarginRegular'];
-      } else {
-        headingStyle.push(`h${v.depth + 2}`);
-        headingStyle.push('topMarginRegular');
-      }
-
-      content.push({
-        text: v.text,
-        style: headingStyle,
-      });
-    } else if (v.type === 'space') {
-      const headingStyle = [];
-      headingStyle.push(`h${v.depth}`);
-      content.push({
-        text: '\u200B ',
-        style: ['small', 'topMarginRegular'],
-      });
-    } else if (v.type === 'code') {
-      const newText = v.text.replace(/ /g, '\u200B ');
-      content.push({
-        text: newText,
-        style: ['small', 'mono', 'gray', 'topMarginRegular'],
-      });
-    } else if (v.type === 'list_start') {
-      listInsert = v.ordered ? 'ol' : 'ul';
-      if (v.ordered) {
-        listInsert = 'ol';
-        oList.start = v.start;
-      } else {
-        listInsert = 'ul';
-      }
-    } else if (v.type === 'text') {
-      const textArr = getInlineMarkDownDef(v.text);
-      if (listInsert === 'ul') {
-        uList.ul.push({
-          text: textArr,
-        });
-      } else if (listInsert === 'ol') {
-        oList.ol.push({
-          text: textArr,
-        });
-      }
-    } else if (v.type === 'list_end') {
-      // Clone the appropriate list and add it to the main content
-      if (listInsert === 'ul') {
-        content.push(
-          { ...uList },
-        );
-      } else if (listInsert === 'ol') {
-        content.push(
-          { ...oList },
-        );
-      }
-      // reset temp list elements
-      uList = { ul: [], style: ['topMarginRegular'] };
-      oList = { ol: [], style: ['topMarginRegular'] };
-      listInsert = '';
-    }
-  });
-  return content;
-}
-
+  getTypeInfo,
+  schemaInObjectNotation,
+  objectToTree,
+  objectToTableTree,
+} from '@/object-tree-gen';
 
 // Info Def
 export function getInfoDef(spec, bookTitle, localize) {
@@ -186,7 +69,7 @@ export function getInfoDef(spec, bookTitle, localize) {
 }
 
 // Security Def
-export function getSecurityDef(spec, tableLayout, localize) {
+export function getSecurityDef(spec, localize) {
   const content = [];
   if (spec.securitySchemes) {
     content.push({ text: localize.securityAndAuthentication, style: ['h3', 'b', 'primary', 'right', 'topMargin3'] });
@@ -207,7 +90,7 @@ export function getSecurityDef(spec, tableLayout, localize) {
         headerRows: 1,
         body: tableContent,
       },
-      layout: tableLayout,
+      layout: rowLinesTableLayout,
       style: 'tableMargin',
       pageBreak: 'after',
     });
@@ -216,7 +99,7 @@ export function getSecurityDef(spec, tableLayout, localize) {
 }
 
 // Parameter Table
-function getParameterTableDef(parameters, paramType, tableLayout, localize) {
+function getParameterTableDef(parameters, paramType, localize) {
   // let filteredParams= parameters ? parameters.filter(param => param.in === paramType):[];
   if (parameters.length === 0) {
     return;
@@ -282,80 +165,105 @@ function getParameterTableDef(parameters, paramType, tableLayout, localize) {
         widths: ['auto', 'auto', '*'],
         body: tableContent,
       },
-      layout: tableLayout,
+      layout: rowLinesTableLayout,
       style: 'tableMargin',
     },
   ];
 }
 
 // Request Body Def
-function getRequestBodyDef(requestBody, tableLayout, localize) {
+function getRequestBodyDef(requestBody, schemaStyle, localize) {
   if (!requestBody) {
     return;
   }
   const content = [];
-  let formParamTableDef;
+  let formParamDef;
   for (const contentType in requestBody.content) {
     const contentTypeObj = requestBody.content[contentType];
-    let requestBodyTableDef;
+    const requestBodyDef = [
+      { text: `${localize.requestBody} - ${contentType}`, margin: [0, 10, 0, 10], style: ['small', 'b'] },
+    ];
+
     if ((contentType.includes('form') || contentType.includes('multipart-form')) && contentTypeObj.schema) {
-      formParamTableDef = getParameterTableDef(contentTypeObj.schema.properties, 'FORM DATA', tableLayout, localize);
-      content.push(formParamTableDef);
+      formParamDef = getParameterTableDef(contentTypeObj.schema.properties, 'FORM DATA', localize);
+      content.push(formParamDef);
     } else if (contentType.includes('json') || contentType.includes('xml')) {
       let origSchema = requestBody.content[contentType].schema;
       if (origSchema) {
         origSchema = JSON.parse(JSON.stringify(origSchema));
         const schemaInObjectNotaion = schemaInObjectNotation(origSchema);
-        requestBodyTableDef = [
-          { text: `${localize.requestBody} - ${contentType}`, margin: [0, 10, 0, 0], style: ['small', 'b'] },
-          objectToTree(schemaInObjectNotaion, localize),
-        ];
+
+        if (schemaStyle === 'object') {
+          let treeDef;
+          if (schemaInObjectNotaion['::type'] && schemaInObjectNotaion['::type'] === 'array') {
+            treeDef = objectToTree(schemaInObjectNotaion['::props'], localize, 'array');
+          } else {
+            treeDef = objectToTree(schemaInObjectNotaion, localize);
+          }
+          requestBodyDef.push(treeDef);
+        } else {
+          let schemaTableTreeDef;
+          if (schemaInObjectNotaion['::type'] && schemaInObjectNotaion['::type'] === 'array') {
+            schemaTableTreeDef = objectToTableTree(schemaInObjectNotaion['::prop'], localize, 'array');
+          } else {
+            schemaTableTreeDef = objectToTableTree(schemaInObjectNotaion, localize);
+          }
+          if (schemaTableTreeDef && schemaTableTreeDef.length > 0) {
+            requestBodyDef.push({
+              table: {
+                body: schemaTableTreeDef,
+              },
+              margin: [10, 10, 0, 0],
+            });
+          }
+        }
       }
-      content.push(requestBodyTableDef);
+      content.push(requestBodyDef);
     }
   }
   return content;
 }
 
-
 // Response Def
-function getResponseDef(responses, tableLayout, localize) {
+function getResponseDef(responses, schemaStyle, localize) {
   const respDef = [];
   for (const statusCode in responses) {
-    const allResponseModelTabelDefs = [];
+    const allResponseDefs = [];
     for (const contentType in responses[statusCode].content) {
-      let responseBodyTableDef;
+      const responseDef = [
+        { text: `${localize.responseModel} - ${contentType}`, margin: [10, 10, 0, 0], style: ['small', 'b'] },
+      ];
+
       let origSchema = responses[statusCode].content[contentType].schema;
       if (origSchema) {
         origSchema = JSON.parse(JSON.stringify(origSchema));
-        const schemaInObjtNotation = schemaInObjectNotation(origSchema);
-        const respBody = objectToTableTree(schemaInObjtNotation);
-        /*
-        const respBody = objectToTree(schemaInObjtNotation);
-        responseBodyTableDef = [
-          { text: `${localize.responseModel} - ${contentType}`, margin: [10, 10, 0, 0], style: ['small', 'b'] },
-          { stack: respBody, margin: [10, 5, 0, 0] },
-        ];
-        */
-        responseBodyTableDef = [
-          { text: `${localize.responseModel} - ${contentType}`, margin: [10, 10, 0, 0], style: ['small', 'b'] },
-          {
-            stack: [
-              {
-                table: {
-                  body: (respBody && respBody.length > 0) ? respBody : [{ text: 'c1' }, { text: 'c2' }, { text: 'c3' }],
-                },
+        const schemaInObjectNotaion = schemaInObjectNotation(origSchema);
+        if (schemaStyle === 'object') {
+          let schemaTreeDef;
+          if (schemaInObjectNotaion['::type'] && schemaInObjectNotaion['::type'] === 'array') {
+            schemaTreeDef = objectToTree(schemaInObjectNotaion['::props'], localize, 'array');
+          } else {
+            schemaTreeDef = objectToTree(schemaInObjectNotaion, localize);
+          }
+          responseDef.push(schemaTreeDef);
+        } else {
+          let schemaTableTreeDef;
+          if (schemaInObjectNotaion['::type'] && schemaInObjectNotaion['::type'] === 'array') {
+            schemaTableTreeDef = objectToTableTree(schemaInObjectNotaion['::prop'], localize, 'array');
+          } else {
+            schemaTableTreeDef = objectToTableTree(schemaInObjectNotaion, localize);
+          }
+          if (schemaTableTreeDef && schemaTableTreeDef.length > 0) {
+            responseDef.push({
+              table: {
+                body: schemaTableTreeDef,
               },
-            ],
-            margin: [10, 10, 0, 0],
-          },
-        ];
-      } else {
-        responseBodyTableDef = [
-          { text: `${localize.responseModel} - ${contentType}`, margin: [10, 5, 0, 0], style: ['small', 'b'] },
-        ];
+              margin: [10, 3, 0, 0],
+            });
+          }
+        }
       }
-      allResponseModelTabelDefs.push(responseBodyTableDef);
+      allResponseDefs.push(responseDef);
     }
     respDef.push({
       text: [
@@ -364,16 +272,16 @@ function getResponseDef(responses, tableLayout, localize) {
       ],
       margin: [0, 10, 0, 0],
     });
-    if (allResponseModelTabelDefs.length > 0) {
-      respDef.push(allResponseModelTabelDefs);
+    if (allResponseDefs.length > 0) {
+      respDef.push(allResponseDefs);
     }
   }
   return respDef;
 }
 
 // API details def
-export function getApiDef(spec, filterPath, sectionHeading, tableLayout, localize) {
-  const content = [{ text: sectionHeading, style: ['h2', 'b'] }];
+export function getApiDef(spec, filterPath, schemaStyle, localize) {
+  const content = [{ text: localize.api, style: ['h2', 'b'] }];
   let tagSeq = 0;
 
   spec.tags.map((tag) => {
@@ -422,11 +330,11 @@ export function getApiDef(spec, filterPath, sectionHeading, tableLayout, localiz
       const headerParams = path.parameters ? path.parameters.filter((param) => param.in === 'header') : null;
       const cookieParams = path.parameters ? path.parameters.filter((param) => param.in === 'cookie') : null;
 
-      const pathParamTableDef = getParameterTableDef(pathParams, 'path', tableLayout, localize);
-      const queryParamTableDef = getParameterTableDef(queryParams, 'query', tableLayout, localize);
-      const requestBodyTableDefs = getRequestBodyDef(path.requestBody, tableLayout, localize);
-      const headerParamTableDef = getParameterTableDef(headerParams, 'header', tableLayout, localize);
-      const cookieParamTableDef = getParameterTableDef(cookieParams, 'cookie', tableLayout, localize);
+      const pathParamTableDef = getParameterTableDef(pathParams, 'path', localize);
+      const queryParamTableDef = getParameterTableDef(queryParams, 'query', localize);
+      const requestBodyTableDefs = getRequestBodyDef(path.requestBody, schemaStyle, localize);
+      const headerParamTableDef = getParameterTableDef(headerParams, 'header', localize);
+      const cookieParamTableDef = getParameterTableDef(cookieParams, 'cookie', localize);
       operationContent.push({ text: localize.request, style: ['p', 'b', 'alternate'], margin: [0, 10, 0, 0] });
       if (pathParamTableDef || queryParamTableDef || headerParamTableDef || cookieParamTableDef || requestBodyTableDefs) {
         if (pathParamTableDef) {
@@ -458,7 +366,7 @@ export function getApiDef(spec, filterPath, sectionHeading, tableLayout, localiz
 
       // Generate Response Defs
       operationContent.push({ text: localize.response, style: ['p', 'b', 'alternate'], margin: [0, 10, 0, 0] });
-      const respDef = getResponseDef(path.responses, tableLayout, localize);
+      const respDef = getResponseDef(path.responses, schemaStyle, localize);
       if (respDef && respDef.length > 0) {
         operationContent.push({
           stack: respDef,
@@ -507,7 +415,7 @@ export function getApiDef(spec, filterPath, sectionHeading, tableLayout, localiz
 
 
 // API List Def
-export function getApiListDef(spec, sectionHeading, tableLayout, localize) {
+export function getApiListDef(spec, sectionHeading, localize) {
   const content = [{ text: sectionHeading, style: ['h3', 'b'], pageBreak: 'none' }];
   spec.tags.map((tag, i) => {
     const tableContent = [
@@ -538,7 +446,7 @@ export function getApiListDef(spec, sectionHeading, tableLayout, localize) {
           widths: ['auto', '*'],
           body: tableContent,
         },
-        layout: tableLayout,
+        layout: rowLinesTableLayout,
         style: 'tableMargin',
       },
     );
