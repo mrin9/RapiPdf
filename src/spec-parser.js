@@ -15,7 +15,7 @@ export default async function ProcessSpec(specUrl, sortTags) {
     resolvedRefSpec = await JsonRefs.resolveRefs(convertedSpec.openapi, resolveOptions);
     jsonParsedSpec = resolvedRefSpec.resolved;
   } catch (err) {
-    console.info('%c There was an issue while parsing the spec %o ', 'color:orangered', err);
+    console.info('%c There was an issue while parsing the spec %o ', 'color:orangered', err); // eslint-disable-line no-console
   }
 
   const openApiSpec = jsonParsedSpec;

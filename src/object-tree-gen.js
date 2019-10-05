@@ -225,8 +225,8 @@ export function objectToTree(obj, localize, prevKeyDataType = 'object', prevKey 
     const descrStack = generatePropDescription(propDescrArray, localize);
 
     return [
-      { text: prevKey, style: ['sub', 'mono'], margin: 0 },
-      { text: (propDescrArray[0] ? propDescrArray[0] : ''), style: ['sub', 'mono', 'lightGray'], margin: 0 },
+      { text: prevKey, style: ['small', 'mono'], margin: 0 },
+      { text: (propDescrArray[0] ? propDescrArray[0] : ''), style: ['small', 'mono', 'lightGray'], margin: 0 },
       { stack: descrStack, margin: 0 },
     ];
   }
@@ -345,8 +345,8 @@ export function objectToTableTree(obj, localize, allRows = [], level = 0) {
         objType = 'object';
       }
       const objRow = [
-        { text: key, style: ['sub', 'mono', 'b'], margin: [leftMargin, 0, 0, 0] },
-        { text: objType, style: ['sub', 'mono', 'lightGray'], margin: 0 },
+        { text: key, style: ['small', 'b'], margin: [leftMargin, 0, 0, 0] },
+        { text: objType, style: ['small', 'mono', 'lightGray'], margin: 0 },
         { text: '', margin: 0 },
       ];
       allRows.push(objRow);
@@ -360,8 +360,8 @@ export function objectToTableTree(obj, localize, allRows = [], level = 0) {
       const descrStack = generatePropDescription(typeAndDescr, localize);
 
       allRows.push([
-        { text: key, style: ['sub', 'mono'], margin: [leftMargin, 0, 0, 0] },
-        { text: (typeAndDescr[0] ? typeAndDescr[0] : ''), style: ['sub', 'mono', 'lightGray'], margin: 0 },
+        { text: key, style: ['small'], margin: [leftMargin, 0, 0, 0] },
+        { text: (typeAndDescr[0] ? typeAndDescr[0] : ''), style: ['small', 'mono', 'lightGray'], margin: 0 },
         { stack: ((descrStack && descrStack.length) > 0 ? descrStack : [{ text: '' }]), margin: 0 },
       ]);
     }

@@ -130,16 +130,33 @@
   &lt;/body&gt; 
   &lt;/html&gt;
   </code></pre>
-  <p>
-    Go ahead, provide your Open API spec and click <span style="font-weight:bold">GENERATE PDF
-    </span> !!!
-  </p>
 
+  <div> Go ahead, provide your Open API spec and click GENERATE PDF !!! </div>
   <rapi-pdf id='rapipdf' style="width:730px; height:40px; font-size:18px;"
     spec-url="https://mrin9.github.io/RapiPdf/specs/petstore.json" 
     button-bg="#b44646"
-    pdf-title="My API Reference"
+    pdf-title="API Reference"
   > </rapi-pdf>
+
+  <div style="margin-top:16px;"> With different Color scheme </div>
+  <rapi-pdf id='rapipdf' style="width:730px; height:40px; font-size:18px;"
+    spec-url="https://mrin9.github.io/RapiPdf/specs/petstore.json" 
+    pdf-schema-style="table"
+    button-bg="#b44646"
+    pdf-primary-color="teal",
+    pdf-alternate-color="darkred"
+    pdf-title="API Reference"
+  > </rapi-pdf>
+
+  <div style="margin-top:16px;"> With an alternate request/response model represnation style </div>
+  <rapi-pdf id='rapipdf' style="width:730px; height:40px; font-size:18px;"
+    spec-url="https://mrin9.github.io/RapiPdf/specs/petstore.json" 
+    pdf-schema-style="table"
+    button-bg="#b44646"
+    pdf-title="API Reference"
+  > </rapi-pdf>
+
+
 </div>
   </div>
 
@@ -222,6 +239,12 @@
             </tr>
 
             <tr>
+              <td class="mono-bold">pdf-schema-style</td>
+              <td class="gray">style to display request and response schemas<br/>can be 'table' or 'object'</td>
+              <td>object</td>
+            </tr>
+
+            <tr>
               <td class="mono-bold">include-info</td>
               <td class="gray"> true to include info section in the generated PDF</td>
               <td>true</td>
@@ -246,7 +269,7 @@
             </tr>
 
             <tr>
-              <td class="mono-bold">include-api-list </td>
+              <td class="mono-bold">include-api-list</td>
               <td class="gray">true to include list of all the APIs and their summary at the end in the generated PDF </td>
               <td>false</td>
             </tr>

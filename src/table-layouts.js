@@ -7,7 +7,7 @@ export const rowLinesTableLayout = {
     return 0;
   },
   hLineColor(i, node) {
-    return (i === 0 || i === 1 || i === node.table.body.length) ? 'black' : 'lightgray';
+    return (i === 0 || i === 1 || i === node.table.body.length) ? '#777' : 'lightgray';
   },
 };
 

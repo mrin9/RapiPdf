@@ -259,23 +259,29 @@ function getResponseDef(responses, schemaStyle, localize) {
             responseDef.push(schemaTreeDef);
           }
         } else {
-          // If Schema style is Tree
+          // If Schema style is Table-Tree
           let schemaTableTreeDef;
+          let rootObjectType;
           if (schemaInObjectNotaion['::type'] && schemaInObjectNotaion['::type'] === 'array') {
-            schemaTableTreeDef = objectToTableTree(schemaInObjectNotaion['::prop'], localize, 'array');
+            schemaTableTreeDef = objectToTableTree(schemaInObjectNotaion['::props'], localize);
+            rootObjectType = [{ text: 'ARRAY OF OBJECT WITH BELOW STRUCTURE', style: ['sub', 'b', 'alternate'], colSpan: 3 }];
           } else {
             schemaTableTreeDef = objectToTableTree(schemaInObjectNotaion, localize);
+            rootObjectType = [{ text: 'OBJECT WITH BELOW STRUCTURE', style: ['sub', 'b', 'alternate'], colSpan: 3 }];
           }
           if (schemaTableTreeDef && schemaTableTreeDef.length > 0 && Array.isArray(schemaTableTreeDef[0]) && schemaTableTreeDef[0].length > 0) {
+            schemaTableTreeDef.unshift(rootObjectType);
             schemaTableTreeDef.unshift([
               { text: localize.name, style: ['sub', 'b', 'alternate'] },
               { text: localize.type, style: ['sub', 'b', 'alternate'] },
               { text: localize.description, style: ['sub', 'b', 'alternate'] },
             ]);
+
             responseDef.push({
               table: {
                 headerRows: 1,
                 body: schemaTableTreeDef,
+                dontBreakRows: true,
               },
               layout: rowLinesTableLayout,
               margin: [10, 3, 0, 0],
