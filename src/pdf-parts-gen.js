@@ -101,7 +101,7 @@ export function getSecurityDef(spec, localize) {
 // Parameter Table
 function getParameterTableDef(parameters, paramType, localize) {
   // let filteredParams= parameters ? parameters.filter(param => param.in === paramType):[];
-  if (parameters.length === 0) {
+  if (parameters === undefined || parameters.length === 0) {
     return;
   }
   const tableContent = [
