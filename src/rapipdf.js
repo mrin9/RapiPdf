@@ -217,6 +217,7 @@ export default customElements.define('rapi-pdf', class RapiPdf extends HTMLEleme
     const includeInfo = this.getAttribute('include-info') !== 'false';
     const includeToc = this.getAttribute('include-toc') !== 'false';
     const includeSecurity = this.getAttribute('include-security') !== 'false';
+    const includeExample = this.getAttribute('include-example') === 'true';
     const includeApiDetails = this.getAttribute('include-api-details') !== 'false';
     const includeApiList = this.getAttribute('include-api-list') === 'true';
 
@@ -234,6 +235,7 @@ export default customElements.define('rapi-pdf', class RapiPdf extends HTMLEleme
       includeInfo,
       includeToc,
       includeSecurity,
+      includeExample,
       includeApiDetails,
       includeApiList,
       localize,

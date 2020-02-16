@@ -3,18 +3,25 @@ const FileManagerPlugin = require('filemanager-webpack-plugin');
 const webpack = require('webpack');
 const CompressionPlugin = require('compression-webpack-plugin');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
-const { DuplicatesPlugin } = require("inspectpack/plugin");
+const { DuplicatesPlugin } = require('inspectpack/plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
-
 const path = require('path');
+const VERSION = JSON.stringify(require('./package.json').version).replace(/"/g, '');
+
+const BANNER = `RapiPdf ${VERSION.replace()} - WebComponent to generate PDF from OpenAPI spec
+License: MIT
+Repo   : https://github.com/mrin9/RapiPdf
+Author : Mrinmoy Majumdar`;
 
 const commonPlugins = [
   new webpack.HotModuleReplacementPlugin(),
   new webpack.optimize.LimitChunkCountPlugin({
     maxChunks: 1,
   }),
-  new HtmlWebpackPlugin({template: 'index.html'}),
+  new HtmlWebpackPlugin({ template: 'index.html' }),
   new CleanWebpackPlugin(),
+  new webpack.BannerPlugin(BANNER),
+  new webpack.DefinePlugin({ VERSION }),
   new CompressionPlugin(),
   new FileManagerPlugin({
     onEnd: {
@@ -27,7 +34,7 @@ const commonPlugins = [
 
 if (process.env.NODE_ENV === 'production') {
   console.log('BUILDING FOR PRODUCTION ... ');
-  commonPlugins.push(new BundleAnalyzerPlugin({ analyzerMode:'static' }));
+  commonPlugins.push(new BundleAnalyzerPlugin({ analyzerMode: 'static' }));
   commonPlugins.push(new DuplicatesPlugin({ emitErrors: false, verbose: true }));
 }
 
@@ -38,8 +45,12 @@ module.exports = {
   externals: {
     esprima: 'esprima',
     commander: 'commander',
-    'native-promise-only':'native-promise-only',
+    'native-promise-only': 'native-promise-only',
     yargs: 'yargs',
+    'node-fetch': 'null',
+    'node-fetch-h2': 'null',
+    'cross-fetch': 'null',
+    qs: 'null',
   },
   optimization: {
     splitChunks: {
@@ -48,8 +59,8 @@ module.exports = {
   },
   devtool: 'cheap-module-source-map',
   output: {
-    path: path.join(__dirname, "dist"),
-    filename: 'rapipdf-min.js'
+    path: path.join(__dirname, 'dist'),
+    filename: 'rapipdf-min.js',
   },
   devServer: {
     contentBase: path.join(__dirname, 'docs'),
@@ -68,12 +79,12 @@ module.exports = {
           // failOnWarning: true,
           // failOnError: true,
           fix: true,
-          configFile: "./.eslintrc",
+          configFile: './.eslintrc',
           outputReport: {
             filePath: './eslint_report.html',
             formatter: 'html',
           },
-        }
+        },
       },
       {
         test: /\.js$/,
@@ -81,18 +92,17 @@ module.exports = {
         loader: 'babel-loader',
       },
       {
-        test: /\.scss$/,
+        test: /\.css$/,
         use: [
           { loader: 'style-loader' }, // creates style nodes in HTML from CommonJS strings
           { loader: 'css-loader' }, // translates CSS into CommonJS
-          { loader: 'sass-loader' }, // compiles Sass to CSS
-        ]
+        ],
       },
       {
         test: /\.(woff|woff2|eot|ttf|otf)$/,
         use: [{
           loader: 'file-loader',
-          options:{
+          options: {
             name: '[name].[ext]',
           },
         }],

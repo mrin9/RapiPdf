@@ -18,6 +18,7 @@ paths:
             format: int32
             minimum: 12
             maximum: 120
+          example: 70  
         - name: full-name
           in: query
           description: Name of a person

@@ -12,8 +12,12 @@ import {
 export function getInfoDef(spec, bookTitle, localize) {
   let content;
   if (spec.info) {
-    let contactDef = []; let contactName; let contactEmail; let contactUrl; let
-      termsOfService;
+    let contactDef = [];
+    let contactName;
+    let contactEmail;
+    let contactUrl;
+    let termsOfService;
+
     if (spec.info.contact) {
       if (spec.info.contact.name) {
         contactName = { text: [{ text: `\n${localize.name}: `, style: ['b', 'small'] }, { text: spec.info.contact.name, style: ['small'] }] };
@@ -99,7 +103,7 @@ export function getSecurityDef(spec, localize) {
 }
 
 // Parameter Table
-function getParameterTableDef(parameters, paramType, localize) {
+function getParameterTableDef(parameters, paramType, localize, includeExample = false) {
   // let filteredParams= parameters ? parameters.filter(param => param.in === paramType):[];
   if (parameters === undefined || parameters.length === 0) {
     return;
@@ -108,6 +112,7 @@ function getParameterTableDef(parameters, paramType, localize) {
     [
       { text: localize.name, style: ['sub', 'b', 'alternate'] },
       { text: localize.type, style: ['sub', 'b', 'alternate'] },
+      { text: includeExample ? localize.example : '', style: ['sub', 'b', 'alternate'] },
       { text: localize.description, style: ['sub', 'b', 'alternate'] },
     ],
   ];
@@ -122,6 +127,7 @@ function getParameterTableDef(parameters, paramType, localize) {
       tableContent.push([
         { text: paramName, style: ['small', 'mono'] },
         { text: type + format, style: ['small', 'mono'] },
+        { text: includeExample ? (param.example ? param.example : (param.examples && param.examples[0] ? param.examples[0] : '')) : '', style: ['small'], margin: [0, 2, 0, 0] },
         { text: param.description, style: ['small'], margin: [0, 2, 0, 0] },
       ]);
     }
@@ -150,6 +156,7 @@ function getParameterTableDef(parameters, paramType, localize) {
             (paramSchema.pattern ? { text: `${localize.pattern}: ${paramSchema.pattern}`, style: ['small', 'gray'] } : ''),
           ],
         },
+        { text: includeExample ? (param.example ? param.example : (param.examples && param.examples[0] ? param.examples[0] : '')) : '', style: ['small'], margin: [0, 2, 0, 0] },
         { text: param.description, style: ['small'], margin: [0, 2, 0, 0] },
       ]);
     });
@@ -161,7 +168,7 @@ function getParameterTableDef(parameters, paramType, localize) {
       table: {
         headerRows: 1,
         dontBreakRows: true,
-        widths: ['auto', 'auto', '*'],
+        widths: ['auto', 'auto', includeExample ? 'auto' : 0, '*'],
         body: tableContent,
       },
       layout: rowLinesTableLayout,
@@ -305,7 +312,7 @@ function getResponseDef(responses, schemaStyle, localize) {
 }
 
 // API details def
-export function getApiDef(spec, filterPath, schemaStyle, localize) {
+export function getApiDef(spec, filterPath, schemaStyle, localize, includeExample) {
   const content = [{ text: localize.api, style: ['h2', 'b'] }];
   let tagSeq = 0;
 
@@ -355,11 +362,11 @@ export function getApiDef(spec, filterPath, schemaStyle, localize) {
       const headerParams = path.parameters ? path.parameters.filter((param) => param.in === 'header') : null;
       const cookieParams = path.parameters ? path.parameters.filter((param) => param.in === 'cookie') : null;
 
-      const pathParamTableDef = getParameterTableDef(pathParams, 'path', localize);
-      const queryParamTableDef = getParameterTableDef(queryParams, 'query', localize);
-      const requestBodyTableDefs = getRequestBodyDef(path.requestBody, schemaStyle, localize);
-      const headerParamTableDef = getParameterTableDef(headerParams, 'header', localize);
-      const cookieParamTableDef = getParameterTableDef(cookieParams, 'cookie', localize);
+      const pathParamTableDef = getParameterTableDef(pathParams, 'path', localize, includeExample);
+      const queryParamTableDef = getParameterTableDef(queryParams, 'query', localize, includeExample);
+      const requestBodyTableDefs = getRequestBodyDef(path.requestBody, schemaStyle, localize, includeExample);
+      const headerParamTableDef = getParameterTableDef(headerParams, 'header', localize, includeExample);
+      const cookieParamTableDef = getParameterTableDef(cookieParams, 'cookie', localize, includeExample);
       operationContent.push({ text: localize.request, style: ['p', 'b', 'alternate'], margin: [0, 10, 0, 0] });
       if (pathParamTableDef || queryParamTableDef || headerParamTableDef || cookieParamTableDef || requestBodyTableDefs) {
         if (pathParamTableDef) {
