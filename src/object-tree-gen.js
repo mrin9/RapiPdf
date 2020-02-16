@@ -148,9 +148,9 @@ export function schemaInObjectNotation(schema, obj = {}, level = 0) {
     obj['::type'] = 'object';
     for (const key in schema.properties) {
       if (schema.required && schema.required.includes(key)) {
-        obj[`${key}*`] = schemaInObjectNotation(schema.properties[key], {}, (level + 1), key);
+        obj[`${key}*`] = schemaInObjectNotation(schema.properties[key], {}, (level + 1));
       } else {
-        obj[key] = schemaInObjectNotation(schema.properties[key], {}, (level + 1), key);
+        obj[key] = schemaInObjectNotation(schema.properties[key], {}, (level + 1));
       }
     }
   } else if (schema.items) { // If Array

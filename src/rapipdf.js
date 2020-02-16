@@ -36,7 +36,7 @@ tmpl.innerHTML = `
     font-size: 85%;
     font-weight: 600;
     display: inline-block;
-    padding: 6px 16px;
+    padding: 8px 16px;
     outline: none;
     outline-offset: -2px;
     line-height: 1;
@@ -108,6 +108,7 @@ export default customElements.define('rapi-pdf', class RapiPdf extends HTMLEleme
       securitySchemes: 'SECURITY SCHEMES',
       key: 'KEY',
       type: 'TYPE',
+      example: 'EXAMPLE',
       description: 'DESCRIPTION',
       request: 'REQUEST',
       requestBody: 'REQUEST BODY',
@@ -157,8 +158,10 @@ export default customElements.define('rapi-pdf', class RapiPdf extends HTMLEleme
         if (oldValue !== newValue) {
           if (newValue === 'true') {
             this.inputEl.style.display = 'none';
+            this.btnEl.style.borderRadius = 'var(--border-radius)';
           } else {
             this.inputEl.style.display = 'block';
+            this.btnEl.style.borderRadius = '0 var(--border-radius) var(--border-radius) 0';
           }
           return true;
         }

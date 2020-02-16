@@ -1,10 +1,29 @@
-import JsonRefs from 'json-refs';
+// import JsonRefs from 'json-refs';
+import Swagger from 'swagger-client';
 import converter from 'swagger2openapi';
 
 export default async function ProcessSpec(specUrl, sortTags) {
-  let jsonParsedSpec; let convertedSpec; let
-    resolvedRefSpec;
+  let jsonParsedSpec;
+  let convertedSpec;
   const convertOptions = { patch: true, warnOnly: true };
+  try {
+    let specObj;
+    if (typeof specUrl === 'string') {
+      specObj = await Swagger(specUrl);
+    } else {
+      specObj = { spec: specUrl };
+    }
+    jsonParsedSpec = specObj.spec;
+    if (specObj.spec.swagger) {
+      convertedSpec = await converter.convertObj(specObj.spec, convertOptions);
+      jsonParsedSpec = convertedSpec.openapi;
+    }
+  } catch (err) {
+    console.info('%c There was an issue while parsing the spec %o ', 'color:orangered', err); // eslint-disable-line no-console
+  }
+
+  /*
+  let resolvedRefSpec;
   const resolveOptions = { resolveCirculars: false };
   try {
     if (typeof specUrl === 'string') {
@@ -17,6 +36,7 @@ export default async function ProcessSpec(specUrl, sortTags) {
   } catch (err) {
     console.info('%c There was an issue while parsing the spec %o ', 'color:orangered', err); // eslint-disable-line no-console
   }
+  */
 
   const openApiSpec = jsonParsedSpec;
   const methods = ['get', 'put', 'post', 'delete', 'patch', 'options', 'head'];

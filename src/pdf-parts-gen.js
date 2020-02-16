@@ -111,7 +111,6 @@ function getParameterTableDef(parameters, paramType, localize) {
       { text: localize.description, style: ['sub', 'b', 'alternate'] },
     ],
   ];
-
   if (paramType === 'FORM DATA') {
     for (const paramName in parameters) {
       const param = parameters[paramName];
@@ -134,7 +133,7 @@ function getParameterTableDef(parameters, paramType, localize) {
           text: [
             { text: param.required ? '*' : '', style: ['small', 'b', 'red', 'mono'] },
             { text: param.name, style: ['small', 'mono'] },
-            (paramSchema.depricated ? { text: `\n${localize.deprecated}`, style: ['small', 'red', 'b'] } : undefined),
+            (paramSchema.deprecated ? { text: `\n${localize.deprecated}`, style: ['small', 'red', 'b'] } : ''),
           ],
         },
         {
