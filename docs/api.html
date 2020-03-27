@@ -1,0 +1,285 @@
+<!doctype html>
+
+<head>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-132775238-2"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-132775238-2');
+  </script>
+
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes">
+  <meta name="description" content="RapiPdf is Web Component based Swagger & OpenAPI Spec to PDF generator">
+  <meta name="keywords" content="RapiDoc,ReDoc,Swagger,SwaggerUI,Custom Element,Web Component,OpenAPI,REST">
+
+  <link rel="shortcut icon" type="image/png" href="./images/logo-outline.png"/>
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css?family=Roboto+Mono:400,700" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Varela+Round" rel="stylesheet">
+
+  <!-- Code Highlight -->
+  <link rel="stylesheet" href="./highlight/styles/zenburn.css">
+  <script src="./highlight/highlight.pack.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <link rel="stylesheet" href="index.css">
+  <link rel="stylesheet" href="table.css">
+
+  <title>RapiPDF - Web Component based Swagger & OpenAPI PDF Generator</title>
+  <style>
+    .m-table {
+      width:100%;
+    }
+    #main-img{
+      width:740px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class='topbar'>
+    <div class="header">
+      <a class="menu-item" data-action="url" href="./index.html">
+        <img class="logo" src="./images/logo.png" style="width:36px;height:36px;margin-right:10px;" href="./index.html"/>
+      </a>  
+      <div class="product-name">RapiPDF</div>
+      <div class="menu" style="flex:1"></div>
+      <nav class="menu" onclick="goToSection(event)">
+        <a class="menu-item" data-action="url" href="./index.html"> Home </a>
+        <a class="menu-item" data-action="url" href="https://mrin9.github.io/RapiDoc/"> RapiDoc </a>
+        <a class="menu-item" data-action="git" href="https://github.com/mrin9/RapiPdf"> GitHub </a>
+      </nav>
+    </div>
+  </div>
+  <div class="banner" id="banner" style="max-height:255px; overflow:hidden">
+    <div style="display:flex; justify-content: center; margin-top:20px">
+      <div style="display:block">
+        <img class="screenshot shadow3 hide-in-mobile" style="filter: opacity(0.85);" src="./images/pdf_sample1.png" />
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="container" style="display:flex; padding:32px 0 0 0; justify-content: center;">
+      <a href="#att"> Attributes</a> &nbsp; |  &nbsp; 
+      <a href="#methods">  Methods</a> &nbsp; |  &nbsp; 
+      <a href="#localize"> Localization</a>
+    </div>
+  </div>
+
+  <!-- Start of API -->
+  <div class="api container" id="api">
+    <div style="display:flex; flex-direction: column; ">
+      <a id="att"></a>
+      <h2 style="margin: 0px 0 4px 0;"> Attributes</h2> 
+      <div class="table-block">
+        <table class="m-table">
+          <tr>
+            <th class="attr-col">Attribute</th>
+            <th style="text-align:left">Description </th>
+            <th class="default-col">Default</th>
+          </tr>
+
+          <tr>
+            <td class="mono-bold">spec-url </td>
+            <td class="gray">url of the OpenAPI spec to view </td>
+            <td>(empty)</td>
+          </tr>
+
+          <tr>
+            <td class="mono-bold">button-label</td>
+            <td class="gray"> Label on the Button</td>
+            <td>GENERATE PDF</td>
+          </tr>
+
+          <tr>
+            <td class="mono-bold">button-bg</td>
+            <td class="gray">Background color for the button</td>
+            <td>#0078d7</td>
+          </tr>
+
+          <tr>
+            <td class="mono-bold">button-color</td>
+            <td class="gray">Text color on the button</td>
+            <td>white</td>
+          </tr>
+
+          <tr>
+            <td class="mono-bold">input-bg</td>
+            <td class="gray">Background color for text input</td>
+            <td>white</td>
+          </tr>
+
+          <tr>
+            <td class="mono-bold">input-color</td>
+            <td class="gray">Text color of the input box</td>
+            <td>#333</td>
+          </tr>
+
+          <tr>
+            <td class="mono-bold">hide-input</td>
+            <td class="gray"> true to hide input Text box </td>
+            <td>false</td>
+          </tr>
+
+          <tr>
+            <td class="mono-bold">pdf-primary-color</td>
+            <td class="gray">Color used for headings of main sections in PDF</td>
+            <td>#b44646</td>
+          </tr>
+
+          <tr>
+            <td class="mono-bold">pdf-alternate-color</td>
+            <td class="gray">Color used for sub headings</td>
+            <td>#005b96</td>
+          </tr>
+
+          <tr>
+            <td class="mono-bold">pdf-title</td>
+            <td class="gray">Title of the generated PDF</td>
+            <td>API Reference</td>
+          </tr>
+  
+          <tr>
+            <td class="mono-bold">pdf-footer-text</td>
+            <td class="gray">Text to be printed at the bottom of every page</td>
+            <td>(empty)</td>
+          </tr>
+
+          <tr>
+            <td class="mono-bold">pdf-schema-style</td>
+            <td class="gray">style to display request and response schemas<br/>can be 'table' or 'object'</td>
+            <td>object</td>
+          </tr>
+
+          <tr>
+            <td class="mono-bold">include-info</td>
+            <td class="gray"> true to include info section in the generated PDF</td>
+            <td>true</td>
+          </tr>
+
+          <tr>
+            <td class="mono-bold">include-toc</td>
+            <td class="gray">true to include table-of-contents in the generated PDF</td>
+            <td>true</td>
+          </tr>
+
+          <tr>
+            <td class="mono-bold">include-security</td>
+            <td class="gray">true to include security section in the generated PDF</td>
+            <td>true</td>
+          </tr>
+
+          <tr>
+            <td class="mono-bold">include-api-details</td>
+            <td class="gray">true to include all the API details in the generated PDF</td>
+            <td>true</td>
+          </tr>
+
+          <tr>
+            <td class="mono-bold">include-api-list</td>
+            <td class="gray">true to include list of all the APIs and their summary at the end in the generated PDF </td>
+            <td>false</td>
+          </tr>
+        </table>
+      </div>  
+
+      <a id="methods"></a>
+      <h2 style="margin: 24px 0 4px 0;" > Methods</h2>
+      <div class="table-block">
+        <table class="m-table">
+          <tr>
+            <th > Name</th>
+            <th >Description </th>
+          </tr>
+          <tr>
+            <td class="mono-bold">generatePdf(spec)</td>
+            <td class="gray">
+              to programmatically generate the PDF. <br/>
+              Takes a single parameter that can be :
+              <ul>
+                <li> either a string containing the url of the specs</li>  
+                <li> or a JSON object representing a valid spec</li>  
+              </ul>
+              <a href="https://github.com/mrin9/RapiPdf/blob/master/docs/examples/example1.html"> Example </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="mono-bold">setAttribute(attr-name, value)</td>
+            <td class="gray">All HTML elements contains setAttribute() method, You may use this method to programmatically update/change any of its properties</td>
+          </tr>
+        </table>
+      </div>
+
+      <a id="localize"></a>
+      <h2 style="margin: 32px 0 4px 0;"> Localization</h2>
+      <div class="mono-bold" style="text-align: center;">create a &lt;template&gt; inside &lt;rapi-pdf&gt; element and provide the translations</div>
+      <pre class="shadow code-block"><code class="html" style="border-radius:4px">
+&lt;rapi-pdf spec-url="https://api.apis.guru/v2/specs/bitbucket.org/2.0/swagger.json"&gt;
+  &lt;template&gt;
+  {
+    "index"          : "INDEX",
+    "api"            : "API",
+    "apiList"        : "API List",
+    "apiReference"   : "API Reference",
+    "apiVersion"     : "API Version",
+    "contact"        : "CONTACT",
+    "name"           : "NAME",
+    "email"          : "EMAIL",
+    "url"            : "URL",
+    "termsOfService" : "Terms of service",
+    "securitySchemes": "SECURITY SCHEMES",
+    "type"           : "TYPE",
+    "description"    : "DESCRIPTION",
+    "request"        : "REQUEST",
+    "requestBody"    : "REQUEST BODY",
+    "response"       : "RESPONSE",
+    "responseModel"  : "RESPONSE MODEL",
+    "statusCode"     : "STATUS CODE",
+    "deprecated"     : "DEPRECATED",
+    "allowed"        : "allowed",
+    "pattern"        : "pattern",
+    "parameters"     : "Parameters",
+    "method"         : "METHOD",
+    "securityAndAuthentication" : "Security and Authentication",
+    "noRequestParameters"       : "No request parameters",
+  }
+  &lt;/template&gt;
+&lt;/rapi-pdf&gt;
+        </code>
+      </pre>
+
+    </div>  
+  </div>
+<!-- End of API -->
+
+  <div id="footer" class="footer">
+    <div class="footer-item"> MIT Licence</div>
+    <div class="footer-item"> <a href="https://github.com/mrin9/RapiDoc"> GitHub</a></div>
+    <div class="footer-item"> <a href="https://mrin9.github.io/RapiPdf/"> RapiPDF</a></div>
+    <div class="footer-item hide-in-mobile"> <a href="https://www.npmjs.com/package/rapidoc"> npm</a></div>
+  </div>
+
+
+  <script>
+  function goToSection(e){
+    if (e.target.dataset.action==='url'){
+      return;
+    }
+
+    e.preventDefault();
+    var gotoEl = document.getElementById(e.target.getAttribute('href').substring(1));
+    if (gotoEl){
+      gotoEl.scrollIntoView({ block: 'start',  behavior: 'smooth' });
+    }
+  }
+  </script>
+</body>
+
+</html>

@@ -37,13 +37,13 @@
 <body>
   <div class="banner container" id="banner">
     <div class="header">
-      <img class="logo" src="./images/logo.png" style="width:48px;height:48px;margin-right:10px;" />
-      <div class="product-name">&lt;rapi-pdf&gt;</div>
+      <img class="logo" src="./images/logo-outline.png" style="width:48px;height:48px;margin-right:10px;" />
+      <div class="product-name">RapiPDF</div>
       <div class="menu" style="flex:1"></div>
       <nav class="menu" onclick="goToSection(event)">
         <a class="menu-item" href="#features"> Features </a>
         <a class="menu-item" href="#qstart"> Quick Start </a>
-        <a class="menu-item" href="#api"> API </a>
+        <a class="menu-item" data-action="url" href="./api.html"> API </a>
         <a class="menu-item" data-action="url" href="https://mrin9.github.io/RapiDoc/"> RapiDoc </a>
         <a class="menu-item" data-action="git" href="https://github.com/mrin9/RapiPdf"> GitHub </a>
       </nav>
@@ -159,189 +159,6 @@
 
 </div>
   </div>
-
-  <!-- Start of API -->
-  <div class="api container" id="api">
-      <div style="display:flex; flex-direction: column; ">
-        <h2> Attributes</h2> 
-        <div class="table-block">
-          <table class="m-table">
-            <tr>
-              <th class="attr-col">Attribute</th>
-              <th style="text-align:left">Description </th>
-              <th class="default-col">Default</th>
-            </tr>
-
-            <tr>
-              <td class="mono-bold">spec-url </td>
-              <td class="gray">url of the OpenAPI spec to view </td>
-              <td>(empty)</td>
-            </tr>
-
-            <tr>
-              <td class="mono-bold">button-label</td>
-              <td class="gray"> Label on the Button</td>
-              <td>GENERATE PDF</td>
-            </tr>
-
-            <tr>
-              <td class="mono-bold">button-bg</td>
-              <td class="gray">Background color for the button</td>
-              <td>#0078d7</td>
-            </tr>
-
-            <tr>
-              <td class="mono-bold">button-color</td>
-              <td class="gray">Text color on the button</td>
-              <td>white</td>
-            </tr>
-
-            <tr>
-              <td class="mono-bold">input-bg</td>
-              <td class="gray">Background color for text input</td>
-              <td>white</td>
-            </tr>
-
-            <tr>
-              <td class="mono-bold">input-color</td>
-              <td class="gray">Text color of the input box</td>
-              <td>#333</td>
-            </tr>
-
-            <tr>
-              <td class="mono-bold">hide-input</td>
-              <td class="gray"> true to hide input Text box </td>
-              <td>false</td>
-            </tr>
-
-            <tr>
-              <td class="mono-bold">pdf-primary-color</td>
-              <td class="gray">Color used for headings of main sections in PDF</td>
-              <td>#b44646</td>
-            </tr>
-
-            <tr>
-              <td class="mono-bold">pdf-alternate-color</td>
-              <td class="gray">Color used for sub headings</td>
-              <td>#005b96</td>
-            </tr>
-
-            <tr>
-              <td class="mono-bold">pdf-title</td>
-              <td class="gray">Title of the generated PDF</td>
-              <td>API Reference</td>
-            </tr>
-    
-            <tr>
-              <td class="mono-bold">pdf-footer-text</td>
-              <td class="gray">Text to be printed at the bottom of every page</td>
-              <td>(empty)</td>
-            </tr>
-
-            <tr>
-              <td class="mono-bold">pdf-schema-style</td>
-              <td class="gray">style to display request and response schemas<br/>can be 'table' or 'object'</td>
-              <td>object</td>
-            </tr>
-
-            <tr>
-              <td class="mono-bold">include-info</td>
-              <td class="gray"> true to include info section in the generated PDF</td>
-              <td>true</td>
-            </tr>
-
-            <tr>
-              <td class="mono-bold">include-toc</td>
-              <td class="gray">true to include table-of-contents in the generated PDF</td>
-              <td>true</td>
-            </tr>
-
-            <tr>
-              <td class="mono-bold">include-security</td>
-              <td class="gray">true to include security section in the generated PDF</td>
-              <td>true</td>
-            </tr>
-
-            <tr>
-              <td class="mono-bold">include-api-details</td>
-              <td class="gray">true to include all the API details in the generated PDF</td>
-              <td>true</td>
-            </tr>
-
-            <tr>
-              <td class="mono-bold">include-api-list</td>
-              <td class="gray">true to include list of all the APIs and their summary at the end in the generated PDF </td>
-              <td>false</td>
-            </tr>
-          </table>
-        </div>  
-
-        <h2> Methods</h2>
-        <div class="table-block">
-          <table class="m-table">
-            <tr>
-              <th > Name</th>
-              <th >Description </th>
-            </tr>
-            <tr>
-              <td class="mono-bold">generatePdf(spec)</td>
-              <td class="gray">
-                to programmatically generate the PDF. <br/>
-                Takes a single parameter that can be :
-                <ul>
-                  <li> either a string containing the url of the specs</li>  
-                  <li> or a JSON object representing a valid spec</li>  
-                </ul>
-                <a href="https://github.com/mrin9/RapiPdf/blob/master/docs/examples/example1.html"> Example </a>
-              </td>
-            </tr>
-            <tr>
-              <td class="mono-bold">setAttribute(attr-name, value)</td>
-              <td class="gray">All HTML elements contains setAttribute() method, You may use this method to programmatically update/change any of its properties</td>
-            </tr>
-          </table>
-        </div>
-
-        <h2> Localization</h2>
-        <div class="mono-bold" style="text-align: center;">create a &lt;template&gt; inside &lt;rapi-pdf&gt; element and provide the translations</div>
-        <pre class="shadow code-block"><code class="html" style="border-radius:4px">
-&lt;rapi-pdf spec-url="https://api.apis.guru/v2/specs/bitbucket.org/2.0/swagger.json"&gt;
-  &lt;template&gt;
-  {
-    "index"          : "INDEX",
-    "api"            : "API",
-    "apiList"        : "API List",
-    "apiReference"   : "API Reference",
-    "apiVersion"     : "API Version",
-    "contact"        : "CONTACT",
-    "name"           : "NAME",
-    "email"          : "EMAIL",
-    "url"            : "URL",
-    "termsOfService" : "Terms of service",
-    "securitySchemes": "SECURITY SCHEMES",
-    "type"           : "TYPE",
-    "description"    : "DESCRIPTION",
-    "request"        : "REQUEST",
-    "requestBody"    : "REQUEST BODY",
-    "response"       : "RESPONSE",
-    "responseModel"  : "RESPONSE MODEL",
-    "statusCode"     : "STATUS CODE",
-    "deprecated"     : "DEPRECATED",
-    "allowed"        : "allowed",
-    "pattern"        : "pattern",
-    "parameters"     : "Parameters",
-    "method"         : "METHOD",
-    "securityAndAuthentication" : "Security and Authentication",
-    "noRequestParameters"       : "No request parameters",
-  }
-  &lt;/template&gt;
-&lt;/rapi-pdf&gt;
-          </code>
-        </pre>
-
-      </div>  
-    </div>
-  <!-- End of API -->
 
   <div id="footer" class="footer container">
     <div class="footer-item"> MIT Licence</div>

@@ -1,3 +1,4 @@
+
 body{
   font-family: 'Varela Round', sans-serif;
   font-size: 14px;
@@ -8,11 +9,17 @@ body{
   margin: 0;
   display: block;
 }
+.topbar{
+  background-color: maroon;
+  padding: 6px 24px;
+}
+.hide-in-mobile { display:none; }
+
 a{ color:navy;}
 code{ font-family: 'Roboto Mono', monospace;}
 
 .banner {
-  padding: 60px 16px;
+  padding: 42px 16px;
   background: #b44646;
   color: #fff;
   text-align: center;
@@ -52,15 +59,11 @@ code{ font-family: 'Roboto Mono', monospace;}
 }
 
 .product-name {
-  font-family:"Roboto Mono";
-  font-weight: 800;
-  font-size: 36px;
+  font-weight: 300;
+  font-size: 32px;
   line-height: 40px;
   color: #fff;
-  transition: .3s all;
-  min-width: 225px;
 }
-
 
 .features,
 .qstart,
@@ -71,7 +74,6 @@ code{ font-family: 'Roboto Mono', monospace;}
   display:flex;
   flex-wrap:wrap;
   justify-content: center;
-  min-height:150px;
 }
 
 .examples,
@@ -216,7 +218,7 @@ code{ font-family: 'Roboto Mono', monospace;}
     margin-right: 0;
   }
   .banner {
-    padding: 80px 32px;
+    padding: 24px 32px;
   }    
   .features {
     padding: 80px 32px;
@@ -236,6 +238,7 @@ code{ font-family: 'Roboto Mono', monospace;}
 }
 
 @media only screen and (min-width: 800px){
+  .hide-in-mobile { display:block; }
   .menu { display:inline-block; }
   .logo { display:block; }
   .code-block{
