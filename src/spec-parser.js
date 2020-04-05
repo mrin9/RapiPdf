@@ -11,7 +11,7 @@ export default async function ProcessSpec(specUrl, sortTags) {
     if (typeof specUrl === 'string') {
       specObj = await Swagger(specUrl);
     } else {
-      specObj = { spec: specUrl };
+      specObj = await Swagger({ spec: specUrl });
     }
     jsonParsedSpec = specObj.spec;
     if (specObj.spec.swagger) {
@@ -129,27 +129,31 @@ export default async function ProcessSpec(specUrl, sortTags) {
           finalParameters = fullPath.parameters ? fullPath.parameters.slice(0) : [];
         }
 
+        const pathObj = {
+          summary,
+          method: methodName,
+          description: fullPath.description,
+          path,
+          operationId: fullPath.operationId,
+          requestBody: fullPath.requestBody,
+          parameters: finalParameters,
+          servers: fullPath.servers ? commonPathProp.servers.concat(fullPath.servers) : commonPathProp.servers,
+          responses: fullPath.responses,
+          deprecated: fullPath.deprecated,
+          security: fullPath.security,
+          commonSummary: commonPathProp.summary,
+          commonDescription: commonPathProp.description,
+        };
+
         if (fullPath.tags) {
           fullPath.tags.forEach((mtag) => {
             const mtagObj = tags.find((v) => v.name === mtag);
             if (mtagObj) {
-              mtagObj.paths.push({
-                summary,
-                method: methodName,
-                description: fullPath.description,
-                path,
-                operationId: fullPath.operationId,
-                requestBody: fullPath.requestBody,
-                parameters: finalParameters,
-                servers: fullPath.servers ? commonPathProp.servers.concat(fullPath.servers) : commonPathProp.servers,
-                responses: fullPath.responses,
-                deprecated: fullPath.deprecated,
-                security: fullPath.security,
-                commonSummary: commonPathProp.summary,
-                commonDescription: commonPathProp.description,
-              });
+              mtagObj.paths.push(pathObj);
             }
           });
+        } else {
+          tagObj.paths.push(pathObj);
         }
         totalPathCount++;
       }
