@@ -52,6 +52,12 @@ export default async function ProcessSpec(specUrl, sortTags) {
       parameters: openApiSpec.paths[path].parameters ? openApiSpec.paths[path].parameters : [],
     };
 
+    if (openApiSpec.tags) {
+      openApiSpec.tags.forEach(
+        (tag) => tags.push({ name: tag.name, description: tag.description, paths: [] }),
+      );
+    }
+
     methods.forEach((methodName) => {
       let tagObj;
       let tagText;
@@ -123,22 +129,28 @@ export default async function ProcessSpec(specUrl, sortTags) {
           finalParameters = fullPath.parameters ? fullPath.parameters.slice(0) : [];
         }
 
-        // Update Responses
-        tagObj.paths.push({
-          summary,
-          method: methodName,
-          description: fullPath.description,
-          path,
-          operationId: fullPath.operationId,
-          requestBody: fullPath.requestBody,
-          parameters: finalParameters,
-          servers: fullPath.servers ? commonPathProp.servers.concat(fullPath.servers) : commonPathProp.servers,
-          responses: fullPath.responses,
-          deprecated: fullPath.deprecated,
-          security: fullPath.security,
-          commonSummary: commonPathProp.summary,
-          commonDescription: commonPathProp.description,
-        });
+        if (fullPath.tags) {
+          fullPath.tags.forEach((mtag) => {
+            const mtagObj = tags.find((v) => v.name === mtag);
+            if (mtagObj) {
+              mtagObj.paths.push({
+                summary,
+                method: methodName,
+                description: fullPath.description,
+                path,
+                operationId: fullPath.operationId,
+                requestBody: fullPath.requestBody,
+                parameters: finalParameters,
+                servers: fullPath.servers ? commonPathProp.servers.concat(fullPath.servers) : commonPathProp.servers,
+                responses: fullPath.responses,
+                deprecated: fullPath.deprecated,
+                security: fullPath.security,
+                commonSummary: commonPathProp.summary,
+                commonDescription: commonPathProp.description,
+              });
+            }
+          });
+        }
         totalPathCount++;
       }
     }); // End of Methods
