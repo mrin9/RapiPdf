@@ -406,12 +406,14 @@ export function getApiDef(spec, filterPath, schemaStyle, localize, includeExampl
         });
       }
 
-      // End of Operation - Line
-      operationContent.push({
-        canvas: [{
-          type: 'line', x1: 0, y1: 5, x2: 595 - 2 * 35, y2: 5, lineWidth: 0.5, lineColor: '#cccccc',
-        }],
-      });
+      // End of Operation - Line (Except the last content)
+      if (j === tag.paths.length - 1) {
+        operationContent.push({
+          canvas: [{
+            type: 'line', x1: 0, y1: 5, x2: 595 - 2 * 35, y2: 5, lineWidth: 0.5, lineColor: '#cccccc',
+          }],
+        });
+      }
     }
 
     if (pathSeq > 0) {
