@@ -312,7 +312,7 @@ function getResponseDef(responses, schemaStyle, localize) {
 }
 
 // API details def
-export function getApiDef(spec, filterPath, schemaStyle, localize, includeExample) {
+export function getApiDef(spec, filterPath, schemaStyle, localize, includeExample, includeApiList) {
   const content = [{ text: localize.api, style: ['h2', 'b'] }];
   let tagSeq = 0;
 
@@ -444,6 +444,12 @@ export function getApiDef(spec, filterPath, schemaStyle, localize, includeExampl
       );
     }
   });
+
+  // Remove last page break if api list not included
+  if (!includeApiList) {
+    content.pop();
+  }
+
   return content;
 }
 

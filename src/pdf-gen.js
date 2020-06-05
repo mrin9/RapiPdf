@@ -69,7 +69,7 @@ export default async function createPdf(specUrl, options) {
     allContent.push(securityDef);
   }
   if (options.includeApiDetails) {
-    apiDef = getApiDef(parsedSpec, '', options.pdfSchemaStyle, options.localize, options.includeExample);
+    apiDef = getApiDef(parsedSpec, '', options.pdfSchemaStyle, options.localize, options.includeExample, options.includeApiList);
     allContent.push(apiDef);
   }
   if (options.includeApiList) {
