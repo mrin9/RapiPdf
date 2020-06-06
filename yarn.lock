@@ -4368,6 +4368,11 @@ html-minifier-terser@^5.0.1:
     relateurl "^0.2.7"
     terser "^4.6.3"
 
+html-to-pdfmake@^2.0.2:
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/html-to-pdfmake/-/html-to-pdfmake-2.0.2.tgz#2ad2062904278e4679081617d216d72a00d06244"
+  integrity sha512-fZi5xTSgVY76CnnaWUtnBeoaEcDXFbD+p/cSuf9Z1PcwIXzqUHXNPcFfRDN47rex6jhcsRJM0RaUp0JDIg0Y3g==
+
 html-webpack-plugin@^4.0.2:
   version "4.0.4"
   resolved "https://registry.yarnpkg.com/html-webpack-plugin/-/html-webpack-plugin-4.0.4.tgz#90cdfb168094e93e047174d9baca098ec5540636"

@@ -1,12 +1,17 @@
 import marked from 'marked';
+import htmlToPdfmake from 'html-to-pdfmake';
 import { rowLinesTableLayout } from '@/table-layouts';
-import { getMarkDownDef } from '@/markdown';
 import {
   getTypeInfo,
   schemaInObjectNotation,
   objectToTree,
   objectToTableTree,
 } from '@/object-tree-gen';
+
+function markdownToPdfmake(markdown) {
+  const html = marked(markdown);
+  return htmlToPdfmake(html);
+}
 
 // Info Def
 export function getInfoDef(spec, bookTitle, localize) {
@@ -46,9 +51,8 @@ export function getInfoDef(spec, bookTitle, localize) {
 
     let specInfDescrMarkDef;
     if (spec.info.description) {
-      const tokens = marked.lexer(spec.info.description);
       specInfDescrMarkDef = {
-        stack: getMarkDownDef(tokens),
+        stack: markdownToPdfmake(spec.info.description),
         style: ['topMargin3'],
       };
     } else {
@@ -337,20 +341,17 @@ export function getApiDef(spec, filterPath, schemaStyle, localize, includeExampl
       });
       operationContent.push({ text: '', style: ['topMarginRegular'] });
 
-      let pathSummaryMarkDef; let pathDescrMarkDef; let
-        tokens;
+      let pathSummaryMarkDef; let pathDescrMarkDef;
       if (path.summary) {
-        tokens = marked.lexer(path.summary);
         pathSummaryMarkDef = {
-          stack: getMarkDownDef(tokens),
+          stack: markdownToPdfmake(path.summary),
           style: ['primary', 'b'],
         };
         operationContent.push(pathSummaryMarkDef);
       }
       if (path.description && path.description.trim() !== path.summary.trim()) {
-        tokens = marked.lexer(path.description);
         pathDescrMarkDef = {
-          stack: getMarkDownDef(tokens),
+          stack: markdownToPdfmake(path.description),
         };
         operationContent.push(pathDescrMarkDef);
       }
@@ -416,12 +417,10 @@ export function getApiDef(spec, filterPath, schemaStyle, localize, includeExampl
 
     if (pathSeq > 0) {
       tagSeq += 1;
-      let tagDescrMarkDef; let
-        tokens;
+      let tagDescrMarkDef;
       if (tag.description) {
-        tokens = marked.lexer(tag.description);
         tagDescrMarkDef = {
-          stack: getMarkDownDef(tokens),
+          stack: markdownToPdfmake(tag.description),
           style: ['topMarginRegular'],
         };
       } else {
