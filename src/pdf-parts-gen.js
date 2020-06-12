@@ -312,7 +312,7 @@ function getResponseDef(responses, schemaStyle, localize) {
 }
 
 // API details def
-export function getApiDef(spec, filterPath, schemaStyle, localize, includeExample) {
+export function getApiDef(spec, filterPath, schemaStyle, localize, includeExample, includeApiList) {
   const content = [{ text: localize.api, style: ['h2', 'b'] }];
   let tagSeq = 0;
 
@@ -406,12 +406,14 @@ export function getApiDef(spec, filterPath, schemaStyle, localize, includeExampl
         });
       }
 
-      // End of Operation - Line
-      operationContent.push({
-        canvas: [{
-          type: 'line', x1: 0, y1: 5, x2: 595 - 2 * 35, y2: 5, lineWidth: 0.5, lineColor: '#cccccc',
-        }],
-      });
+      // End of Operation - Line (Except the last content)
+      if (j === tag.paths.length - 1) {
+        operationContent.push({
+          canvas: [{
+            type: 'line', x1: 0, y1: 5, x2: 595 - 2 * 35, y2: 5, lineWidth: 0.5, lineColor: '#cccccc',
+          }],
+        });
+      }
     }
 
     if (pathSeq > 0) {
@@ -442,6 +444,12 @@ export function getApiDef(spec, filterPath, schemaStyle, localize, includeExampl
       );
     }
   });
+
+  // Remove last page break if api list not included
+  if (!includeApiList) {
+    content.pop();
+  }
+
   return content;
 }
 
