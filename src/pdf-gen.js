@@ -7,8 +7,8 @@ import {
   getInfoDef, getSecurityDef, getApiDef, getApiListDef,
 } from '@/pdf-parts-gen';
 
-export default async function createPdf(specUrl, options) {
-  const parsedSpec = await ProcessSpec(specUrl, options.pdfSortTags);
+export default async function createPdf(specUrl, options, customizeApiPageCallback, apiSortFn) {
+  const parsedSpec = await ProcessSpec(specUrl, options.pdfSortTags, apiSortFn);
 
   const pdfStyles = {
     title: { fontSize: 32 },
@@ -69,7 +69,7 @@ export default async function createPdf(specUrl, options) {
     allContent.push(securityDef);
   }
   if (options.includeApiDetails) {
-    apiDef = getApiDef(parsedSpec, '', options.pdfSchemaStyle, options.localize, options.includeExample, options.includeApiList);
+    apiDef = getApiDef(parsedSpec, '', options.pdfSchemaStyle, options.localize, options.includeExample, options.includeApiList, customizeApiPageCallback);
     allContent.push(apiDef);
   }
   if (options.includeApiList) {
