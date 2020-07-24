@@ -35,7 +35,7 @@
     "swagger2openapi": "^5.4.0"
   },
   "scripts": {
-    "build": "NODE_ENV=production webpack",
+    "build": "NODE_ENV='production' webpack",
     "serve": "webpack-dev-server --mode=development",
     "serve-everyone": "webpack-dev-server --mode=development --host 0.0.0.0",
     "lint": "./node_modules/eslint/bin/eslint.js ./src/**/*.js",
