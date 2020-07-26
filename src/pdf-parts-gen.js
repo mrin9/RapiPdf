@@ -186,7 +186,7 @@ function getExamplesDef(contentTypeObj, localizedExampleLabel) {
   if (contentTypeObj.example) {
     exampleSectionDef.push([
       { text: `${localizedExampleLabel}:`, margin: [20, 10, 0, 0], style: ['small', 'b'] },
-      { text: JSON.stringify(contentTypeObj.example, null, 2), margin: [40, 10, 0, 0], style: 'monoSub' },
+      { text: JSON.stringify(contentTypeObj.example, null, '\u200B \u200B'), margin: [40, 10, 0, 0], style: 'monoSub' },
     ]);
   }
   if (contentTypeObj.examples) {
