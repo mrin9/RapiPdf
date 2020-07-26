@@ -35,8 +35,9 @@
     "swagger2openapi": "^5.4.0"
   },
   "scripts": {
-    "build": "NODE_ENV=production webpack",
+    "build": "cross-env NODE_ENV='production' webpack",
     "serve": "webpack-dev-server --mode=development",
+    "serve-everyone": "webpack-dev-server --mode=development --host 0.0.0.0",
     "lint": "./node_modules/eslint/bin/eslint.js ./src/**/*.js",
     "lint-fix": "./node_modules/eslint/bin/eslint.js --fix ./src/**/*.js"
   },
@@ -46,6 +47,7 @@
     "babel-loader": "^8.1.0",
     "clean-webpack-plugin": "^3.0.0",
     "compression-webpack-plugin": "^3.1.0",
+    "cross-env": "^7.0.2",
     "css-loader": "^3.4.2",
     "eslint": "^6.8.0",
     "eslint-config-airbnb": "^18.1.0",

@@ -39,6 +39,7 @@ export default async function createPdf(specUrl, options) {
     red: { color: 'orangered' },
     blue: { color: '#005b96' },
     mono: { font: 'RobotoMono', fontSize: 10 },
+    monoSub: { font: 'RobotoMono', fontSize: 8 },
   };
 
   const allContent = [];
