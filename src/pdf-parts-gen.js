@@ -181,8 +181,28 @@ function getParameterTableDef(parameters, paramType, localize, includeExample = 
   ];
 }
 
+function getExamplesDef(contentTypeObj, localizedExampleLabel) {
+  const exampleSectionDef = [];
+  if (contentTypeObj.example) {
+    exampleSectionDef.push([
+      { text: `${localizedExampleLabel}:`, margin: [20, 10, 0, 0], style: ['small', 'b'] },
+      { text: JSON.stringify(contentTypeObj.example, null, '\u200B \u200B'), margin: [40, 10, 0, 0], style: 'monoSub' },
+    ]);
+  }
+  if (contentTypeObj.examples) {
+    let iterCount = 0;
+    for (const oneExample in contentTypeObj.examples) {
+      exampleSectionDef.push([
+        { text: `${localizedExampleLabel} ${++iterCount}:`, margin: [20, 10, 0, 0], style: ['small', 'b'] },
+        { text: JSON.stringify(oneExample, null, 2), margin: [40, 10, 0, 0], style: 'monoSub' },
+      ]);
+    }
+  }
+  return exampleSectionDef;
+}
+
 // Request Body Def
-function getRequestBodyDef(requestBody, schemaStyle, localize) {
+function getRequestBodyDef(requestBody, schemaStyle, localize, includeExample = false) {
   if (!requestBody) {
     return;
   }
@@ -212,7 +232,7 @@ function getRequestBodyDef(requestBody, schemaStyle, localize) {
           }
           requestBodyDef.push(treeDef);
         } else {
-          // if Schema Style is Tree
+          // Schema style is "tree."
           let schemaTableTreeDef;
           if (schemaInObjectNotaion['::type'] && schemaInObjectNotaion['::type'] === 'array') {
             schemaTableTreeDef = objectToTableTree(schemaInObjectNotaion['::prop'], localize, 'array');
@@ -239,12 +259,16 @@ function getRequestBodyDef(requestBody, schemaStyle, localize) {
       }
       content.push(requestBodyDef);
     }
+
+    if (includeExample) {
+      content.push(getExamplesDef(contentTypeObj, localize.example));
+    }
   }
   return content;
 }
 
 // Response Def
-function getResponseDef(responses, schemaStyle, localize) {
+function getResponseDef(responses, schemaStyle, localize, includeExample = false) {
   const respDef = [];
   for (const statusCode in responses) {
     const allResponseDefs = [];
@@ -253,7 +277,8 @@ function getResponseDef(responses, schemaStyle, localize) {
         { text: `${localize.responseModel} - ${contentType}`, margin: [10, 10, 0, 0], style: ['small', 'b'] },
       ];
 
-      let origSchema = responses[statusCode].content[contentType].schema;
+      const contentTypeObj = responses[statusCode].content[contentType];
+      let origSchema = contentTypeObj.schema;
       if (origSchema) {
         origSchema = JSON.parse(JSON.stringify(origSchema));
         const schemaInObjectNotaion = schemaInObjectNotation(origSchema);
@@ -298,6 +323,9 @@ function getResponseDef(responses, schemaStyle, localize) {
             });
           }
         }
+      }
+      if (includeExample) {
+        responseDef.push(getExamplesDef(contentTypeObj, localize.example));
       }
       allResponseDefs.push(responseDef);
     }
@@ -399,7 +427,7 @@ export function getApiDef(spec, filterPath, schemaStyle, localize, includeExampl
 
       // Generate Response Defs
       operationContent.push({ text: localize.response, style: ['p', 'b', 'alternate'], margin: [0, 10, 0, 0] });
-      const respDef = getResponseDef(path.responses, schemaStyle, localize);
+      const respDef = getResponseDef(path.responses, schemaStyle, localize, includeExample);
       if (respDef && respDef.length > 0) {
         operationContent.push({
           stack: respDef,
