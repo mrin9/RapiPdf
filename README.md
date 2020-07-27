@@ -8,7 +8,7 @@
 </p>
 
 # RapiPDF
-Custom Eelement for Open-API to PDF generation
+Custom element for Open-API to PDF generation
 
 ## Features
 - Supports Swagger 2.0 and OpenAPI 3.0
