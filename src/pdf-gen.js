@@ -91,7 +91,6 @@ export default async function createPdf(specUrl, options, customizeApiPageCallba
     styles: pdfStyles,
   };
 
-
   pdfMake.fonts = {
     Roboto: {
       normal: 'Roboto-Regular.ttf',
@@ -109,5 +108,9 @@ export default async function createPdf(specUrl, options, customizeApiPageCallba
   };
   // pdfMake.vfs = pdfFonts.pdfMake.vfs;
   pdfMake.vfs = pdfFonts;
-  pdfMake.createPdf(finalDocDef).open();
+  if (options.pdfName !== '') {
+    pdfMake.createPdf(finalDocDef).download(options.pdfName);
+  } else {
+    pdfMake.createPdf(finalDocDef).open();
+  }
 }

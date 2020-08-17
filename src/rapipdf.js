@@ -220,8 +220,10 @@ export default customElements.define('rapi-pdf', class RapiPdf extends HTMLEleme
     const includeExample = this.getAttribute('include-example') === 'true';
     const includeApiDetails = this.getAttribute('include-api-details') !== 'false';
     const includeApiList = this.getAttribute('include-api-list') === 'true';
+    const pdfName = this.getAttribute('pdf-name') ? this.getAttribute('pdf-name') : '';
     const localize = this.localize;
     const options = {
+      pdfName,
       pdfSortTags,
       pdfPrimaryColor,
       pdfAlternateColor,
