@@ -215,7 +215,7 @@ function getRequestBodyDef(requestBody, schemaStyle, localize) {
           // if Schema Style is Tree
           let schemaTableTreeDef;
           if (schemaInObjectNotaion['::type'] && schemaInObjectNotaion['::type'] === 'array') {
-            schemaTableTreeDef = objectToTableTree(schemaInObjectNotaion['::prop'], localize, 'array');
+            schemaTableTreeDef = objectToTableTree(schemaInObjectNotaion['::props'], localize);
           } else {
             schemaTableTreeDef = objectToTableTree(schemaInObjectNotaion, localize);
           }
