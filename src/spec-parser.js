@@ -2,7 +2,7 @@
 import Swagger from 'swagger-client';
 import converter from 'swagger2openapi';
 
-export default async function ProcessSpec(specUrl, sortTags) {
+export default async function ProcessSpec(specUrl, sortTags, apiSortFn) {
   let jsonParsedSpec;
   let convertedSpec;
   const convertOptions = { patch: true, warnOnly: true };
@@ -165,6 +165,9 @@ export default async function ProcessSpec(specUrl, sortTags) {
   securitySchemes = (openApiSpec.components ? openApiSpec.components.securitySchemes : {});
   if (sortTags) {
     tags.sort((a, b) => (a.name < b.name ? -1 : (a.name > b.name ? 1 : 0)));
+    if(apiSortFn != null){
+      apiSortFn(tags);
+    }
   }
   const parsedSpec = {
     info: openApiSpec.info,
