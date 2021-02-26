@@ -10,7 +10,7 @@ import {
 
 function markdownToPdfmake(markdown) {
   const html = marked(markdown);
-  return htmlToPdfmake(html);
+  return htmlToPdfmake(html);   
 }
 
 // Info Def
@@ -202,7 +202,7 @@ function getExamplesDef(contentTypeObj, localizedExampleLabel) {
 }
 
 // Request Body Def
-function getRequestBodyDef(requestBody, schemaStyle, localize, includeExample = false) {
+function getRequestBodyDef(requestBody, schemaStyle, localize, includeExample = false, isCallBack = false) {
   if (!requestBody) {
     return;
   }
@@ -210,9 +210,16 @@ function getRequestBodyDef(requestBody, schemaStyle, localize, includeExample = 
   let formParamDef;
   for (const contentType in requestBody.content) {
     const contentTypeObj = requestBody.content[contentType];
-    const requestBodyDef = [
+    const requestBodyDef = [];
+    if (isCallBack) {
+      requestBodyDef.push({
+        text: 'CALLBACK REQUEST', color: '#005b96', margin: [0, 10, 0, 0], style: ['medium', 'b'],
+      });
+    }
+    requestBodyDef.push(
       { text: `${localize.requestBody} - ${contentType}`, margin: [0, 10, 0, 0], style: ['small', 'b'] },
-    ];
+    );
+
 
     if ((contentType.includes('form') || contentType.includes('multipart-form')) && contentTypeObj.schema) {
       formParamDef = getParameterTableDef(contentTypeObj.schema.properties, 'FORM DATA', localize);
@@ -270,13 +277,16 @@ function getRequestBodyDef(requestBody, schemaStyle, localize, includeExample = 
 // Response Def
 function getResponseDef(responses, schemaStyle, localize, includeExample = false) {
   const respDef = [];
+  const responseDef = [];
+
   for (const statusCode in responses) {
     const allResponseDefs = [];
+
     for (const contentType in responses[statusCode].content) {
       const responseDef = [
         { text: `${localize.responseModel} - ${contentType}`, margin: [10, 10, 0, 0], style: ['small', 'b'] },
       ];
-
+      console.log(responseDef, 'responseDefresponseDefresponseDefresponseDefresponseDef');
       const contentTypeObj = responses[statusCode].content[contentType];
       let origSchema = contentTypeObj.schema;
       if (origSchema) {
@@ -345,6 +355,7 @@ function getResponseDef(responses, schemaStyle, localize, includeExample = false
 
 // API details def
 export function getApiDef(spec, filterPath, schemaStyle, localize, includeExample, includeApiList) {
+  console.log(spec, filterPath, schemaStyle, localize, includeExample, includeApiList);
   const content = [{ text: localize.api, style: ['h2', 'b'] }];
   let tagSeq = 0;
 
@@ -383,7 +394,7 @@ export function getApiDef(spec, filterPath, schemaStyle, localize, includeExampl
         };
         operationContent.push(pathDescrMarkDef);
       }
-
+      console.log('path.requestBody', path);
       // Generate Request Defs
       const requestSetDef = [];
       const pathParams = path.parameters ? path.parameters.filter((param) => param.in === 'path') : null;
@@ -396,8 +407,17 @@ export function getApiDef(spec, filterPath, schemaStyle, localize, includeExampl
       const requestBodyTableDefs = getRequestBodyDef(path.requestBody, schemaStyle, localize, includeExample);
       const headerParamTableDef = getParameterTableDef(headerParams, 'header', localize, includeExample);
       const cookieParamTableDef = getParameterTableDef(cookieParams, 'cookie', localize, includeExample);
+      const callBackData = null;
+      if (path.callbacks != null) {
+        const myKey = Object.keys(path.callbacks)[0];
+        console.log(path.callbacks[myKey]);
+        const callBackDefKey = '{$request.body#/callbackUrl}';
+        callBackData = path.callbacks[myKey][callBackDefKey];
+      }
+      const callBackRequestBodyTableDefs = null;
+      if (callBackData != null) callBackRequestBodyTableDefs = getRequestBodyDef(callBackData.post.requestBody, schemaStyle, localize, includeExample, true);
       operationContent.push({ text: localize.request, style: ['p', 'b', 'alternate'], margin: [0, 10, 0, 0] });
-      if (pathParamTableDef || queryParamTableDef || headerParamTableDef || cookieParamTableDef || requestBodyTableDefs) {
+      if (pathParamTableDef || queryParamTableDef || headerParamTableDef || cookieParamTableDef || requestBodyTableDefs || callBackRequestBodyTableDefs) {
         if (pathParamTableDef) {
           requestSetDef.push(pathParamTableDef);
         }
@@ -409,6 +429,11 @@ export function getApiDef(spec, filterPath, schemaStyle, localize, includeExampl
             requestSetDef.push(v);
           });
         }
+        /* if (callBackRequestBodyTableDefs != null) {
+          callBackRequestBodyTableDefs.map((v) => {
+            requestSetDef.push(v);
+          });
+        } */
         if (headerParamTableDef) {
           requestSetDef.push(headerParamTableDef);
         }
@@ -428,12 +453,41 @@ export function getApiDef(spec, filterPath, schemaStyle, localize, includeExampl
       // Generate Response Defs
       operationContent.push({ text: localize.response, style: ['p', 'b', 'alternate'], margin: [0, 10, 0, 0] });
       const respDef = getResponseDef(path.responses, schemaStyle, localize, includeExample);
+      const respCallBackDev = null;
+
       if (respDef && respDef.length > 0) {
         operationContent.push({
           stack: respDef,
           margin: [10, 5, 0, 5],
         });
       }
+      // operationContent.push({
+      //  text: 'CallBack Request L', color: '#006400', margin: [10, 10, 0, 0], style: ['small', 'b'],
+      // });
+      if (callBackRequestBodyTableDefs != null) {
+        callBackRequestBodyTableDefs.map((v) => {
+          v = v.map((item, index) => {
+            if (index != 0) {
+              item.margin = [10, 5, 0, 5];
+            }
+            return item;
+          });
+          operationContent.push(v);
+        });
+      }
+      if (callBackData != null) respCallBackDev = getResponseDef(callBackData.post.responses, schemaStyle, localize, includeExample, true);
+      if (respCallBackDev != null && respCallBackDev.length > 0) {
+        operationContent.push({
+
+          text: 'CALLBACK RESPONSE', color: '#005b96', margin: [0, 10, 0, 0], style: ['medium', 'b'],
+        });
+
+        operationContent.push({
+          stack: respCallBackDev,
+          margin: [10, 5, 0, 5],
+        });
+      }
+
 
       // End of Operation - Line (Except the last content)
       if (j === tag.paths.length - 1) {
@@ -443,6 +497,18 @@ export function getApiDef(spec, filterPath, schemaStyle, localize, includeExampl
           }],
         });
       }
+      // csk - moved the callback push from above to here
+    /* if (callBackRequestBodyTableDefs != null) {
+        callBackRequestBodyTableDefs.map((v) => {
+          requestSetDef.push(v);
+        });
+      }
+      if (respCallBackDev != null && respCallBackDev.length > 0) {
+        operationContent.push({
+          stack: respCallBackDev,
+          margin: [10, 5, 0, 5],
+        });
+      } */
     }
 
     if (pathSeq > 0) {
@@ -456,6 +522,7 @@ export function getApiDef(spec, filterPath, schemaStyle, localize, includeExampl
       } else {
         tagDescrMarkDef = { text: '' };
       }
+
 
       content.push(
         {
