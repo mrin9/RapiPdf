@@ -2,22 +2,33 @@
 import Swagger from 'swagger-client';
 import converter from 'swagger2openapi';
 
+
 export default async function ProcessSpec(specUrl, sortTags) {
   let jsonParsedSpec;
   let convertedSpec;
   const convertOptions = { patch: true, warnOnly: true };
   try {
     let specObj;
+    console.log(specUrl);
     if (typeof specUrl === 'string') {
-      specObj = await Swagger(specUrl);
+      specObj = await Swagger({
+        disableInterfaces: false,
+        url: specUrl,   
+      });
     } else {
-      specObj = await Swagger({ spec: specUrl });
+      specObj = await Swagger({
+        disableInterfaces: false,
+        spec: specUrl,
+      });
     }
+
     jsonParsedSpec = specObj.spec;
     if (specObj.spec.swagger) {
       convertedSpec = await converter.convertObj(specObj.spec, convertOptions);
       jsonParsedSpec = convertedSpec.openapi;
     }
+    console.log(convertedSpec);
+    console.log(jsonParsedSpec);
   } catch (err) {
     console.info('%c There was an issue while parsing the spec %o ', 'color:orangered', err); // eslint-disable-line no-console
   }
@@ -128,7 +139,6 @@ export default async function ProcessSpec(specUrl, sortTags) {
         } else {
           finalParameters = fullPath.parameters ? fullPath.parameters.slice(0) : [];
         }
-
         const pathObj = {
           summary,
           method: methodName,
@@ -143,10 +153,11 @@ export default async function ProcessSpec(specUrl, sortTags) {
           security: fullPath.security,
           commonSummary: commonPathProp.summary,
           commonDescription: commonPathProp.description,
+          callbacks: fullPath.callbacks ? fullPath.callbacks : null,
         };
-
         if (fullPath.tags) {
           fullPath.tags.forEach((mtag) => {
+            console.log(mtag);
             const mtagObj = tags.find((v) => v.name === mtag);
             if (mtagObj) {
               mtagObj.paths.push(pathObj);
