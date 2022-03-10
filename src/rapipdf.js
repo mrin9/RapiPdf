@@ -9,9 +9,10 @@ tmpl.innerHTML = `
     --input-bg:#fff;
     --fg:#333;
     --primary-text:#fff;
-    --font-size:13px;
+    --font-size: 1rem;
+    --font-family: "Open Sans", sans-serif !important;
     display:block;
-    width:350px;
+    width:auto;
   }
 
   .spec-input {
@@ -30,33 +31,13 @@ tmpl.innerHTML = `
     outline: 1px dotted var(--fg);
     outline-offset: -3px;
   }
-
-  .btn-default {
-    border-radius: 0 var(--border-radius) var(--border-radius) 0;
-    font-size: 85%;
-    font-weight: 600;
-    display: inline-block;
-    padding: 8px 16px;
-    outline: none;
-    outline-offset: -2px;
-    line-height: 1;
-    text-align: center;
-    white-space: nowrap;
-    background-color:var(--primary-color);
-    color:var(--primary-text);
-    border: 0px solid var(--primary-color);
-    transition: background-color 0.2s;
-    user-select: none;
-    cursor: pointer;
+  .rapi-pdf-btn{
+    font-family: var(--font-family);
   }
-  .btn-default:focus{
-    outline: 1px solid var(--primary-text);
-  }
-  
   </style>
   <div style='display:flex; width:100%; height: 100%;'>
     <input  class="spec-input"  id="spec-url" type="text"  placeholder="Spec URL" value="" tabindex="0">
-    <button class="btn-default" type="button" style="margin-left:-1px" tabindex="0">GENERATE PDF</button>
+    <button class="rapi-pdf-btn btn btn-primary" type="button" tabindex="0">GENERATE PDF</button>
   </div>  
 `;
 
@@ -66,10 +47,19 @@ export default customElements.define('rapi-pdf', class RapiPdf extends HTMLEleme
     const shadowRoot = this.attachShadow({ mode: 'open' });
     const elFromTemplate = tmpl.content.cloneNode(true);
     this.inputEl = elFromTemplate.querySelector('.spec-input');
-    this.btnEl = elFromTemplate.querySelector('.btn-default');
-
+    this.btnEl = elFromTemplate.querySelector('.rapi-pdf-btn');
+    const fontAwesomeStyle = document.querySelector('link[href*="font-awesome"]');
+    const boostrapStyle = document.querySelector('link[href*="bootstrap"]');
     // Initialize attributes if not defined
     shadowRoot.appendChild(elFromTemplate);
+    // adding fontawesome style ref
+    if (fontAwesomeStyle) {
+      this.shadowRoot.appendChild(fontAwesomeStyle.cloneNode());
+    }
+    // adding boostrap style ref
+    if (boostrapStyle) {
+      this.shadowRoot.appendChild(boostrapStyle.cloneNode());
+    }
   }
 
   static get properties() {
@@ -137,7 +127,7 @@ export default customElements.define('rapi-pdf', class RapiPdf extends HTMLEleme
   }
 
   static get observedAttributes() {
-    return ['spec-url', 'button-bg', 'input-bg', 'button-color', 'input-color', 'button-label', 'hide-input'];
+    return ['spec-url', 'button-bg', 'input-bg', 'button-color', 'input-color', 'button-label', 'hide-input', 'button-icon', 'button-css-class'];
   }
 
   attributeChangedCallback(name, oldValue, newValue) {
@@ -158,11 +148,22 @@ export default customElements.define('rapi-pdf', class RapiPdf extends HTMLEleme
         if (oldValue !== newValue) {
           if (newValue === 'true') {
             this.inputEl.style.display = 'none';
-            this.btnEl.style.borderRadius = 'var(--border-radius)';
           } else {
             this.inputEl.style.display = 'block';
-            this.btnEl.style.borderRadius = '0 var(--border-radius) var(--border-radius) 0';
           }
+          return true;
+        }
+        break;
+      case 'button-icon':
+        if (oldValue !== newValue && newValue != null) {
+          this.btnEl.innerHTML = `<i class="${newValue}"></i> GENERATE PDF`;
+          return true;
+        }
+        break;
+      case 'button-css-class':
+        if (oldValue !== newValue && newValue != null) {
+          this.btnEl.classList.remove('btn-primary');
+          this.btnEl.classList.add(newValue);
           return true;
         }
         break;
