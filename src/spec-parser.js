@@ -129,6 +129,15 @@ export default async function ProcessSpec(specUrl, sortTags) {
           finalParameters = fullPath.parameters ? fullPath.parameters.slice(0) : [];
         }
 
+        if (fullPath.requestBody && fullPath.requestBody.$ref) {
+          const ref = fullPath.requestBody.$ref.split('/');
+          const refName = ref[ref.length - 1];
+          const refObj = openApiSpec.components.requestBodies[refName];
+          if (refObj) {
+            fullPath.requestBody = refObj;
+          }
+        }
+
         const pathObj = {
           summary,
           method: methodName,
