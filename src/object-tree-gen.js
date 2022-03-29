@@ -143,14 +143,24 @@ export function schemaInObjectNotation(schema, obj = {}, level = 0) {
   if (!schema) {
     return;
   }
-  if (schema.type === 'object' || schema.properties) { // If Object
+  if (schema.type === 'object' || schema.properties || schema.additionalProperties) { // If Object
     obj['::description'] = schema.description ? schema.description : '';
     obj['::type'] = 'object';
+    if (schema.additionalProperties) {
+      obj['::type'] = 'map';
+    }
     for (const key in schema.properties) {
       if (schema.required && schema.required.includes(key)) {
         obj[`${key}*`] = schemaInObjectNotation(schema.properties[key], {}, (level + 1));
       } else {
         obj[key] = schemaInObjectNotation(schema.properties[key], {}, (level + 1));
+      }
+    }
+    if (schema.additionalProperties) {
+      if (schema.required) {
+        obj['map[string]value*'] = schemaInObjectNotation(schema.additionalProperties, {}, (level + 1));
+      } else {
+        obj['map[string]value'] = schemaInObjectNotation(schema.additionalProperties, {}, (level + 1));
       }
     }
   } else if (schema.items) { // If Array
