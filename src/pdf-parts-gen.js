@@ -9,7 +9,7 @@ import {
 } from '@/object-tree-gen';
 
 function markdownToPdfmake(markdown) {
-  const html = marked(markdown);
+  const html = marked(markdown, {headerIds: false});
   return htmlToPdfmake(html);
 }
 
