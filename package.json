@@ -1,6 +1,6 @@
 {
-  "name": "rapipdf",
-  "version": "2.2.1",
+  "name": "@andste82/rapipdf",
+  "version": "2.2.2",
   "description": "RapiPdf - Generate PDF from Open API spec",
   "author": "Mrinmoy Majumdar <mrin9@yahoo.com>",
   "repository": {
