@@ -138,6 +138,31 @@ export default async function ProcessSpec(specUrl, sortTags) {
           }
         }
 
+        if (fullPath.requestBody && fullPath.requestBody.content) {
+          if ('application/json' in fullPath.requestBody.content && 'schema' in fullPath.requestBody.content['application/json']) {
+            const schemaData = fullPath.requestBody.content['application/json'].schema;
+            if ('discriminator' in schemaData && 'properties' in schemaData) {
+              if (schemaData.discriminator.propertyName in schemaData.properties && schemaData.properties[schemaData.discriminator.propertyName].enum) {
+                const discriminatorEnum = schemaData.properties[schemaData.discriminator.propertyName].enum;
+                const anyOfList = [];
+                for (const enumKey of discriminatorEnum) {
+                  if (enumKey in openApiSpec.components.schemas) {
+                    console.log(enumKey);
+                    anyOfList.push(openApiSpec.components.schemas[enumKey]);
+                  }
+                }
+
+                if (anyOfList.length > 0) {
+                  fullPath.requestBody.content['application/json'].schema = {
+                    anyOf: anyOfList,
+                    required: [schemaData.discriminator.propertyName],
+                  };
+                }
+              }
+            }
+          }
+        }
+
         const pathObj = {
           summary,
           method: methodName,
