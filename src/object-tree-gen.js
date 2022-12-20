@@ -25,6 +25,7 @@ export function getTypeInfo(schema) {
     constrain: '',
     arrayType: '',
     typeInfoText: '',
+    example: schema.example ? schema.example : '',
   };
   if (info.type === '{recursive}') {
     info.description = schema.$ref.substring(schema.$ref.lastIndexOf('/') + 1);
@@ -73,7 +74,7 @@ export function getTypeInfo(schema) {
       info.constrain = `max:${schema.maxLength} chars`;
     }
   }
-  info.typeInfoText = `${info.type}~|~${info.readOrWriteOnly} ${info.deprecated}~|~${info.constrain}~|~${info.default}~|~${info.allowedValues}~|~${info.pattern}~|~${info.description}`;
+  info.typeInfoText = `${info.type}~|~${info.readOrWriteOnly} ${info.deprecated}~|~${info.constrain}~|~${info.default}~|~${info.allowedValues}~|~${info.pattern}~|~${info.description}~|~${info.example}`;
   return info;
 }
 
@@ -127,6 +128,14 @@ function generatePropDescription(propDescrArray, localize) {
       text: `${propDescrArray[6]}`,
       style: ['sub', 'lightGray'],
       margin: [0, 3, 0, 0],
+    });
+  }
+  if (propDescrArray[7]) {
+    descrStack.push({
+      text: [
+        { text: `${localize.example.toLowerCase()}: `, style: ['sub', 'b', 'darkGray'] },
+        { text: propDescrArray[7], style: ['sub', 'darkGray', 'b'] },
+      ],
     });
   }
   return descrStack;
