@@ -199,7 +199,8 @@ export function schemaInObjectNotation(schema, obj = {}, level = 0) {
     schema[xxxOf].map((v) => {
       if (v.type === 'object' || v.properties || v.allOf || v.anyOf || v.oneOf) {
         const partialObj = schemaInObjectNotation(v, {}, (level + 1));
-        objWithAnyOfProps[`OPTION:${i}`] = partialObj;
+        if (v.discriminator && v.discriminator.propertyName) objWithAnyOfProps[`${v.discriminator.propertyName}:${v[v.discriminator.propertyName]}`] = partialObj;
+        else objWithAnyOfProps[`OPTION:${i}`] = partialObj;
         i++;
       } else if (v.type === 'array' || v.items) {
         const partialObj = [schemaInObjectNotation(v, {}, (level + 1))];
@@ -251,7 +252,17 @@ export function objectToTree(obj, localize, prevKeyDataType = 'object', prevKey 
     if (key === 'ANY:OF' || key === 'ONE:OF') {
       const allOptions = [];
       for (const k in obj[key]) {
-        allOptions.push(objectToTree(obj[key][k], localize, 'object', k));
+        allOptions.push({
+          text: `${k}`,
+          linkToDestination: 'mainToc',
+          style: ['p', 'blue', 'b'],
+          margin: [0, 15, 0, 0],
+          tocItem: true,
+          tocMargin: [30, 0, 0, 0],
+          tocStyle: ['small', 'blue', 'mono'],
+          tocNumberStyle: ['small', 'blue', 'mono'],
+        });
+        allOptions.push(objectToTree(obj[key][k], localize, 'object', ''));
       }
       return [
         {
@@ -261,7 +272,7 @@ export function objectToTree(obj, localize, prevKeyDataType = 'object', prevKey 
             {
               margin: [10, 0, 0, 0],
               stack: [
-                { text: `${key.replace(':', ' ')}`, style: ['sub', 'blue', 'b'], margin: [0, 5, 0, 0] },
+                { text: `${key.replace(':', ' ')}`, style: ['p', 'blue', 'b'], margin: [0, 5, 0, 0] },
                 ...allOptions,
               ],
             },

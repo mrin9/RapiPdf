@@ -56,7 +56,7 @@ export default async function createPdf(specUrl, options) {
   if (options.includeToc) {
     tocDef = {
       toc: {
-        title: { text: options.localize.index, style: ['b', 'h2'] },
+        title: { id: 'mainToc', text: options.localize.index, style: ['b', 'h2'] },
         numberStyle: { bold: true },
         style: ['small'],
       },

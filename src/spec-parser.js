@@ -147,7 +147,7 @@ export default async function ProcessSpec(specUrl, sortTags) {
                 const anyOfList = [];
                 for (const enumKey of discriminatorEnum) {
                   if (enumKey in openApiSpec.components.schemas) {
-                    console.log(enumKey);
+                    openApiSpec.components.schemas[enumKey][schemaData.discriminator.propertyName] = enumKey;
                     anyOfList.push(openApiSpec.components.schemas[enumKey]);
                   }
                 }
