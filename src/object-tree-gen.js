@@ -25,6 +25,7 @@ export function getTypeInfo(schema) {
     constrain: '',
     arrayType: '',
     typeInfoText: '',
+    example: schema.example ? schema.example : '',
   };
   if (info.type === '{recursive}') {
     info.description = schema.$ref.substring(schema.$ref.lastIndexOf('/') + 1);
@@ -73,7 +74,7 @@ export function getTypeInfo(schema) {
       info.constrain = `max:${schema.maxLength} chars`;
     }
   }
-  info.typeInfoText = `${info.type}~|~${info.readOrWriteOnly} ${info.deprecated}~|~${info.constrain}~|~${info.default}~|~${info.allowedValues}~|~${info.pattern}~|~${info.description}`;
+  info.typeInfoText = `${info.type}~|~${info.readOrWriteOnly} ${info.deprecated}~|~${info.constrain}~|~${info.default}~|~${info.allowedValues}~|~${info.pattern}~|~${info.description}~|~${info.example}`;
   return info;
 }
 
@@ -129,6 +130,14 @@ function generatePropDescription(propDescrArray, localize) {
       margin: [0, 3, 0, 0],
     });
   }
+  if (propDescrArray[7]) {
+    descrStack.push({
+      text: [
+        { text: `${localize.example.toLowerCase()}: `, style: ['sub', 'b', 'darkGray'] },
+        { text: propDescrArray[7], style: ['sub', 'darkGray', 'b'] },
+      ],
+    });
+  }
   return descrStack;
 }
 
@@ -143,14 +152,24 @@ export function schemaInObjectNotation(schema, obj = {}, level = 0) {
   if (!schema) {
     return;
   }
-  if (schema.type === 'object' || schema.properties) { // If Object
+  if (schema.type === 'object' || schema.properties || schema.additionalProperties) { // If Object
     obj['::description'] = schema.description ? schema.description : '';
     obj['::type'] = 'object';
+    if (schema.additionalProperties) {
+      obj['::type'] = 'map';
+    }
     for (const key in schema.properties) {
       if (schema.required && schema.required.includes(key)) {
         obj[`${key}*`] = schemaInObjectNotation(schema.properties[key], {}, (level + 1));
       } else {
         obj[key] = schemaInObjectNotation(schema.properties[key], {}, (level + 1));
+      }
+    }
+    if (schema.additionalProperties) {
+      if (schema.required) {
+        obj['map[string]value*'] = schemaInObjectNotation(schema.additionalProperties, {}, (level + 1));
+      } else {
+        obj['map[string]value'] = schemaInObjectNotation(schema.additionalProperties, {}, (level + 1));
       }
     }
   } else if (schema.items) { // If Array
@@ -189,7 +208,8 @@ export function schemaInObjectNotation(schema, obj = {}, level = 0) {
     schema[xxxOf].map((v) => {
       if (v.type === 'object' || v.properties || v.allOf || v.anyOf || v.oneOf) {
         const partialObj = schemaInObjectNotation(v, {}, (level + 1));
-        objWithAnyOfProps[`OPTION:${i}`] = partialObj;
+        if (v.discriminator && v.discriminator.propertyName) objWithAnyOfProps[`${v.discriminator.propertyName}:${v[v.discriminator.propertyName]}`] = partialObj;
+        else objWithAnyOfProps[`OPTION:${i}`] = partialObj;
         i++;
       } else if (v.type === 'array' || v.items) {
         const partialObj = [schemaInObjectNotation(v, {}, (level + 1))];
@@ -241,7 +261,17 @@ export function objectToTree(obj, localize, prevKeyDataType = 'object', prevKey 
     if (key === 'ANY:OF' || key === 'ONE:OF') {
       const allOptions = [];
       for (const k in obj[key]) {
-        allOptions.push(objectToTree(obj[key][k], localize, 'object', k));
+        allOptions.push({
+          text: `${k}`,
+          linkToDestination: 'mainToc',
+          style: ['p', 'blue', 'b'],
+          margin: [0, 15, 0, 0],
+          tocItem: true,
+          tocMargin: [30, 0, 0, 0],
+          tocStyle: ['small', 'blue', 'mono'],
+          tocNumberStyle: ['small', 'blue', 'mono'],
+        });
+        allOptions.push(objectToTree(obj[key][k], localize, 'object', ''));
       }
       return [
         {
@@ -251,7 +281,7 @@ export function objectToTree(obj, localize, prevKeyDataType = 'object', prevKey 
             {
               margin: [10, 0, 0, 0],
               stack: [
-                { text: `${key.replace(':', ' ')}`, style: ['sub', 'blue', 'b'], margin: [0, 5, 0, 0] },
+                { text: `${key.replace(':', ' ')}`, style: ['p', 'blue', 'b'], margin: [0, 5, 0, 0] },
                 ...allOptions,
               ],
             },

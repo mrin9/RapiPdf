@@ -363,6 +363,7 @@ export function getApiDef(spec, filterPath, schemaStyle, localize, includeExampl
       operationContent.push({
         text: `${tagSeq + 1}.${pathSeq} ${path.method.toUpperCase()} ${path.path}`,
         style: ['topMargin3', 'mono', 'p', 'primary', 'b'],
+        linkToDestination: 'mainToc',
         tocItem: true,
         tocStyle: ['small', 'blue', 'mono'],
         tocNumberStyle: ['small', 'blue', 'mono'],
@@ -396,7 +397,16 @@ export function getApiDef(spec, filterPath, schemaStyle, localize, includeExampl
       const requestBodyTableDefs = getRequestBodyDef(path.requestBody, schemaStyle, localize, includeExample);
       const headerParamTableDef = getParameterTableDef(headerParams, 'header', localize, includeExample);
       const cookieParamTableDef = getParameterTableDef(cookieParams, 'cookie', localize, includeExample);
-      operationContent.push({ text: localize.request, style: ['p', 'b', 'alternate'], margin: [0, 10, 0, 0] });
+      operationContent.push({
+        text: localize.request,
+        tocItem: true,
+        linkToDestination: 'mainToc',
+        tocMargin: [20, 0, 0, 0],
+        tocStyle: ['small', 'blue', 'mono'],
+        tocNumberStyle: ['small', 'blue', 'mono'],
+        style: ['p', 'b', 'alternate'],
+        margin: [0, 10, 0, 0],
+      });
       if (pathParamTableDef || queryParamTableDef || headerParamTableDef || cookieParamTableDef || requestBodyTableDefs) {
         if (pathParamTableDef) {
           requestSetDef.push(pathParamTableDef);
@@ -426,7 +436,16 @@ export function getApiDef(spec, filterPath, schemaStyle, localize, includeExampl
       }
 
       // Generate Response Defs
-      operationContent.push({ text: localize.response, style: ['p', 'b', 'alternate'], margin: [0, 10, 0, 0] });
+      operationContent.push({
+        text: localize.response,
+        tocItem: true,
+        linkToDestination: 'mainToc',
+        tocMargin: [20, 0, 0, 0],
+        tocStyle: ['small', 'blue', 'mono'],
+        tocNumberStyle: ['small', 'blue', 'mono'],
+        style: ['p', 'b', 'alternate'],
+        margin: [0, 10, 0, 0],
+      });
       const respDef = getResponseDef(path.responses, schemaStyle, localize, includeExample);
       if (respDef && respDef.length > 0) {
         operationContent.push({
@@ -462,7 +481,8 @@ export function getApiDef(spec, filterPath, schemaStyle, localize, includeExampl
           text: `${tagSeq}. ${tag.name.toUpperCase()}`,
           style: ['h2', 'b', 'primary', 'tableMargin'],
           tocItem: true,
-          tocStyle: ['small', 'b'],
+          linkToDestination: 'mainToc',
+          tocStyle: ['h4', 'b'],
           tocMargin: [0, 10, 0, 0],
         },
         tagDescrMarkDef,
