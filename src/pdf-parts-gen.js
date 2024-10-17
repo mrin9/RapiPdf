@@ -281,7 +281,7 @@ function getRequestBodyDef(requestBody, schemaStyle, localize, includeExample = 
           // Schema style is "tree."
           let schemaTableTreeDef;
           if (schemaInObjectNotaion['::type'] && schemaInObjectNotaion['::type'] === 'array') {
-            schemaTableTreeDef = objectToTableTree(schemaInObjectNotaion['::prop'], localize, 'array');
+            schemaTableTreeDef = objectToTableTree(schemaInObjectNotaion['::props'], localize);
           } else {
             schemaTableTreeDef = objectToTableTree(schemaInObjectNotaion, localize);
           }
@@ -390,7 +390,7 @@ function getResponseDef(responses, schemaStyle, localize, includeExample = false
 }
 
 // API details def
-export function getApiDef(spec, filterPath, schemaStyle, localize, includeExample, includeApiList) {
+export function getApiDef(spec, filterPath, schemaStyle, localize, includeExample, includeApiList, customizeApiPageCallback) {
   const content = [{ text: localize.api, style: ['h2', 'b'] }];
   let tagSeq = 0;
 
@@ -478,6 +478,14 @@ export function getApiDef(spec, filterPath, schemaStyle, localize, includeExampl
         operationContent.push({
           stack: respDef,
           margin: [10, 5, 0, 5],
+        });
+      }
+
+      if (customizeApiPageCallback != null) {
+        const customMessageDef = customizeApiPageCallback(path.summary);
+
+        operationContent.push({
+          stack: customMessageDef
         });
       }
 

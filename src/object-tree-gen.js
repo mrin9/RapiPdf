@@ -108,7 +108,7 @@ function generatePropDescription(propDescrArray, localize) {
     descrStack.push({
       text: [
         { text: `${localize.allowed}:`, style: ['sub', 'b', 'darkGray'] },
-        { text: propDescrArray[4], style: ['small', 'lightGray', 'mono'] },
+        { text: propDescrArray[4], style: ['small', 'darkGray', 'mono'] },
       ],
     });
   }
@@ -118,14 +118,14 @@ function generatePropDescription(propDescrArray, localize) {
     descrStack.push({
       text: [
         { text: `${localize.pattern}:`, style: ['sub', 'b', 'darkGray'] },
-        { text: propDescrArray[5], style: ['small', 'lightGray', 'mono'] },
+        { text: propDescrArray[5], style: ['small', 'darkGray', 'mono'] },
       ],
     });
   }
   if (propDescrArray[6]) {
     descrStack.push({
       text: `${propDescrArray[6]}`,
-      style: ['sub', 'lightGray'],
+      style: ['sub', 'darkGray'],
       margin: [0, 3, 0, 0],
     });
   }
@@ -226,7 +226,7 @@ export function objectToTree(obj, localize, prevKeyDataType = 'object', prevKey 
 
     return [
       { text: prevKey, style: ['small', 'mono'], margin: 0 },
-      { text: (propDescrArray[0] ? propDescrArray[0] : ''), style: ['small', 'mono', 'lightGray'], margin: 0 },
+      { text: (propDescrArray[0] ? propDescrArray[0] : ''), style: ['small', 'mono', 'darkGray'], margin: 0 },
       { stack: descrStack, margin: 0 },
     ];
   }
@@ -340,14 +340,20 @@ export function objectToTableTree(obj, localize, allRows = [], level = 0) {
     if (typeof obj[key] === 'object') {
       let objType;
       if (obj[key]['::type'] === 'array') {
-        objType = 'array';
+        if (obj[key]['::props']['::type']) {
+          objType = `Array of ${obj[key]['::props']['::type']}`;
+        } else if (typeof obj[key]['::props'] !== 'object') {
+          const getInfo = obj[key]['::props'].split('~|~');
+          getInfo[0] = `Array of ${getInfo[0]}`;
+          objType = getInfo[0];
+        }
       } else {
         objType = 'object';
       }
       const objRow = [
         { text: key, style: ['small', 'b'], margin: [leftMargin, 0, 0, 0] },
-        { text: objType, style: ['small', 'mono', 'lightGray'], margin: 0 },
-        { text: '', margin: 0 },
+        { text: objType, style: ['small', 'mono', 'darkGray'], margin: 0 },
+        { text: obj[key]['::description'], style: ['sub', 'darkGray'], margin: 0 },
       ];
       allRows.push(objRow);
       if (obj[key]['::type'] === 'array') {
@@ -361,7 +367,7 @@ export function objectToTableTree(obj, localize, allRows = [], level = 0) {
 
       allRows.push([
         { text: key, style: ['small'], margin: [leftMargin, 0, 0, 0] },
-        { text: (typeAndDescr[0] ? typeAndDescr[0] : ''), style: ['small', 'mono', 'lightGray'], margin: 0 },
+        { text: (typeAndDescr[0] ? typeAndDescr[0] : ''), style: ['small', 'mono', 'darkGray'], margin: 0 },
         { stack: ((descrStack && descrStack.length) > 0 ? descrStack : [{ text: '' }]), margin: 0 },
       ]);
     }

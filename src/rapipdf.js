@@ -204,7 +204,7 @@ export default customElements.define('rapi-pdf', class RapiPdf extends HTMLEleme
     }
   }
 
-  generatePdf(jsonObj) {
+  generatePdf(jsonObj, customizeApiPageCallback, apiSortFn) {
     const pdfSortTags = this.getAttribute('pdf-sort-tags') !== 'false';
     const pdfPrimaryColor = this.getAttribute('pdf-primary-color');
     const pdfAlternateColor = this.getAttribute('pdf-alternate-color');
@@ -220,9 +220,10 @@ export default customElements.define('rapi-pdf', class RapiPdf extends HTMLEleme
     const includeExample = this.getAttribute('include-example') === 'true';
     const includeApiDetails = this.getAttribute('include-api-details') !== 'false';
     const includeApiList = this.getAttribute('include-api-list') === 'true';
-
+    const pdfName = this.getAttribute('pdf-name') ? this.getAttribute('pdf-name') : '';
     const localize = this.localize;
     const options = {
+      pdfName,
       pdfSortTags,
       pdfPrimaryColor,
       pdfAlternateColor,
@@ -241,6 +242,7 @@ export default customElements.define('rapi-pdf', class RapiPdf extends HTMLEleme
       localize,
     };
     const spec = this.specUrl || jsonObj;
-    createPdf(spec, options);
+
+    createPdf(spec, options, customizeApiPageCallback, apiSortFn);
   }
 });

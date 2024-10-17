@@ -7,8 +7,8 @@ import {
   getInfoDef, getSecurityDef, getApiDef, getApiListDef,
 } from '@/pdf-parts-gen';
 
-export default async function createPdf(specUrl, options) {
-  const parsedSpec = await ProcessSpec(specUrl, options.pdfSortTags);
+export default async function createPdf(specUrl, options, customizeApiPageCallback, apiSortFn) {
+  const parsedSpec = await ProcessSpec(specUrl, options.pdfSortTags, apiSortFn);
 
   const pdfStyles = {
     title: { fontSize: 32 },
@@ -70,7 +70,7 @@ export default async function createPdf(specUrl, options) {
     allContent.push(securityDef);
   }
   if (options.includeApiDetails) {
-    apiDef = getApiDef(parsedSpec, '', options.pdfSchemaStyle, options.localize, options.includeExample, options.includeApiList);
+    apiDef = getApiDef(parsedSpec, '', options.pdfSchemaStyle, options.localize, options.includeExample, options.includeApiList, customizeApiPageCallback);
     allContent.push(apiDef);
   }
   if (options.includeApiList) {
@@ -92,7 +92,6 @@ export default async function createPdf(specUrl, options) {
     styles: pdfStyles,
   };
 
-
   pdfMake.fonts = {
     Roboto: {
       normal: 'Roboto-Regular.ttf',
@@ -110,5 +109,9 @@ export default async function createPdf(specUrl, options) {
   };
   // pdfMake.vfs = pdfFonts.pdfMake.vfs;
   pdfMake.vfs = pdfFonts;
-  pdfMake.createPdf(finalDocDef).open();
+  if (options.pdfName !== '') {
+    pdfMake.createPdf(finalDocDef).download(options.pdfName);
+  } else {
+    pdfMake.createPdf(finalDocDef).open();
+  }
 }
