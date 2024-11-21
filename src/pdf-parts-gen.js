@@ -410,8 +410,8 @@ export function getApiDef(spec, filterPath, schemaStyle, localize, includeExampl
         text: `${tagSeq + 1}.${pathSeq} ${path.method.toUpperCase()} ${path.path}`,
         style: ['topMargin3', 'mono', 'p', 'primary', 'b'],
         tocItem: true,
-        tocStyle: ['small', 'blue', 'mono'],
-        tocNumberStyle: ['small', 'blue', 'mono'],
+        tocStyle: ['small', 'alternate', 'mono'], // Style of toc child title
+        tocNumberStyle: ['small', 'alternate', 'mono'], // Style of toc child page number
       });
       operationContent.push({ text: '', style: ['topMarginRegular'] });
 
@@ -508,7 +508,7 @@ export function getApiDef(spec, filterPath, schemaStyle, localize, includeExampl
           text: `${tagSeq}. ${tag.name.toUpperCase()}`,
           style: ['h2', 'b', 'primary', 'tableMargin'],
           tocItem: true,
-          tocStyle: ['small', 'b'],
+          tocStyle: ['small', 'b'], // Style of toc parent title
           tocMargin: [0, 10, 0, 0],
         },
         tagDescrMarkDef,
