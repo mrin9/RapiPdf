@@ -32,12 +32,12 @@ export function getTypeInfo(schema) {
 
   // Set the Type
   if (schema.enum) {
-    let opt = '';
-    schema.enum.map((v) => {
-      opt += `${v}, `;
-    });
+    const opt = (schema['x-enumNames']
+      ? schema.enum.map((val, idx) => `${val} (${schema['x-enumNames'][idx]})`)
+      : schema.enum
+    ).join(', ');
     info.type = 'enum';
-    info.allowedValues = opt.slice(0, -2);
+    info.allowedValues = opt;
   } else if (schema.type) {
     info.type = schema.type;
   }
@@ -47,11 +47,11 @@ export function getTypeInfo(schema) {
     info.arrayType = `${schema.type} of ${arraySchema.type}`;
     info.default = arraySchema.default === 0 ? '0 ' : (arraySchema.default ? arraySchema.default : '');
     if (arraySchema.enum) {
-      let opt = '';
-      arraySchema.enum.map((v) => {
-        opt += `${v}, `;
-      });
-      info.allowedValues = opt.slice(0, -2);
+      const opt = (arraySchema['x-enumNames']
+        ? arraySchema.enum.map((val, idx) => `${val} (${arraySchema['x-enumNames'][idx]})`)
+        : arraySchema.enum
+      ).join(', ');
+      info.allowedValues = opt;
     }
   } else if (schema.type === 'integer' || schema.type === 'number') {
     if (schema.minimum !== undefined && schema.maximum !== undefined) {
