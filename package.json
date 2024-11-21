@@ -29,7 +29,7 @@
   "module": "./src/rapipdf.js",
   "dependencies": {
     "html-to-pdfmake": "^2.0.2",
-    "marked": "^0.8.2",
+    "marked": "^4.0.10",
     "pdfmake": "^0.1.65",
     "swagger-client": "^3.10.0",
     "swagger2openapi": "^5.4.0"
