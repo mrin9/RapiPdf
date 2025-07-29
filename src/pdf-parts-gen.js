@@ -237,10 +237,18 @@ function getExamplesDef(contentTypeObj, localizedExampleLabel) {
   }
   if (contentTypeObj.examples) {
     let iterCount = 0;
-    for (const oneExample in contentTypeObj.examples) {
+    for (const [key, exampleObj] of Object.entries(contentTypeObj.examples)) {
       exampleSectionDef.push([
-        { text: `${localizedExampleLabel} ${++iterCount}:`, margin: [20, 10, 0, 0], style: ['small', 'b'] },
-        { text: JSON.stringify(oneExample, null, 2), margin: [40, 10, 0, 0], style: 'monoSub' },
+        {
+          text: `${localizedExampleLabel} ${++iterCount} (${key}):`,
+          margin: [20, 10, 0, 0],
+          style: ['small', 'b'],
+        },
+        {
+          text: JSON.stringify(exampleObj, null, 2),
+          margin: [40, 10, 0, 0],
+          style: 'monoSub',
+        },
       ]);
     }
   }
